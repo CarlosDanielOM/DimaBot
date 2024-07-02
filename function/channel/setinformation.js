@@ -15,6 +15,7 @@ async function setChannelInformation(channelID, newInformation) {
     })
 
     if (response.status !== 204) {
+        response = await response.json();
         return {
             error: true,
             message: 'Failed to modified channel information',

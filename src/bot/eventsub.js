@@ -1,8 +1,8 @@
 require('dotenv').config();
 const crypto = require('crypto');
 const express = require('express');
-const eventsubHandler = require('./handler/eventsub');
-const eventsubRevocationHandler = require('./handler/eventsubrevocation');
+const eventsubHandler = require('../../handler/eventsub');
+const eventsubRevocationHandler = require('../../handler/eventsubrevocation');
 
 module.exports = {
     init: () => {

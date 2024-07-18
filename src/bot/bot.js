@@ -13,7 +13,6 @@ async function init() {
     await connectChannels(CLIENT.connectChannels, client);
 
     await refreshAllTokens(token.refreshAllTokens)
-    
 }
 
 module.exports = init;

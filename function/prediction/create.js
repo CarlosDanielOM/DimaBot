@@ -1,3 +1,7 @@
+const { getClient } = require("../../util/database/dragonfly");
+const { getStreamerHeaderById } = require("../../util/header");
+const { getTwitchHelixUrl } = require("../../util/link");
+
 async function createPrediction(channelID, title, outcomes, duration, cache = false) {
     const cacheClient = getClient();
 

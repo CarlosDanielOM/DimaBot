@@ -1,6 +1,7 @@
 const CHANNEL = require('../function/channel')
 const STREAMERS = require('../class/streamer')
-const vipSchema = require('../schema/vip')
+const vipSchema = require('../schema/vip');
+const { getUserByLogin } = require('../function/user/getuser');
 
 const days = 24 * 60 * 60 * 1000;
 
@@ -34,7 +35,7 @@ async function addVIPCommand(channelID, argument, tags) {
     
     let [user, duration] = argument.split(' ');
 
-    let userData = await CHANNEL.getUserByLogin(user);
+    let userData = await getUserByLogin(user);
     if(userData.error) {
         return {
             error: true,

@@ -9,21 +9,23 @@ async function ban(channelID, userID, moderatorID, duration = null, reason = nul
     params.append('moderator_id', moderatorID);
 
     let bodyData = {
-        user_id: userID,
+        data: {
+            user_id: userID
+        }
     }
 
     if(duration) {
-        bodyData.duration = duration;
+        bodyData.data.duration = duration;
     }
 
     if(reason) {
-        bodyData.reason = reason;
+        bodyData.data.reason = reason;
     }
 
     let response = await fetch(getTwitchHelixUrl('moderation/bans', params), {
         method: 'POST',
         headers: botHeader,
-        body: JSON.stringify(bodyData)       
+        body: JSON.stringify(bodyData)
     })
 
     let data = await response.json();
@@ -43,3 +45,5 @@ async function ban(channelID, userID, moderatorID, duration = null, reason = nul
     }
     
 }
+
+module.exports = ban;

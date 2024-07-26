@@ -1,4 +1,5 @@
 const { getStreamerHeaderById } = require("../../util/header");
+const { getTwitchHelixUrl } = require("../../util/link");
 
 async function removeChannelVIP(channelID, userID) {
     let streamerHeader = await getStreamerHeaderById(channelID);

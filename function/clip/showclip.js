@@ -57,7 +57,7 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
             duration,
             thumbnail,
             title: streamerChannelData.title,
-            game: clipGame.name,
+            game: clipGame.data.name,
             streamer: streamerData.display_name,
             profileImage: streamerData.profile_image_url,
             description: streamerData.description,

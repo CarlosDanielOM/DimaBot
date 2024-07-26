@@ -7,11 +7,18 @@ async function speach(messageID, message, channelID) {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            messageID,
-            message
+            speach: message,
+            msgID: messageID
         })
     })
-
+    if(response.status !== 200) {
+        return {
+            error: true,
+            message: 'Error al enviar mensaje',
+            status: response.status,
+            type: 'error'
+        }
+    }
     let data = await response.json();
 
     if(data.error) {

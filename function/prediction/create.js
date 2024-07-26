@@ -11,7 +11,7 @@ async function createPrediction(channelID, title, outcomes, duration, cache = fa
         broadcaster_id: channelID,
         title: title,
         outcomes: outcomes,
-        duration: Number(duration),
+        prediction_window: Number(duration),
     }
 
     const response = await fetch(getTwitchHelixUrl('predictions'), {

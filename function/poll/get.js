@@ -54,6 +54,7 @@ async function getPoll(channelID, pollID = null, cache = false) {
         choices: choices,
         channelID: poll.broadcaster_id,
         channel: poll.broadcaster_login,
+        status: poll.status,
     }
 
     if(cache) {

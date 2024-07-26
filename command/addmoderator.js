@@ -15,7 +15,7 @@ async function addModerator(channelID, user) {
         }
     }
 
-    let setModerator = await CHANNEL.setModerator(channelID, newModID.data.id);
+    let setModerator = await CHANNEL.addModerator(channelID, newModID.data.id);
 
     if(setModerator.error) {
         return {

@@ -42,7 +42,7 @@ async function refreshAllTokens() {
             cache.hset(`${streamer}:streamer:data`, 'token', channel.token);
             cache.hset(`${streamer}:streamer:data`, 'refresh_token', channel.refresh_token);
 
-            if(count == 5) {
+            if(count != 5) {
                 let doc = await channelSchema.findOneAndUpdate({name: streamer}, {twitch_user_token: tokenEncrypt, twitch_user_refresh_token: refreshTokenEncrypt, refreshedAt: Date.now()});
 
                 if(doc.errors) {

@@ -19,7 +19,7 @@ class STREAMERS {
             this.cache = getClient();
             const result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt');
 
-            result.forEach(async streamer => {
+            for(let i = 0; i < result.length; i++) {
                 let data = {
                     name: streamer.name,
                     user_id: streamer.twitch_user_id,
@@ -31,7 +31,7 @@ class STREAMERS {
                 }
                 
                 await this.cache.hset(`${streamer.name}:streamer:data`, data);
-            });
+            }
             
         } catch (error) {
             console.error(`Error getting streamers from DB: ${error}`);

@@ -42,7 +42,13 @@ class Command {
         try {
             await deleted.deleteOne();
         } catch (error) {
-            console
+            console.log(`Error deleting command: ${error} for channelID: ${channelID}`);
+        }
+
+        return {
+            error: false,
+            deleted: true,
+            command: deleted
         }
     }
 
@@ -136,6 +142,13 @@ class Command {
                 status: 500,
                 type: 'error_updating_command'
             }
+        }
+
+        return {
+            error: false,
+            message: 'Command updated',
+            status: 200,
+            type: 'command_updated'
         }
         
     }

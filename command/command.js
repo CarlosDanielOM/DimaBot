@@ -1,6 +1,7 @@
 const COMMAND = require('../class/command')
 const STREAMERS = require('../class/streamer')
 const commandTimerSchema = require('../schema/commandtimer');
+const { getClient } = require('../util/database/dragonfly');
 
 const commandPermissionsLevels = {
     1: 'everyone',
@@ -140,8 +141,9 @@ async function createCommand(channelID, argument, type = null) {
     
 }
 
-async function deleteCommand(channelID, command) {
-    let exists = await COMMAND.getCommandFromDB(channelID, command);
+async function deleteCommand(channelID, commandCMD) {
+    let exists = await COMMAND.getCommandFromDB(channelID, commandCMD);
+    const cacheClient = getClient();
     if(exists.error) {
         return {
             error: true,
@@ -166,7 +168,8 @@ async function deleteCommand(channelID, command) {
         }
     }
     
-    let deleted = await COMMAND.deleteCommand(channelID, command);
+    let deleted = await COMMAND.deleteCommand(channelID, commandCMD);
+    await cacheClient.del(`${channelID}:commands:${commandCMD}`);
 
     if(deleted.error) {
         return {

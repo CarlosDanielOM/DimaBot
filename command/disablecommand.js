@@ -1,8 +1,9 @@
 const commandSchema = require('../schema/command');
+const { getClient } = require('../util/database/dragonfly');
 
 async function disableCommand (channelID, argument) {
     let command = await commandSchema.findOne({channelID: channelID, cmd: argument});
-
+    let cacheClient = getClient();
     if (!command) {
         return {
             error: true,
@@ -25,6 +26,8 @@ async function disableCommand (channelID, argument) {
 
     await command.save();
 
+    await cacheClient.del(`${channelID}:commands:${argument}`);
+    
     return {
         error: false,
         message: `Command ${argument} is now disabled`,

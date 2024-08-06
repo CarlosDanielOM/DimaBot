@@ -4,7 +4,7 @@ const { getStreamerHeaderById } = require('../util/header');
 const { getTwitchHelixUrl } = require('../util/link');
 
 async function followage(channelID, user) {
-    let userObj = await getUserByLogin(user);
+    let userObj = await getUserByLogin(user.toLowerCase());
     userObj = userObj.data;
     let streamer = await STREAMER.getStreamerById(channelID);
 
@@ -41,7 +41,7 @@ async function followage(channelID, user) {
     if(data.data.length < 1) {
         return {
             error: true,
-            message: 'User is not following the channel',
+            message: `${user} is not following the channel`,
             status: 404,
             type: 'not_found'
         }

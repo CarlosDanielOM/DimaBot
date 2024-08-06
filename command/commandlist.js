@@ -1,6 +1,6 @@
 const commandSchema = require('../schema/command')
 
-async function getCommandList(channelID, userLevel = 1, type = all) {
+async function getCommandList(channelID, userLevel = 1, type = 'all') {
     let commands = await commandSchema.find({channelID, enabled: true});
 
     if(!commands) {

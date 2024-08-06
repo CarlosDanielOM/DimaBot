@@ -1,15 +1,15 @@
-const commandsSchema = require('../schemas/command');
-const STREAMERS = require('../class/streamers');
+const commandsSchema = require('../schema/command');
+const STREAMERS = require('../class/streamer');
 
-async function spotifySongRequest(channel, argument, userLevel = 1) {
+async function spotifySongRequest(channelID, argument, userLevel = 1) {
     if(!argument) return { error: true, message: 'no argument provided'};
-    if(!channel) return { error: true, message: 'no channel provided'};
+    if(!channelID) return { error: true, message: 'no channel provided'};
     if(!userLevel) return { error: true, message: 'no user level provided'};
 
-    let streamer = await STREAMERS.getStreamer(channel);
+    let streamer = await STREAMERS.getStreamerById(channelID);
 
 
-    let commandInfo = await commandsSchema.findOne({ func: 'spotifySongRequest', channel: channel });
+    let commandInfo = await commandsSchema.findOne({ func: 'spotifySongRequest', channelID: channelID });
 
     if(!commandInfo) return { error: true, message: 'command not found' };
 
@@ -25,7 +25,7 @@ async function spotifySongRequest(channel, argument, userLevel = 1) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ channelID: streamer.user_id })
+                body: JSON.stringify({ channelID: channelID })
             });
             data = await response.json();
             if(data.error) return { error: true, message: data.message };
@@ -38,7 +38,7 @@ async function spotifySongRequest(channel, argument, userLevel = 1) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ channelID: streamer.user_id })
+                body: JSON.stringify({ channelID: channelID })
             });
             data = await response.json();
             if(data.error) return { error: true, message: data.message };
@@ -51,7 +51,7 @@ async function spotifySongRequest(channel, argument, userLevel = 1) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ channelID: streamer.user_id })
+                body: JSON.stringify({ channelID: channelID })
             });
             data = await response.json();
             if(data.error) return { error: true, message: data.message };
@@ -64,8 +64,11 @@ async function spotifySongRequest(channel, argument, userLevel = 1) {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ channelID: streamer.user_id, song: argument })
+                body: JSON.stringify({ channelID: channelID, song: argument })
             });
+            if(response.status !== 200) {
+                return { error: true, message: '' };
+            }
             data = await response.json();
             if(data.error) return { error: true, message: data.message };
             return { error: false, message: 'Song queued' };

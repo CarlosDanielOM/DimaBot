@@ -69,7 +69,7 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
 
     let message = `Check out ${raiderChannel.name} at https://twitch.tv/${raiderChannel.login} and give them a follow! They were last playing ${raiderChannel.game}`;
 
-    let anounce = CHAT.announcement(channelID, channelID, message, color);
+    let anounce = await CHAT.announcement(channelID, modID, message, color);
     if(anounce.error) {
         return {
             error: true,
@@ -89,7 +89,7 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
         soClip: clip,
         soChannel: raiderChannel,
         error: false,
-        message: 'Shoutout sent',
+        message: '',
         status: 200,
         type: 'success'
     }

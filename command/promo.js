@@ -64,7 +64,8 @@ async function promo(channelID, streamerName) {
     return {
         error: false,
         streamerChannelInfo,
-        clip: clip
+        clip: clip,
+        message: `Please, check out ${streamerChannelInfo.name} playing ${streamerChannelInfo.game} with the title "${streamerChannelInfo.title}" at https://twitch.tv/${streamerChannelInfo.login}`
     }
     
 }

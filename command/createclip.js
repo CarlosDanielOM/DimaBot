@@ -4,13 +4,24 @@ const getClip = require("../function/clip/getclip");
 async function createChannelClip(channelID) {
     let createClipFun = await createClip(channelID);
 
-    if(createClip.error) {
-        return createClip;
+    if(createClipFun.error) {
+        return createClipFun;
     }
 
     let clipData = await checkClipStatus(channelID, createClipFun.clipID);
 
     if(clipData.status === 404) {
+        return {
+            error: true,
+            message: 'There was an error creating the clip.',
+            status: 404,
+            type: 'Clip not found'
+        }
+    }
+
+    console.log(clipData);
+
+    if(!clipData.data) {
         return {
             error: true,
             message: 'There was an error creating the clip.',

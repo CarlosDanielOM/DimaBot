@@ -13,7 +13,7 @@ async function init() {
 
     await connectChannels(CLIENT.connectChannels, client);
 
-    await refreshAllTokens(token.refreshAllTokens)
+    // await refreshAllTokens(token.refreshAllTokens)
 
     client.on('resub', (channel, username, months, message, userstate, methods) => {
         let tier = userstate['msg-param-sub-plan'];

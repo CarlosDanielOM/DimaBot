@@ -11,7 +11,7 @@ const textConvertor = require('./text');
 let modID = '698614112';
 
 async function redeem(client, eventData) {
-    const { sendTrigger } = require('../src/server');
+    // const { sendTrigger, sendTrigger } = require('../src/server');
     const { broadcaster_user_id, broadcaster_user_login, user_id, user_login, user_input } = eventData;
     const { reward } = eventData;
 
@@ -86,3 +86,21 @@ async function redeem(client, eventData) {
 }
 
 module.exports = redeem;
+
+
+async function sendTrigger(channelID, triggerData) {
+    let res = await fetch(`${getUrl()}/trigger/${channelID}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(triggerData)
+    }); // Fetch the trigger
+
+    if (res.error) {
+        console.log({ res, where: 'sendTrigger', for: 'triggerData' })
+        return { error: true, message: 'Error sending trigger' }
+    };
+
+    return { error: false, message: 'Trigger sent' }
+}

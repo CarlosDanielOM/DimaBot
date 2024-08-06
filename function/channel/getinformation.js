@@ -1,18 +1,17 @@
 const STREAMERS = require('../../class/streamer')
-const { getStreamerHeaderById } = require('../../util/header')
+const { getStreamerHeaderById, getBotHeader } = require('../../util/header')
 const { getTwitchHelixUrl } = require('../../util/link')
 
 async function getChannelInformation(channelID) {
-    let streamer = await STREAMERS.getStreamerById(channelID)
-
-    let streamerHeader = await getStreamerHeaderById(channelID)
+    // let streamerHeader = await getStreamerHeaderById(channelID)
+    let botHeader = await getBotHeader();
 
     let params = new URLSearchParams({
         broadcaster_id: channelID
     })
 
     let response = await fetch(`${getTwitchHelixUrl('channels', params)}`, {
-        headers: streamerHeader
+        headers: botHeader
     })
 
     let data = await response.json();

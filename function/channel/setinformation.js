@@ -18,7 +18,7 @@ async function setChannelInformation(channelID, newInformation) {
         response = await response.json();
         return {
             error: true,
-            message: 'Failed to modified channel information',
+            message: response.message,
             status: response.status,
             type: response.error
         }

@@ -1,8 +1,8 @@
-const { getStreamerHeaderById } = require('../../util/header')
+const { getStreamerHeaderById, getBotHeader } = require('../../util/header')
 const { getTwitchHelixUrl } = require('../../util/link')
 
 async function announcement(channelID, moderatorID, message, color = 'purple') {
-    let streamerHeader = await getStreamerHeaderById(channelID);
+    let botHeader = await getBotHeader();
 
     let params = new URLSearchParams({
         broadcaster_id: channelID,
@@ -16,7 +16,7 @@ async function announcement(channelID, moderatorID, message, color = 'purple') {
 
     let response = await fetch(getTwitchHelixUrl('chat/announcements', params), {
         method: 'POST',
-        headers: streamerHeader,
+        headers: botHeader,
         body: JSON.stringify(bodyData)
     })
 

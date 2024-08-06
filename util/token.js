@@ -58,6 +58,9 @@ async function refreshAllTokens() {
 
     if(count == 5) count = 0;
 
+
+    console.log('Refreshing all tokens');
+    
     await Promise.all(promises);
     await STREAMERS.updateStreamers();
     

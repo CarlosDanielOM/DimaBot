@@ -21,16 +21,16 @@ class STREAMERS {
 
             for(let i = 0; i < result.length; i++) {
                 let data = {
-                    name: streamer.name,
-                    user_id: streamer.twitch_user_id,
-                    token: decrypt(streamer.twitch_user_token),
-                    refresh_token: decrypt(streamer.twitch_user_refresh_token),
-                    actived: streamer.actived ? 'true' : 'false',
-                    premium: streamer.premium ? 'true' : 'false',
-                    premium_plus: streamer.premium_plus ? 'true' : 'false',
+                    name: result[i].name,
+                    user_id: result[i].twitch_user_id,
+                    token: decrypt(result[i].twitch_user_token),
+                    refresh_token: decrypt(result[i].twitch_user_refresh_token),
+                    actived: result[i].actived ? 'true' : 'false',
+                    premium: result[i].premium ? 'true' : 'false',
+                    premium_plus: result[i].premium_plus ? 'true' : 'false',
                 }
                 
-                await this.cache.hset(`${streamer.name}:streamer:data`, data);
+                await this.cache.hset(`${result[i].name}:streamer:data`, data);
             }
             
         } catch (error) {

@@ -1,4 +1,4 @@
-let production = false;
+let production = true;
 
 module.exports = {
     isProduction: () => {return production},
@@ -8,7 +8,9 @@ module.exports = {
             url = "https://api.domdimabot.com"
         } else {
             url = "http://localhost:3000";
+            // url = "https://api.domdimabot.com"
         }
+        return url;
     },
     refreshAllTokens: async fun => {
         try {

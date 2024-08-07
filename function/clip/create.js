@@ -7,7 +7,7 @@ async function createClip(channelID) {
     let params = new URLSearchParams();
     params.append('broadcaster_id', channelID);
 
-    let response = await fetch(getTwitchHelixUrl('clip/create', params), {
+    let response = await fetch(getTwitchHelixUrl('clips', params), {
         method: 'POST',
         headers: botHeader
     })

@@ -14,7 +14,7 @@ async function getClip(channelID, clipID) {
     }
 
     let params = new URLSearchParams();
-    params.append('broadcaster_id', channelID);
+    // params.append('broadcaster_id', channelID);
     params.append('id', clipID);
 
     let response = await fetch(getTwitchHelixUrl('clips', params), {

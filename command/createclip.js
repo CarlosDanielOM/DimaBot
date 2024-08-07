@@ -19,8 +19,6 @@ async function createChannelClip(channelID) {
         }
     }
 
-    console.log(clipData);
-
     if(!clipData.data) {
         return {
             error: true,

@@ -12,6 +12,7 @@ const startTimerCommands = require('../timer_functions/starttimer');
 const stopTimerCommands = require('../timer_functions/stoptimer');
 const defaultMessages = require('../util/defaultmessage');
 const resetSumimetro = require('../handler_function/resetsumimetro')
+const resetCommandsFromCache = require('../handler_function/resetcommandscache')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -58,6 +59,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             resetRedemptionPrice(client, eventData.broadcaster_user_id);
             stopTimerCommands(client, eventData);
             resetSumimetro(eventData.broadcaster_user_id);
+            resetCommandsFromCache(client, eventData.broadcaster_user_id);
             break;
         case 'channel.channel_points_custom_reward_redemption.add':
             redeemHandler(client, eventData);

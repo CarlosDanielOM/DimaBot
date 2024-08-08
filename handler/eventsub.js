@@ -33,6 +33,8 @@ async function eventsubHandler(subscriptionData, eventData) {
 
     if(!eventsubData.enabled) return;
 
+    console.log({type, eventsubData, eventData});
+
     switch(type) {
         case 'channel.follow':
             if(eventsubData.message == '' || eventsubData.message == null) {

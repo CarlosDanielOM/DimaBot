@@ -8,8 +8,8 @@ const specialCommandsFunc = (/\$\(([a-z]+)\s?([a-z0-9]+)?\s?([a-zA-Z0-9\s]+)?\)/
 async function textConvertor(channelID, eventData, message, rewardData = {}) {
     let streamer = await STREAMERS.getStreamerById(channelID);
     let specials = message.match(specialCommandsFunc) || [];
-
-    specials.forEach(async special => {
+    for(let i = 0; i < specials.length; i++) {
+        specialCommandsFunc.lastIndex = 0;
         let cmdSpecial = specialCommandsFunc.exec(message);
         switch(cmdSpecial[1]) {
             case 'user':
@@ -172,8 +172,7 @@ async function textConvertor(channelID, eventData, message, rewardData = {}) {
                 }
                 break;
         }
-    })
-    
+    }
     return message;
 }
 

@@ -11,35 +11,35 @@ async function resetRedemptionCost(client, channelID) {
 
     if(rewards.length === 0) return { error: true, message: 'No rewards found', status: 404, type: 'no_rewards_found' };
 
-    rewards.forEach(async reward => {
+    for(let i = 0; i < rewards.length; i++) {
         let data = {
-            title: reward.rewardTitle,
-            prompt: reward.rewardPrompt,
-            cost: reward.rewardOriginalCost,
+            title: rewards[i].rewardTitle,
+            prompt: rewards[i].rewardPrompt,
+            cost: rewards[i].rewardOriginalCost,
         }
-    })
 
-    let response = await fetch(`${getUrl()}/rewards/${channelID}/${reward.rewardID}`, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    });
-
-    let responseData = await response.json();
-
-    if(responseData.error) {
-        console.log({
-            response: responseData,
-            where: 'resetRedemptionCost',
-            channel: channel.twitch_user_login,
-        })
-        return {
-            error: true,
-            message: 'Error updating reward',
-            status: 500,
-            type: 'error_updating_reward'
+        let response = await fetch(`${getUrl()}/rewards/${channelID}/${rewards[i].rewardID}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+    
+        let responseData = await response.json();
+    
+        if(responseData.error) {
+            console.log({
+                response: responseData,
+                where: 'resetRedemptionCost',
+                channel: channel.twitch_user_login,
+            })
+            return {
+                error: true,
+                message: 'Error updating reward',
+                status: 500,
+                type: 'error_updating_reward'
+            }
         }
     }
 

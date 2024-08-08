@@ -9,8 +9,7 @@ async function customRedemptionReward(eventData, rewardData) {
     if(!reward) return { error: true, message: 'Reward not found', status: 404, type: 'reward_not_found' };
 
     if(reward.rewardCostChange > 0) {
-        let newCost = reward.rewardOriginalCost + reward.rewardCostChange;
-        console.log({newCost})
+        let newCost = reward.rewardCost + reward.rewardCostChange;
         if(newCost < 1) newCost = 1;
         let data = {
             title: reward.rewardTitle,

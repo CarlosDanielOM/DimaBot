@@ -10,6 +10,7 @@ async function customRedemptionReward(eventData, rewardData) {
 
     if(reward.rewardCostChange > 0) {
         let newCost = reward.rewardOriginalCost + reward.rewardCostChange;
+        console.log({newCost})
         if(newCost < 1) newCost = 1;
         let data = {
             title: reward.rewardTitle,

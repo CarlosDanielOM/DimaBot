@@ -7,12 +7,12 @@ async function resetSumimetro(channelID) {
     
     if(keys.length == 0) return;
 
-    for(let key of keys) {
+    for(let i = 0; i < keys.length; i++) {
         try {
-            await cacheClient.del(key);
+            await cacheClient.del(keys[i]);
         }
         catch(e) {
-            console.log(`Error deleting key: ${key}`);
+            console.log(`Error deleting key: ${keys[i]}`);
         }
     }
 

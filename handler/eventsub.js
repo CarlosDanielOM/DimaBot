@@ -18,10 +18,10 @@ async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
     let streamer = await STREAMERS.getStreamerById(eventData.broadcaster_user_id);
     if(!streamer) {
-        streamer = await STREAMERS.getStreamerById(eventData.to_broadcaster_user_login);
+        streamer = await STREAMERS.getStreamerById(eventData.to_broadcaster_user_id);
         if(!streamer) return;
     }
-
+    
     const {type, version, status, cost, id} = subscriptionData;
     let eventsubData = await eventsubSchema.findOne({type, channelID: streamer.user_id})
     if(!eventsubData) {

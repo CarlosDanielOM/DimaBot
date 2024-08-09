@@ -144,11 +144,11 @@ async function textConvertor(channelID, eventData, message, rewardData = {}) {
                 break;
             //! BAN COMMANDS
             case 'ban':
-                if (!special[2]) break;
-                switch (special[2]) {
+                if (!cmdSpecial[2]) break;
+                switch (cmdSpecial[2]) {
                     case 'time':
                         if(eventData.is_permanent) {
-                            message = message.replace(special[0], 'permanently');
+                            message = message.replace(cmdSpecial[0], 'permanently');
                             break;
                         
                         };
@@ -157,15 +157,15 @@ async function textConvertor(channelID, eventData, message, rewardData = {}) {
                         let startDate = new Date(start);
                         let endDate = new Date(end);
                         let time = Math.floor((endDate - startDate) / 1000);
-                        message = message.replace(special[0], time);
+                        message = message.replace(cmdSpecial[0], time);
                         break;
                     case 'reason':
                         let reason = eventData.reason;
-                        message = message.replace(special[0], reason);
+                        message = message.replace(cmdSpecial[0], reason);
                         break;
                     case 'mod':
                         let mod = eventData.moderator_user_name;
-                        message = message.replace(special[0], mod);
+                        message = message.replace(cmdSpecial[0], mod);
                         break;
                     default:
                         break;

@@ -41,7 +41,7 @@ async function textConvertor(channelID, eventData, message, rewardData = {}) {
                         break;
                     case 'game':
                         let game = await CHANNEL.getInformation(channelID);
-                        message = message.replace(cmdSpecial[0], game.data.game);
+                        message = message.replace(cmdSpecial[0], game.data.game_name);
                         break;
                     case 'channel':
                         message = message.replace(cmdSpecial[0], streamer.name);

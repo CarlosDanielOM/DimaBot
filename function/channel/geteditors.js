@@ -37,7 +37,7 @@ async function getChannelEditors(channelID, cache = false) {
 
         let editorData = {
             id: editor.user_id,
-            name: editor.user_name,
+            name: editor.user_name.toLowerCase(),
         }
 
         if(cache) {
@@ -45,7 +45,7 @@ async function getChannelEditors(channelID, cache = false) {
                 cacheClient.del(`${channelID}:channel:editors`)
                 reset = true
             }
-            cacheClient.sadd(`${channelID}:channel:editors`, `${editor.user_name}`);
+            cacheClient.sadd(`${channelID}:channel:editors`, `${editor.user_name.toLowerCase()}`);
             cacheClient.expire(`${channelID}:channel:editors`, 60 * 60 * 24);
         }
         

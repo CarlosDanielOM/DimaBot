@@ -45,7 +45,7 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         }
     } else {
         let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, user.toLowerCase());
-
+        
         if(isEditor == 1) {
             return {
                 error: false,

@@ -1,8 +1,10 @@
 const CHANNEL = require("../function/channel");
 const ban = require("../function/moderation/ban");
 const { getUserByLogin } = require("../function/user/getuser");
+const { getClient } = require("../util/database/dragonfly");
 
 async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
+    let cacheClient = getClient();
     let userData = await getUserByLogin(user);
     if(userData.error) {
         return {
@@ -42,6 +44,17 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
             }
         }
     } else {
+        let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, user.toLowerCase());
+
+        if(isEditor == 1) {
+            return {
+                error: false,
+                message: `Como editor no puedes jugar a la ruleta rusa.`,
+                status: 403,
+                type: 'error'
+            }
+        }
+        
         let removeMod = await CHANNEL.removeModerator(channelID, userData.id);
         if(removeMod.error) {
             return {

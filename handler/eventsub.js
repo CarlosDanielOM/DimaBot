@@ -13,6 +13,7 @@ const stopTimerCommands = require('../timer_functions/stoptimer');
 const defaultMessages = require('../util/defaultmessage');
 const resetSumimetro = require('../handler_function/resetsumimetro')
 const resetCommandsFromCache = require('../handler_function/resetcommandscache')
+const { getEditors } = require('../function/channel')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -46,6 +47,7 @@ async function eventsubHandler(subscriptionData, eventData) {
                 eventsubData.message = `Hey! $(twitch channel) is live! $(twitch title) playing $(twitch game)!`;
             };
             defaultMessages(client, eventData, eventsubData.message);
+            await getEditors(eventData.broadcaster_user_id, true);
             //! SEPARATOR FOR FUNCTIONS
             unVIPExpiredUser(client, eventData);
             await startTimerCommands(client, eventData);

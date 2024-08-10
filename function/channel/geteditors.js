@@ -42,11 +42,11 @@ async function getChannelEditors(channelID, cache = false) {
 
         if(cache) {
             if(!reset) {
-                cacheClient.del(`${streamer.name}:channel:editors`)
+                cacheClient.del(`${channelID}:channel:editors`)
                 reset = true
             }
-            cacheClient.sadd(`${streamer.name}:channel:editors`, `${editor.user_name}`);
-            cacheClient.expire(`${streamer.name}:channel:editors`, 60 * 60 * 24);
+            cacheClient.sadd(`${channelID}:channel:editors`, `${editor.user_name}`);
+            cacheClient.expire(`${channelID}:channel:editors`, 60 * 60 * 24);
         }
         
         editorList.push(editorData);

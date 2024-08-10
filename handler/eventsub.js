@@ -14,9 +14,11 @@ const defaultMessages = require('../util/defaultmessage');
 const resetSumimetro = require('../handler_function/resetsumimetro')
 const resetCommandsFromCache = require('../handler_function/resetcommandscache')
 const { getEditors } = require('../function/channel')
+const { getClient } = require('../util/database/dragonfly')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
+    const cacheClient = getClient();
     let streamer = await STREAMERS.getStreamerById(eventData.broadcaster_user_id);
     if(!streamer) {
         streamer = await STREAMERS.getStreamerById(eventData.to_broadcaster_user_id);
@@ -62,6 +64,11 @@ async function eventsubHandler(subscriptionData, eventData) {
             stopTimerCommands(client, eventData);
             resetSumimetro(eventData.broadcaster_user_id);
             resetCommandsFromCache(client, eventData.broadcaster_user_id);
+            try {
+                await cacheClient.del(`${eventData.broadcaster_user_id}:channel:editors`);
+            } catch (error) {
+                console.log({error: 'Error deleting editors from cache', message: error});
+            }
             break;
         case 'channel.channel_points_custom_reward_redemption.add':
             redeemHandler(client, eventData);

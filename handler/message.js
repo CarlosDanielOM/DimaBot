@@ -241,6 +241,7 @@ module.exports = message;
 
 async function giveUserLevel(channel, tags, channelID) {
     let userLevel = 1;
+    let cacheClient = getClient();
 
     if(tags.subscriber) {
         userLevel = tags['badge-info'].subscriber + 1;
@@ -261,6 +262,10 @@ async function giveUserLevel(channel, tags, channelID) {
     }
 
     //* TODO EDITORS level 8
+    let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, tags.username);
+    if(isEditor == 1) {
+        userLevel = 8;
+    }
 
     //* TODO Super Mods level 9
 

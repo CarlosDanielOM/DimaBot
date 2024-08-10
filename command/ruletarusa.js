@@ -5,6 +5,18 @@ const { getClient } = require("../util/database/dragonfly");
 
 async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     let cacheClient = getClient();
+
+    let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, user.toLowerCase());
+        
+    if(isEditor == 1) {
+        return {
+            error: false,
+            message: `Como editor no puedes jugar a la ruleta rusa.`,
+            status: 403,
+            type: 'error'
+        }
+    }
+    
     let userData = await getUserByLogin(user);
     if(userData.error) {
         return {
@@ -16,6 +28,15 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         }
     }
     userData = userData.data;
+
+    if(userData.id == channelID) {
+        return {
+            error: false,
+            message: `No puedes jugar a la ruleta rusa en tu propio canal.`,
+            status: 403,
+            type: 'error'
+        }
+    }
     
     let probability = Math.floor(Math.random() * 120) + 1;
     let dead = false;
@@ -44,17 +65,6 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
             }
         }
     } else {
-        let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, user.toLowerCase());
-        
-        if(isEditor == 1) {
-            return {
-                error: false,
-                message: `Como editor no puedes jugar a la ruleta rusa.`,
-                status: 403,
-                type: 'error'
-            }
-        }
-        
         let removeMod = await CHANNEL.removeModerator(channelID, userData.id);
         if(removeMod.error) {
             return {

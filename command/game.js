@@ -48,12 +48,9 @@ async function game(channelID, argument = null, userLevel = 1, commandLevel = 7)
     let gameID = null;
 
     for(let category of gameInfo.data) {
-        console.log(category);
         if(category.name.toLowerCase() === argument.toLowerCase()) {
             gameID = category.id;
             break;
-        } else {
-            gameID = null;
         }
     }
 

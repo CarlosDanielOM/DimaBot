@@ -45,21 +45,24 @@ async function game(channelID, argument = null, userLevel = 1, commandLevel = 7)
         };
     }
 
+    let gameID = null;
+
     for(let category of gameInfo.data) {
+        console.log(category);
         if(category.name.toLowerCase() === argument.toLowerCase()) {
-            argument = category.id;
+            gameID = category.id;
             break;
         } else {
-            argument = null;
+            gameID = null;
         }
     }
 
-    if(!argument) {
-        argument = gameInfo.data[0].id;
+    if(!gameID) {
+        gameID = gameInfo.data[0].id;
     }
 
     let gameData = {
-        game_id: argument,
+        game_id: gameID,
         game_name: gameInfo.data[0].name
     };
     

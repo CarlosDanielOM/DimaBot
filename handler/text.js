@@ -27,6 +27,15 @@ async function textConvertor(channelID, eventData, message, rewardData = {}) {
                 let randomNumber = Math.floor(Math.random() * maxNumber);
                 message = message.replace(cmdSpecial[0], randomNumber);
                 break;
+            case 'randomuser':
+                let chatters = await CHAT.getChatters(channelID, channelID);
+                if(chatters.error) {
+                    message = message.replace(cmdSpecial[0], chatters.message);
+                    break;
+                }
+                let randomUser = chatters.chatters[Math.floor(Math.random() * chatters.chatters.length)].user_name;
+                message = message.replace(cmdSpecial[0], randomUser);
+                break;
             //! TWITCH COMMANDS
             case 'twitch':
                 if(!cmdSpecial[2]) break;

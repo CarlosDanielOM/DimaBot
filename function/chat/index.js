@@ -6,6 +6,7 @@ const getChatSettings = require('./getsettings');
 const getUserColor = require('./getusercolor');
 const setOnlyEmotes = require('./setonlyemotes');
 const shoutout = require('./shoutout');
+const getChatters = require('./getchatters');
 
 module.exports = {
     clearChat,
@@ -15,5 +16,6 @@ module.exports = {
     setOnlyEmotes,
     getChatSettings,
     announcement,
-    shoutout
+    shoutout,
+    getChatters
 }

@@ -69,6 +69,15 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                 let random = Math.floor(Math.random() * maxNumber);
                 cmdFunc = cmdFunc.replace(special[0], random);
                 break;
+            case 'randomuser':
+                let chatters = await CHAT.getChatters(channelID, channelID);
+                if(chatters.error) {
+                    cmdFunc = cmdFunc.replace(special[0], chatters.message);
+                    break;
+                }
+                let randomUser = chatters.chatters[Math.floor(Math.random() * chatters.chatters.length)].user_name;
+                cmdFunc = cmdFunc.replace(special[0], randomUser);
+                break;
             case 'count':
                 if(!argument) argument = 0;
                 if(argument != 0) argument = argument.replace(/\+/g, '');

@@ -46,21 +46,25 @@ async function game(channelID, argument = null, userLevel = 1, commandLevel = 7)
     }
 
     let gameID = null;
+    let gameName = null;
 
     for(let category of gameInfo.data) {
         if(category.name.toLowerCase() === argument.toLowerCase()) {
+            console.log(category);
             gameID = category.id;
+            gameName = category.name;
             break;
         }
     }
 
     if(!gameID) {
         gameID = gameInfo.data[0].id;
+        gameName = gameInfo.data[0].name;
     }
 
     let gameData = {
         game_id: gameID,
-        game_name: gameInfo.data[0].name
+        game_name: gameName
     };
     
     let game = await CHANNEL.setInformation(channelID, gameData);

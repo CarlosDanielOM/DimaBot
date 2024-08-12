@@ -127,7 +127,7 @@ async function message(client, channel, tags, message) {
             res = await COMMANDS.game(channelID, argument, userLevel, commandUserLevel);
             break;
         case 'title':
-            res = await COMMANDS.title(channelID, argument, userLevel, commandUserLevel);
+            res = await COMMANDS.title(channelID, argument, userLevel, commandUserLevel, streamer.premium);
             break;
         case 'speach':
             res = await COMMANDS.speach(channelID, tags, argument);

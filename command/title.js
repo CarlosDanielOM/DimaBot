@@ -1,7 +1,8 @@
 const CHANNEL = require('../function/channel');
 const { getClient } = require('../util/database/dragonfly');
+const titleConfigSchema = require('../schema/titleconfig');
 
-async function title(channelID, title, userLevel = 1, commandLevel = 7) {
+async function title(channelID, title, userLevel = 1, commandLevel = 7, premium = 'false') {
     let cacheClient = getClient();
     if(!title || userLevel < commandLevel) {
         let data = await CHANNEL.getInformation(channelID);
@@ -15,6 +16,15 @@ async function title(channelID, title, userLevel = 1, commandLevel = 7) {
             message: `The title for this stream is: ${title}`,
             status: 200,
             type: 'success'
+        }
+    }
+
+    if(premium == 'true') {
+        let titleConfig = await titleConfigSchema.findOne({ channelID: channelID });
+        if(titleConfig) {
+            let pretitle = titleConfig.pretitle;
+            let posttitle = titleConfig.posttitle;
+            title = `${pretitle} ${title} ${posttitle}`;
         }
     }
 

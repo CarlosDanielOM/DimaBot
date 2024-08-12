@@ -245,13 +245,6 @@ async function editCommand(channelID, argument) {
 
     let func = opts.join(' ');
 
-    if(!func) {
-        return {
-            error: true,
-            message: 'Command function is empty'
-        }
-    }
-
     if(func.length > maxFuncLength) {
         return {
             error: true,

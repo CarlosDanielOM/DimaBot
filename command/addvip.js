@@ -5,32 +5,7 @@ const { getUserByLogin } = require('../function/user/getuser');
 
 const days = 24 * 60 * 60 * 1000;
 
-async function addVIPCommand(channelID, argument, tags) {
-    if(tags.vip) {
-        return {
-            error: true,
-            message: 'User is already a VIP',
-            status: 400,
-            type: 'user_already_vip'
-        }
-    }
-
-    if(tags.mod) {
-        console.log({
-            where: 'addVIPCommand',
-            message: 'User is a moderator',
-            channelID,
-            argument,
-            tags
-        })
-        return {
-            error: true,
-            message: 'User is a moderator',
-            status: 400,
-            type: 'user_is_moderator'
-        }
-    }
-    
+async function addVIPCommand(channelID, argument, tags) {    
     if(!argument) {
         return {
             error: true,

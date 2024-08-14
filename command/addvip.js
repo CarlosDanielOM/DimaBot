@@ -16,6 +16,13 @@ async function addVIPCommand(channelID, argument, tags) {
     }
 
     if(tags.mod) {
+        console.log({
+            where: 'addVIPCommand',
+            message: 'User is a moderator',
+            channelID,
+            argument,
+            tags
+        })
         return {
             error: true,
             message: 'User is a moderator',

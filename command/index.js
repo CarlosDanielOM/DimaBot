@@ -26,6 +26,7 @@ const spotifySongRequest = require("./spotifysongrequest");
 const sumimetro = require("./sumimetro");
 const {createTimerCommand, deleteTimerCommand, editTimerCommand} = require("./timercommand");
 const title = require("./title");
+const vanish = require("./vanish");
 
 module.exports = {
     addModerator,
@@ -59,5 +60,6 @@ module.exports = {
     createTimerCommand,
     deleteTimerCommand,
     editTimerCommand,
-    title
+    title,
+    vanish
 }

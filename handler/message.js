@@ -213,6 +213,9 @@ async function message(client, channel, tags, message) {
         case 'countdownTimer':
             res = await COMMANDS.countdownTimer(channelID, argument);
             break;
+        case 'vanish':
+            res = await COMMANDS.vanish(channelID, tags.username, isMod);
+            break;
         default:
             let cmdHandler = await commandHandler(channelID, tags, command, argument);
             if(cmdHandler.error) {

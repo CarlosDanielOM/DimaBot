@@ -3,7 +3,7 @@ const removeChannelModerator = require("../function/channel/removemoderator");
 const ban = require("../function/moderation/ban");
 const { getUserByLogin } = require("../function/user/getuser");
 
-async function vanish(channelID, username, isMod, modID = 698614112) {
+async function vanish(channelID, username, isMod = false, modID = 698614112) {
     let userData = await getUserByLogin(username);
 
     if(userData.error) {

@@ -2,8 +2,22 @@ const { addModerator } = require("../function/channel");
 const removeChannelModerator = require("../function/channel/removemoderator");
 const ban = require("../function/moderation/ban");
 const { getUserByLogin } = require("../function/user/getuser");
+const { getClient } = require("../util/database/dragonfly");
 
 async function vanish(channelID, username, isMod = false, modID = 698614112) {
+    let cacheClient = getClient();
+
+    let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, username.toLowerCase());
+
+    if(isEditor == 1) {
+        return {
+            error: false,
+            message: `As an editor you can't vanish from the chat.`,
+            status: 403,
+            type: 'error'
+        }
+    }
+    
     let userData = await getUserByLogin(username);
 
     if(userData.error) {

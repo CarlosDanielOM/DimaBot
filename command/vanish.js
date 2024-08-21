@@ -6,7 +6,6 @@ const { getClient } = require("../util/database/dragonfly");
 
 async function vanish(channelID, tags, modID = 698614112) {
     let cacheClient = getClient();
-    console.log(tags)
 
     let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, tags.username.toLowerCase());
 

@@ -20,7 +20,7 @@ async function vanish(channelID, tags, modID = 698614112) {
     }
     
     if(tags.mod) {
-        let removeMod = await removeChannelModerator(channelID, tags.id);
+        let removeMod = await removeChannelModerator(channelID, tags['user-id']);
         if(removeMod.error) {
             return {
                 error: true,
@@ -32,7 +32,7 @@ async function vanish(channelID, tags, modID = 698614112) {
         }
 
         setTimeout(async () => {
-            let addMod = await addModerator(channelID, tags.id);
+            let addMod = await addModerator(channelID, tags['user-id']);
             if(addMod.error) {
                 console.log({
                     error: true,
@@ -46,7 +46,7 @@ async function vanish(channelID, tags, modID = 698614112) {
         
     }
 
-    let timeout = await ban(channelID, tags.id, modID, 3, 'Vanish');
+    let timeout = await ban(channelID, tags['user-id'], modID, 3, 'Vanish');
     if(timeout.error) {
         return {
             error: true,

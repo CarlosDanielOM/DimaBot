@@ -4,10 +4,10 @@ const ban = require("../function/moderation/ban");
 const { getUserByLogin } = require("../function/user/getuser");
 const { getClient } = require("../util/database/dragonfly");
 
-async function vanish(channelID, username, isMod = false, modID = 698614112) {
+async function vanish(channelID, tags, modID = 698614112) {
     let cacheClient = getClient();
 
-    let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, username.toLowerCase());
+    let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, tags.username.toLowerCase());
 
     if(isEditor == 1) {
         return {
@@ -18,20 +18,8 @@ async function vanish(channelID, username, isMod = false, modID = 698614112) {
         }
     }
     
-    let userData = await getUserByLogin(username);
-
-    if(userData.error) {
-        return {
-            error: true,
-            message: userData.message,
-            status: userData.status,
-            type: userData.type,
-            where: 'userData'
-        }
-    }
-    
-    if(isMod) {
-        let removeMod = await removeChannelModerator(channelID, userData.data.id);
+    if(tags.mod) {
+        let removeMod = await removeChannelModerator(channelID, tags.id);
         if(removeMod.error) {
             return {
                 error: true,
@@ -43,7 +31,7 @@ async function vanish(channelID, username, isMod = false, modID = 698614112) {
         }
 
         setTimeout(async () => {
-            let addMod = await addModerator(channelID, userData.data.id);
+            let addMod = await addModerator(channelID, tags.id);
             if(addMod.error) {
                 console.log({
                     error: true,
@@ -57,7 +45,7 @@ async function vanish(channelID, username, isMod = false, modID = 698614112) {
         
     }
 
-    let timeout = await ban(channelID, userData.data.id, modID, 3, 'Vanish');
+    let timeout = await ban(channelID, tags.id, modID, 3, 'Vanish');
     if(timeout.error) {
         return {
             error: true,
@@ -70,7 +58,7 @@ async function vanish(channelID, username, isMod = false, modID = 698614112) {
 
     return {
         error: false,
-        message: `${userData.data.display_name} has vanished from the chat!`,
+        message: `${tags['display-name']} has vanished from the chat!`,
         status: 200,
         type: 'success'
     }

@@ -15,6 +15,7 @@ const resetSumimetro = require('../handler_function/resetsumimetro')
 const resetCommandsFromCache = require('../handler_function/resetcommandscache')
 const { getEditors } = require('../function/channel')
 const { getClient } = require('../util/database/dragonfly')
+const resetCacheAtOffline = require('../handler_function/clearcache')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -39,9 +40,19 @@ async function eventsubHandler(subscriptionData, eventData) {
 
     switch(type) {
         case 'channel.follow':
+            let followDayCount = await cacheClient.get(`${eventData.broadcaster_user_id}:follows:count`);
+            if(!followDayCount) {
+                followDayCount = 0;
+            }
+            followDayCount++;
+            await cacheClient.set(`${eventData.broadcaster_user_id}:follows:count`, followDayCount);
+            
             if(eventsubData.message == '' || eventsubData.message == null) {
-                eventsubData.message = '$(user) has followed the channel! Welcome!';
+                eventsubData.message = `$(user) has followed the channel! Welcome!`;
             };
+
+            eventsubData.message = eventsubData.message + ` (Follow #${followDayCount})`;
+            
             defaultMessages(client, eventData, eventsubData.message);
             break;
         case 'stream.online':
@@ -64,6 +75,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             stopTimerCommands(client, eventData);
             resetSumimetro(eventData.broadcaster_user_id);
             resetCommandsFromCache(client, eventData.broadcaster_user_id);
+            resetCacheAtOffline(eventData.broadcaster_user_id);
             try {
                 await cacheClient.del(`${eventData.broadcaster_user_id}:channel:editors`);
             } catch (error) {

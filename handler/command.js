@@ -166,7 +166,7 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                     cmdFunc = cmdFunc.replace(special[0], raidUserData.message);
                     break;
                 }
-                let streamerID = raidUserData.data[0].id;
+                let streamerID = raidUserData.data.id;
                 let raidData = await CHANNEL.raid(channelID, streamerID);
                 if(raidData.error) {
                     cmdFunc = cmdFunc.replace(special[0], raidData.message);

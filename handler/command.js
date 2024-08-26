@@ -4,7 +4,8 @@ const CHANNEL = require('../function/channel')
 const CHAT = require('../function/chat')
 const COMMANDS = require('../command');
 
-const categories = require('../function/search/categories')
+const categories = require('../function/search/categories');
+const { getUserByLogin } = require('../function/user/getuser');
 
 let specialCommandsFunc = (/\$\(([a-z]+)\s?([a-z0-9]+)?\s?([a-zA-Z0-9?;\/\s]+)?\)/g);
 
@@ -157,6 +158,22 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                         cmdFunc = cmdFunc.replace(special[0], pollData.message);
                         break;
                 }
+                break;
+            case 'raid':
+                if(!special[2]) break;
+                let raid = special[3] || argument;
+                let raidUserData = await getUserByLogin(raid);
+                if(raidUserData.error) {
+                    cmdFunc = cmdFunc.replace(special[0], raidUserData.message);
+                    break;
+                }
+                let streamerID = raidUserData.data[0].id;
+                let raidData = await CHANNEL.raid(channelID, streamerID);
+                if(raidData.error) {
+                    cmdFunc = cmdFunc.replace(special[0], raidData.message);
+                    break;
+                }
+                cmdFunc = cmdFunc.replace(special[0], '');
                 break;
         }
     };

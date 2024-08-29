@@ -186,6 +186,7 @@ async function deleteCommand(channelID, commandCMD) {
 }
 
 async function editCommand(channelID, argument) {
+    let cacheClient = getClient();
     let {options, text} = getCmdOptions(argument);
 
     let opts = text.split(' ');
@@ -212,6 +213,7 @@ async function editCommand(channelID, argument) {
                 } else {
                     oldCommand.cooldown = 15;
                 }
+                cacheClient.hset(`${channelID}:commands:${commandName}`, 'cooldown', oldCommand.cooldown);
                 break;
             case 'ul':
                 if(option.value.length > 1) {
@@ -237,6 +239,7 @@ async function editCommand(channelID, argument) {
                         }
                     }
                 }
+                cacheClient.hset(`${channelID}:commands:${commandName}`, 'userLevel', oldCommand.userLevel);
                 break;
             default: 
                 break;
@@ -256,7 +259,9 @@ async function editCommand(channelID, argument) {
         if(specialCOmmands(func)) {
             oldCommand.type = 'countable';
         } 
-        oldCommand.message = func;
+        if(func !== null || func != '') {
+            oldCommand.message = func;
+        }
     }
 
     let updated = await COMMAND.updateCommandInDB(channelID, commandName, oldCommand)

@@ -208,7 +208,7 @@ async function editCommand(channelID, argument) {
     options.forEach(option => {
         switch(option.name) {
             case 'cd':
-                if(Number(option.value) > 5) {
+                if(Number(option.value) >= 5) {
                     oldCommand.cooldown = Number(option.value);
                 } else {
                     oldCommand.cooldown = 15;
@@ -259,7 +259,7 @@ async function editCommand(channelID, argument) {
         if(specialCOmmands(func)) {
             oldCommand.type = 'countable';
         } 
-        if(func !== null || func != '' || func != undefined || func.length > 0) {
+        if(func.length > 0) {
             oldCommand.message = func;
         } else {
             oldCommand.message = oldCommand.message;

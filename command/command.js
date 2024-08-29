@@ -239,7 +239,7 @@ async function editCommand(channelID, argument) {
                         }
                     }
                 }
-                cacheClient.hset(`${channelID}:commands:${commandName}`, 'userLevel', oldCommand.userLevel);
+                cacheClient.hset(`${channelID}:commands:${commandName}`, 'level', oldCommand.userLevel);
                 break;
             default: 
                 break;

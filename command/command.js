@@ -259,8 +259,10 @@ async function editCommand(channelID, argument) {
         if(specialCOmmands(func)) {
             oldCommand.type = 'countable';
         } 
-        if(func !== null || func != '') {
+        if(func !== null || func != '' || func != undefined || func.length > 0) {
             oldCommand.message = func;
+        } else {
+            oldCommand.message = oldCommand.message;
         }
     }
 

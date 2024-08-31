@@ -161,7 +161,6 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                 break;
             case 'raid':
                 let raid = special[3] || argument;
-                console.log({raid, special});
                 let raidUserData = await getUserByLogin(raid);
                 if(raidUserData.error) {
                     cmdFunc = cmdFunc.replace(special[0], raidUserData.message);

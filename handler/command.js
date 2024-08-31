@@ -174,6 +174,14 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                 }
                 cmdFunc = cmdFunc.replace(special[0], '');
                 break;
+            case 'unraid':
+                let unraidData = await CHANNEL.unraid(channelID);
+                if(unraidData.error) {
+                    cmdFunc = cmdFunc.replace(special[0], unraidData.message);
+                    break;
+                }
+                cmdFunc = cmdFunc.replace(special[0], '');
+                break;
         }
     };
 

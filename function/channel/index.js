@@ -7,6 +7,7 @@ const setInformation = require('./setinformation');
 const getEditors = require('./geteditors');
 const getSubscriptions = require('./getsubs');
 const raid = require('./raid');
+const unraid = require('./unraid');
 
 module.exports = {
     addModerator,
@@ -17,5 +18,6 @@ module.exports = {
     setInformation,
     getEditors,
     getSubscriptions,
-    raid
+    raid,
+    unraid
 }

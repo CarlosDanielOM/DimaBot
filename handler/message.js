@@ -216,6 +216,9 @@ async function message(client, channel, tags, message) {
         case 'vanish':
             res = await COMMANDS.vanish(channelID, tags);
             break;
+        case 'duel':
+            res = await COMMANDS.duel(channelID, channel, tags['display-name'], tags.mod, argument);
+            break;
         default:
             let cmdHandler = await commandHandler(channelID, tags, command, argument);
             if(cmdHandler.error) {

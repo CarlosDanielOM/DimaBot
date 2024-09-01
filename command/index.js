@@ -27,6 +27,7 @@ const sumimetro = require("./sumimetro");
 const {createTimerCommand, deleteTimerCommand, editTimerCommand} = require("./timercommand");
 const title = require("./title");
 const vanish = require("./vanish");
+const duel = require("./duel");
 
 module.exports = {
     addModerator,
@@ -61,5 +62,6 @@ module.exports = {
     deleteTimerCommand,
     editTimerCommand,
     title,
-    vanish
+    vanish,
+    duel
 }

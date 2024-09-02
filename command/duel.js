@@ -88,10 +88,10 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                     message: `@${argument} has won the duel against @${user}.`
                 }
             } else {
-                let user = await getUserByLogin(argument);
-                user = user.data;
+                let userData = await getUserByLogin(argument);
+                userData = userData.data;
 
-                let moderator = await getChannelModerators(channelID, [user.id]);
+                let moderator = await getChannelModerators(channelID, [userData.id]);
                 if(moderator.error) {
                     return {
                         error: true,
@@ -111,7 +111,7 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                     }, 70000);
                 }
 
-                let timeout = await ban(channelID, user.id, modID, 60, 'Duel');
+                let timeout = await ban(channelID, userData.id, modID, 60, 'Duel');
 
                 if(timeout.error) {
                     return {
@@ -122,7 +122,7 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 
                 return {
                     error: false,
-                    message: `@${user.display_name} has won the duel against @${argument}.`
+                    message: `@${user} has won the duel against @${argument}.`
                 }
             }
         }

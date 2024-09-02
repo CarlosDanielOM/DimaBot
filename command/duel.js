@@ -71,7 +71,7 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                         if(add.error) {
                             console.error({add});
                         }
-                    }, 7000);
+                    }, 70000);
                 }
 
                 let timeout = await ban(channelID, userData.id, modID, 60, 'Duel');
@@ -108,7 +108,7 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                     
                     setTimeout(async () => {
                         await addChannelModerator(channelID, moderator.ids[0]);
-                    }, 7000);
+                    }, 70000);
                 }
 
                 let timeout = await ban(channelID, user.id, modID, 60, 'Duel');

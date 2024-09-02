@@ -67,7 +67,10 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 if(moderator.data.length > 0) {
                     await removeChannelModerator(channelID, moderator.ids[0]);
                     setTimeout(async () => {
-                        await addChannelModerator(channelID, moderator.ids[0]);
+                        let add = await addChannelModerator(channelID, moderator.ids[0]);
+                        if(add.error) {
+                            console.error({add});
+                        }
                     }, 7000);
                 }
 
@@ -97,7 +100,12 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 }
 
                 if(moderator.data.length > 0) {
-                    await removeChannelModerator(channelID, moderator.ids[0]);
+                    let add = await removeChannelModerator(channelID, moderator.ids[0]);
+
+                    if(add.error) {
+                        console.error({add});
+                    }
+                    
                     setTimeout(async () => {
                         await addChannelModerator(channelID, moderator.ids[0]);
                     }, 7000);

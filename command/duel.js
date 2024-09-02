@@ -1,6 +1,9 @@
 const ban = require("../function/moderation/ban");
+const getChannelModerators = require("../function/moderation/getmoderators");
 const { getUserByLogin } = require("../function/user/getuser");
 const { getClient } = require("../util/database/dragonfly");
+const removeChannelModerator = require("../function/channel/removemoderator");
+const addChannelModerator = require("../function/channel/addmoderator");
 
 async function duel(channelID, channel, user, userMod, argument, modID = 698614112) {
     if(!user || !argument) {
@@ -53,7 +56,22 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 let userData = await getUserByLogin(user);
                 userData = userData.data;
 
-                let timeout = await ban(channelID, userData.id, modID, 150, 'Duel');
+                let moderator = await getChannelModerators(channelID, [userData.id]);
+                if(moderator.error) {
+                    return {
+                        error: true,
+                        message: moderator.message
+                    }
+                }
+
+                if(moderator.data.length > 0) {
+                    await removeChannelModerator(channelID, moderator.ids[0]);
+                    setTimeout(async () => {
+                        await addChannelModerator(channelID, moderator.ids[0]);
+                    }, 7000);
+                }
+
+                let timeout = await ban(channelID, userData.id, modID, 60, 'Duel');
 
                 if(timeout.error) {
                     return {
@@ -70,7 +88,22 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 let user = await getUserByLogin(argument);
                 user = user.data;
 
-                let timeout = await ban(channelID, user.id, modID, 150, 'Duel');
+                let moderator = await getChannelModerators(channelID, [user.id]);
+                if(moderator.error) {
+                    return {
+                        error: true,
+                        message: moderator.message
+                    }
+                }
+
+                if(moderator.data.length > 0) {
+                    await removeChannelModerator(channelID, moderator.ids[0]);
+                    setTimeout(async () => {
+                        await addChannelModerator(channelID, moderator.ids[0]);
+                    }, 7000);
+                }
+
+                let timeout = await ban(channelID, user.id, modID, 60, 'Duel');
 
                 if(timeout.error) {
                     return {
@@ -81,7 +114,7 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 
                 return {
                     error: false,
-                    message: `@${user} has won the duel against @${argument}.`
+                    message: `@${user.display_name} has won the duel against @${argument}.`
                 }
             }
         }
@@ -110,7 +143,7 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
     
         return {
             error: false,
-            message: `@${user} has challenged @${argument} to a duel! Type !duel ${user} accept to accept the challenge or !duel ${user} decline to decline the challenge.`
+            message: `@${user} has challenged @${argument} to a duel! Type \"!duel ${user} accept\" to accept the challenge or \"!duel ${user} decline to decline\" the challenge.`
         }
     }
 

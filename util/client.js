@@ -27,14 +27,13 @@ function getClient() {
 async function connectChannels() {
     const joinableChannels = await STREAMERS.getStreamerNames();
 
-    joinableChannels.forEach(async channel => {
+    for (let i = 0; i < joinableChannels.length; i++) {
         try {
-            if(channel == 'domdimabot') return;
-            client.join(channel);
+            client.join(joinableChannels[i]);
         } catch (error) {
-            console.error(`Error connecting to channel ${channel}: ${error}`);
+            console.error(`Error connecting to channel ${joinableChannels[i]}: ${error}`);
         }
-    });
+    }
 }
 
 function connectChannel(channel) {

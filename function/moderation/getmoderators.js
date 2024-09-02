@@ -1,11 +1,11 @@
-const { getStreamerById } = require("../../class/streamer");
 const { getClient } = require("../../util/database/dragonfly");
+const { getStreamerHeaderById } = require("../../util/header");
 const { getTwitchHelixUrl } = require("../../util/link");
 
 async function getChannelModerators(channelID, userIDs = [], cache = false) {
     let cacheClient = getClient();
 
-    let streamerHeader = await getStreamerById(channelID);
+    let streamerHeader = await getStreamerHeaderById(channelID);
 
     let params = new URLSearchParams();
     params.append('broadcaster_id', channelID);

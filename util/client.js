@@ -29,7 +29,7 @@ async function connectChannels() {
 
     for (let i = 0; i < joinableChannels.length; i++) {
         try {
-            await new Promise(resolve => setTimeout(resolve, 500)); // 1 second delay
+            await new Promise(resolve => setTimeout(resolve, 500)); // 0.5 second delay
             await client.join(joinableChannels[i]);
         } catch (error) {
             console.error(`Error connecting to channel ${joinableChannels[i]}: ${error}`);

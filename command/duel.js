@@ -14,7 +14,6 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
     }
     let decision = argument.split(' ')[1] || false;
     argument = argument.split(' ')[0];
-    console.log({argument, decision});
     if(argument.toLowerCase() === user.toLowerCase()) {
         return {
             error: true,

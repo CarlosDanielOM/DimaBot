@@ -141,7 +141,7 @@ async function createCommand(channelID, argument, type = null) {
     
 }
 
-async function deleteCommand(channelID, commandCMD) {
+async function deleteCommand(channelID, commandCMD, userLevel = 1) {
     let exists = await COMMAND.getCommandFromDB(channelID, commandCMD);
     const cacheClient = getClient();
     if(exists.error) {
@@ -156,6 +156,13 @@ async function deleteCommand(channelID, commandCMD) {
         return {
             error: true,
             message: 'You cannot delete a reserved command'
+        }
+    }
+
+    if(userLevel < command.userLevel) {
+        return {
+            error: true,
+            message: 'You do not have enough permissions to delete this command'
         }
     }
 
@@ -185,7 +192,7 @@ async function deleteCommand(channelID, commandCMD) {
     
 }
 
-async function editCommand(channelID, argument) {
+async function editCommand(channelID, argument, userLevel = 1) {
     let cacheClient = getClient();
     let {options, text} = getCmdOptions(argument);
 
@@ -204,6 +211,13 @@ async function editCommand(channelID, argument) {
     }
     
     oldCommand = oldCommand.command;
+
+    if(userLevel < oldCommand.userLevel) {
+        return {
+            error: true,
+            message: 'You do not have enough permissions to edit this command'
+        }
+    }
 
     options.forEach(option => {
         switch(option.name) {

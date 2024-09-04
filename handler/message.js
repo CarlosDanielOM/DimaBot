@@ -155,10 +155,10 @@ async function message(client, channel, tags, message) {
             res = await COMMANDS.createCommand(channelID, argument);
             break;
         case 'deleteCommand':
-            res = await COMMANDS.deleteCommand(channelID, argument);
+            res = await COMMANDS.deleteCommand(channelID, argument, userLevel);
             break;
         case 'editCommand':
-            res = await COMMANDS.editCommand(channelID, argument);
+            res = await COMMANDS.editCommand(channelID, argument, userLevel);
             break;
         case 'followage':
             res = await COMMANDS.followage(channelID, argument || tags['display-name']);

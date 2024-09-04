@@ -162,7 +162,9 @@ async function deleteCommand(channelID, commandCMD, userLevel = 1) {
     if(userLevel < command.userLevel) {
         return {
             error: true,
-            message: 'You do not have enough permissions to delete this command'
+            message: 'You do not have enough permissions to delete this command',
+            where: 'userLevel',
+            channelID
         }
     }
 
@@ -215,7 +217,9 @@ async function editCommand(channelID, argument, userLevel = 1) {
     if(userLevel < oldCommand.userLevel) {
         return {
             error: true,
-            message: 'You do not have enough permissions to edit this command'
+            message: 'You do not have enough permissions to edit this command',
+            where: 'userLevel',
+            channelID
         }
     }
 

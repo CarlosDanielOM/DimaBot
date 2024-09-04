@@ -267,7 +267,6 @@ async function giveUserLevel(channel, tags, channelID) {
         userLevel = 7;
     }
 
-    //* TODO EDITORS level 8
     let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, tags.username);
     if(isEditor == 1) {
         userLevel = 8;

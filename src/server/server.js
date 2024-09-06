@@ -14,6 +14,8 @@ async function server() {
     app.use(bodyParser.urlencoded({ extended: true }));
 
     app.use('/eventsubs', require('./routes/eventsub.routes'));
+    app.use('/rewards', require('./routes/reward.routes'));
+    app.use('/triggers', require('./routes/trigger.routes'));
     
     return app;
 }

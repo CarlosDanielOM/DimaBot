@@ -94,6 +94,15 @@ async function subscribeTwitchEvent(channelID, type, version, condition) {
     let streamerHeaders = await getStreamerHeaderById(channelID);
     let appAccessToken = await getAppToken();
 
+    if(!appAccessToken) {
+        console.error('Error getting app access token');
+        return {
+            error: 'Error getting app access token',
+            message: 'Error getting app access token',
+            status: 500
+        };
+    }
+
     streamerHeaders['Authorization'] = `Bearer ${appAccessToken}`;
 
     let response = await fetch(`${getTwitchHelixURL()}/eventsub/subscriptions`, {
@@ -159,6 +168,15 @@ async function getEventsubs() {
 
 async function unsubscribeTwitchEvent(id) {
     let appAccessToken = await getAppToken();
+
+    if(!appAccessToken) {
+        console.error('Error getting app access token');
+        return {
+            error: 'Error getting app access token',
+            message: 'Error getting app access token',
+            status: 500
+        };
+    }
 
     let headers = {
         'Authorization': `Bearer ${appAccessToken}`,

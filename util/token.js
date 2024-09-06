@@ -164,9 +164,9 @@ async function getAppToken() {
     try {
         let cache = getClient();
 
-        let token = cache.get('domdimabot:app:token');
+        let token = await cache.get('domdimabot:app:token');
 
-        if(token) return token;
+        if(token !== null) return token;
         
         let doc = await appConfigSchema.findOne({name: 'domdimabot'});
 

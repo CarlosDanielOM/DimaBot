@@ -38,7 +38,7 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
 
     let clipGame = await searchGameById(randomClip.game_id);
 
-    if(!clipGame) {
+    if(clipGame.error) {
         console.log({error: true, message: "Game not found", status: 404, type: "game_not_found", channelID})
         return {
             error: true,

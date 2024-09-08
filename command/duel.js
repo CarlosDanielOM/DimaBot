@@ -12,8 +12,6 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
             message: 'You must provide a user to duel.'
         }
     }
-    let decision = argument.split(' ')[1] || false;
-    argument = argument.split(' ')[0];
     if(argument.toLowerCase() === user.toLowerCase()) {
         return {
             error: true,
@@ -44,15 +42,15 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
         }
     }
 
-    if(decision == 'accept') {
-        let exists = await cacheClient.exists(`${channelID}:duel:${argument.toLowerCase()}:${user.toLowerCase()}`);
+    if(argument == 'accept') {
+        let exists = await cacheClient.exists(`${channelID}:duel:${user.toLowerCase()}`);
         if(exists) {
-            let isMod = await cacheClient.get(`${channelID}:duel:${argument.toLowerCase()}:${user.toLowerCase()}`);
+            let duelist = await cacheClient.get(`${channelID}:duel:${user.toLowerCase()}`);
             await cacheClient.del(`${channelID}:duel:${argument.toLowerCase()}:${user.toLowerCase()}`);
             let probability = Math.floor(Math.random() * 121);
             let winner = probability % 2;
             if(winner === 0) {
-                let userData = await getUserByLogin(user);
+                let userData = await getUserByLogin(duelist);
                 userData = userData.data;
 
                 let moderator = await getChannelModerators(channelID, [userData.id]);
@@ -84,10 +82,10 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 
                 return {
                     error: false,
-                    message: `@${argument} has won the duel against @${user}.`
+                    message: `@${user} has won the duel against @${duelist}.`
                 }
             } else {
-                let userData = await getUserByLogin(argument);
+                let userData = await getUserByLogin(user);
                 userData = userData.data;
 
                 let moderator = await getChannelModerators(channelID, [userData.id]);
@@ -121,36 +119,29 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
                 
                 return {
                     error: false,
-                    message: `@${user} has won the duel against @${argument}.`
+                    message: `@${duelist} has won the duel against @${user}.`
                 }
             }
+        } else {
+            return {
+                error: true,
+                message: 'There is no duel challenge to accept.'
+            }
         }
-    } else if (decision === 'decline') {
-        await cacheClient.del(`${channelID}:duel:${user.toLowerCase()}:${argument.toLowerCase()}`);
+    } else if (argument === 'decline') {
+        await cacheClient.del(`${channelID}:duel:${user.toLowerCase()}`);
         return {
             error: false,
             message: `@${user} has declined the duel challenge from @${argument}.`
         }
     } else {
-        let exists = await cacheClient.exists(`${channelID}:duel:${user.toLowerCase()}:${argument.toLowerCase()}`);
-        if(exists) {
-            return {
-                error: true,
-                message: 'You already challenged this user to a duel.'
-            }
-        }
-    
-        if(userMod) {
-            await cacheClient.set(`${channelID}:duel:${user.toLowerCase()}:${argument.toLowerCase()}`, '1');
-        } else {
-            await cacheClient.set(`${channelID}:duel:${user.toLowerCase()}:${argument.toLowerCase()}`, '0');
-        }
+        await cacheClient.set(`${channelID}:duel:${argument.toLowerCase()}`, user.toLowerCase());
         
-        await cacheClient.expire(`${channelID}:duel:${user.toLowerCase()}:${argument.toLowerCase()}`, 180);
+        await cacheClient.expire(`${channelID}:duel:${argument.toLowerCase()}`, 180);
     
         return {
             error: false,
-            message: `@${user} has challenged @${argument} to a duel! Type \"!duel ${user} accept\" to accept the challenge or \"!duel ${user} decline to decline\" the challenge.`
+            message: `@${user} has challenged @${argument} to a duel! Type \"!duel accept\" to accept the challenge or \"!duel decline\" to decline the challenge.`
         }
     }
 

@@ -3,6 +3,8 @@ const ban = require("../function/moderation/ban");
 const { getUserByLogin } = require("../function/user/getuser");
 const { getClient } = require("../util/database/dragonfly");
 
+let timeoutTime = 10;
+
 async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     let cacheClient = getClient();
 
@@ -45,16 +47,34 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     }
 
     if(!dead) {
+        let exists = await cacheClient.exists(`${channelID}:roulette:${userData.id}`);
+        if(exists == 1) {
+            let attempt = await cacheClient.incr(`${channelID}:roulette:${userData.id}`);
+        } else {
+            let attempt = await cacheClient.set(`${channelID}:roulette:${userData.id}`, 1);
+        }
+
+        let attempts = await cacheClient.get(`${channelID}:roulette:${userData.id}`);
+        
         return {
             error: false,
-            message: `${userData.display_name} ha jalado el gatillo y la bala no ha sido disparada.`,
+            message: `${userData.display_name} ha jalado el gatillo y la bala no ha sido disparada. Lleva ${attempts} intentos.`,
             status: 200,
             type: 'success'
         }
     }
+
+    let timeIncrease = await cacheClient.get(`${channelID}:roulette:${userData.id}:died`);
+    if(!timeIncrease) {
+        timeIncrease = 1;
+    } else {
+        timeIncrease++;
+    }
+
+    timeoutTime = timeoutTime * timeIncrease;
     
     if(!isMod) {
-        let timeout = await ban(channelID, userData.id, modID, 150, 'Ruleta rusa');
+        let timeout = await ban(channelID, userData.id, modID, timeoutTime, 'Ruleta rusa');
         if(timeout.error) {
             return {
                 error: true,
@@ -76,7 +96,7 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
             }
         }
 
-        let timeout = await ban(channelID, userData.id, modID, 150, 'Ruleta rusa');
+        let timeout = await ban(channelID, userData.id, modID, timeoutTime, 'Ruleta rusa');
 
         if(timeout.error) {
             return {
@@ -102,9 +122,19 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         }, 1000 * 160);
     }
 
+    let attempts = await cacheClient.get(`${channelID}:roulette:${userData.id}`);
+    await cacheClient.del(`${channelID}:roulette:${userData.id}`);
+
+    let timeDied = await cacheClient.exists(`${channelID}:roulette:${userData.id}:died`);
+    if(timeDied == 1) {
+        await cacheClient.incr(`${channelID}:roulette:${userData.id}:died`);
+    } else {
+        await cacheClient.set(`${channelID}:roulette:${userData.id}:died`, 1);
+    }
+
     return {
         error: false,
-        message: `${userData.display_name} ha jalado el gatillo y la bala ha sido disparada.`,
+        message: `${userData.display_name} ha jalado el gatillo y la bala ha sido disparada. Se murio en el intento #${attempts}.`,
         status: 200,
         type: 'success'
     }

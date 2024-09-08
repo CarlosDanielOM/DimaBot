@@ -46,7 +46,7 @@ async function duel(channelID, channel, user, userMod, argument, modID = 6986141
         let exists = await cacheClient.exists(`${channelID}:duel:${user.toLowerCase()}`);
         if(exists) {
             let duelist = await cacheClient.get(`${channelID}:duel:${user.toLowerCase()}`);
-            await cacheClient.del(`${channelID}:duel:${argument.toLowerCase()}:${user.toLowerCase()}`);
+            await cacheClient.del(`${channelID}:duel:${user.toLowerCase()}`);
             let probability = Math.floor(Math.random() * 121);
             let winner = probability % 2;
             if(winner === 0) {

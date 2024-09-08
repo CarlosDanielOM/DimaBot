@@ -130,6 +130,7 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         await cacheClient.incr(`${channelID}:roulette:${userData.id}:died`);
     } else {
         await cacheClient.set(`${channelID}:roulette:${userData.id}:died`, 1);
+        await cacheClient.expire(`${channelID}:roulette:${userData.id}:died`, 300);
     }
 
     return {

@@ -46,15 +46,16 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         dead = true;
     }
 
-    if(!dead) {
-        let exists = await cacheClient.exists(`${channelID}:roulette:${userData.id}`);
-        if(exists == 1) {
-            let attempt = await cacheClient.incr(`${channelID}:roulette:${userData.id}`);
-        } else {
-            let attempt = await cacheClient.set(`${channelID}:roulette:${userData.id}`, 1);
-        }
+    let exists = await cacheClient.exists(`${channelID}:roulette:${userData.id}`);
+    if(exists == 1) {
+        let attempt = await cacheClient.incr(`${channelID}:roulette:${userData.id}`);
+    } else {
+        let attempt = await cacheClient.set(`${channelID}:roulette:${userData.id}`, 1);
+    }
 
-        let attempts = await cacheClient.get(`${channelID}:roulette:${userData.id}`);
+    let attempts = await cacheClient.get(`${channelID}:roulette:${userData.id}`);
+
+    if(!dead) {
         
         return {
             error: false,
@@ -122,7 +123,6 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         }, 1000 * timeoutTime + 5000);
     }
 
-    let attempts = await cacheClient.get(`${channelID}:roulette:${userData.id}`);
     await cacheClient.del(`${channelID}:roulette:${userData.id}`);
 
     let timeDied = await cacheClient.exists(`${channelID}:roulette:${userData.id}:died`);

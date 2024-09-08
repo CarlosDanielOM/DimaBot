@@ -119,7 +119,7 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
                     where: 'addMod'
                 }
             }
-        }, 1000 * 160);
+        }, 1000 * timeoutTime + 5000);
     }
 
     let attempts = await cacheClient.get(`${channelID}:roulette:${userData.id}`);

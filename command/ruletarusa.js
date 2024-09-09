@@ -66,6 +66,7 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     }
 
     let timeIncrease = await cacheClient.get(`${channelID}:roulette:${userData.id}:died`);
+    timeIncrease = Number(timeIncrease);
     if(!timeIncrease) {
         timeIncrease = 1;
     } else {
@@ -126,11 +127,12 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     await cacheClient.del(`${channelID}:roulette:${userData.id}`);
 
     let timeDied = await cacheClient.exists(`${channelID}:roulette:${userData.id}:died`);
+    timeDied = Number(timeDied);
     if(timeDied == 1) {
         await cacheClient.incr(`${channelID}:roulette:${userData.id}:died`);
     } else {
         await cacheClient.set(`${channelID}:roulette:${userData.id}:died`, 1);
-        await cacheClient.expire(`${channelID}:roulette:${userData.id}:died`, 300);
+        await cacheClient.expire(`${channelID}:roulette:${userData.id}:died`, 600);
     }
 
     return {

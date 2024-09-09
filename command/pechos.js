@@ -27,7 +27,7 @@ async function pechos(channelID, tags) {
             message += `Damn, esos melones son de otro planeta!`;
             break;
         case 6:
-            message += `Pero que tremendo MAGUMBOSSSSS!`;
+            message += `Pero que tremendos MAGUMBOSSSSS!`;
             break;
     }
     

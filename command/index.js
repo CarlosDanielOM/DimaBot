@@ -28,6 +28,7 @@ const {createTimerCommand, deleteTimerCommand, editTimerCommand} = require("./ti
 const title = require("./title");
 const vanish = require("./vanish");
 const duel = require("./duel");
+const pechos = require("./pechos");
 
 module.exports = {
     addModerator,
@@ -63,5 +64,6 @@ module.exports = {
     editTimerCommand,
     title,
     vanish,
-    duel
+    duel,
+    pechos
 }

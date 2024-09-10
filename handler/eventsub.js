@@ -84,7 +84,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             }
             break;
         case 'channel.channel_points_custom_reward_redemption.add':
-            logger({data: eventData, type: 'channel.channel_points_custom_reward_redemption.add'}, true, eventData.broadcaster_user_id, 'eventsub redeem');
+            logger({data: eventData, type: 'channel.channel_points_custom_reward_redemption.add'}, true, eventData.broadcaster_user_id, 'eventsub_redeem');
             redeemHandler(client, eventData);
             break;
         case 'channel.ad_break.begin':

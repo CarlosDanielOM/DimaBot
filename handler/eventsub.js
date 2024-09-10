@@ -16,6 +16,7 @@ const resetCommandsFromCache = require('../handler_function/resetcommandscache')
 const { getEditors } = require('../function/channel')
 const { getClient } = require('../util/database/dragonfly')
 const resetCacheAtOffline = require('../handler_function/clearcache')
+const logger = require('../util/logger')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -83,7 +84,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             }
             break;
         case 'channel.channel_points_custom_reward_redemption.add':
-            console.log('channel.channel_points_custom_reward_redemption.add', eventData);
+            logger({data: eventData, type: 'channel.channel_points_custom_reward_redemption.add'}, true, eventData.broadcaster_user_id, 'eventsub redeem');
             redeemHandler(client, eventData);
             break;
         case 'channel.ad_break.begin':

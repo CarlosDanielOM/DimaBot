@@ -83,6 +83,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             }
             break;
         case 'channel.channel_points_custom_reward_redemption.add':
+            console.log('channel.channel_points_custom_reward_redemption.add', eventData);
             redeemHandler(client, eventData);
             break;
         case 'channel.ad_break.begin':

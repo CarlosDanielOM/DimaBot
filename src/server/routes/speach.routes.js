@@ -6,7 +6,7 @@ const md = require('mp3-duration');
 const fs = require('fs');
 
 const { getUrl } = require('../../../util/dev');
-const { getIO } = require('../../websocket');
+const { getIO } = require('../websocket');
 
 let speachMap = new Map();
 

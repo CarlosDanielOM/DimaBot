@@ -1,7 +1,7 @@
 const { getStreamerHeaderById } = require("../../util/header");
 const { getTwitchHelixUrl } = require("../../util/link");
 
-async function addModerator(channelID, userID) {
+async function addModerator(channelID, userID = '698614112') {
     let streamerHeader = await getStreamerHeaderById(channelID);
 
     let params = new URLSearchParams();

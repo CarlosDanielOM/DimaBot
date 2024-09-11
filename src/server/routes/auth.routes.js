@@ -9,12 +9,12 @@ const STREAMERS = require('../../../class/streamer');
 const CHANNEL = require('../../../function/channel');
 
 const logger = require('../../../util/logger');
-const { encrypt } = require('../../../util/crypto');
+const { encrypt, decrypt } = require('../../../util/crypto');
 const {connectChannel} = require('../../../util/client')
 const {subcriptionsTypes, subscribeTwitchEvent} = require('../../../util/eventsub')
 const JSONCOMMANDS = require('../../../config/reservedcommands.json')
 
-router.post('/', async (req, res) => {
+router.post('/register', async (req, res) => {
     const token = req.query.code;
     const username = req.query.state;
 
@@ -132,6 +132,35 @@ router.post('/', async (req, res) => {
         return res.status(500).send('Internal server error');
     }
 
+});
+
+router.post('/login', async (req, res) => {
+    const {name, id, email, action} = req.body;
+
+    let exists = await channelSchema.findOne({ twitch_user_id: id });
+
+    if(exists) {
+        let token = decrypt(exists.twitch_user_token);
+        return res.status(200).send({
+            error: false,
+            message: 'User already exists',
+            data: exists,
+            token: token
+        });
+    } else {
+        if(action == 'login') {
+            return res.status(404).send({
+                error: 'Not found',
+                message: 'User not found'
+            });
+        } else {
+            return res.status(404).send({
+                error: 'Not found',
+                message: 'User not found'
+            });
+        }
+        
+    }
 });
 
 module.exports = router;

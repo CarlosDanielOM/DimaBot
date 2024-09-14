@@ -21,7 +21,9 @@ async function server() {
     app.use('/speach', require('./routes/speach.routes'));
     app.use('/auth', require('./routes/auth.routes'));
     app.use('/twitch', require('./routes/twitch.routes'));
-    
+    app.use('/overlays', require('./routes/overlay.routes'));
+    app.use('/sumimetro', require('./routes/sumimetro.routes'));
+
     return app;
 }
 

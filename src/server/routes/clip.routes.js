@@ -3,8 +3,8 @@ const router = express.Router();
 const fs = require('fs');
 const { getIO } = require('../websocket');
 
-const HTMLPATH = `${__dirname}/routes/public`;
-const DOWNLOADPATH = `${__dirname}/routes/public/downloads`;
+const HTMLPATH = `${__dirname}/public`;
+const DOWNLOADPATH = `${__dirname}/public/downloads`;
 
 let soSent = [];
 

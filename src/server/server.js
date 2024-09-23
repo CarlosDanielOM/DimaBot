@@ -23,7 +23,7 @@ async function server() {
     app.use('/twitch', require('./routes/twitch.routes'));
     app.use('/overlays', require('./routes/overlay.routes'));
     app.use('/sumimetro', require('./routes/sumimetro.routes'));
-
+    app.use('/user', require('./routes/user.routes'));
     return app;
 }
 

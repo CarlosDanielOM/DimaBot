@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clips</title>
+    <link rel="stylesheet" href="assets/css/clip.css">
+</head>
+<body>
+    <div id="container">
+        <div class="left-container" id="left">
+            <video src="" id="vplayer"></video>
+        </div>
+        <div class="img" id="img"></div>
+        <div class="right-container" id="right">
+            <div class="streamer-info">
+                <div class="streamer-info-name">
+                    <h2 id="streamer-name"></h2>
+                </div>
+            </div>
+            <div class="stream-description">
+                <h4 id="stream-description"></h4>
+            </div>
+            <div class="stream-info">
+                <div class="stream-info-game">
+                    <h3 id="stream-game"></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
+    <script>
+        const container = document.getElementById('container');
+        const leftContainer = document.getElementById('left');
+        const rightContainer = document.getElementById('right');
+        const imgContainer = document.getElementById('img');
+        const streamerName = document.getElementById('streamer-name');
+        const streamDescription = document.getElementById('stream-description');
+        const streamGame = document.getElementById('stream-game');
+        
+        const channelID = window.location.pathname.split('/')[2];
+        
+        const socket = io(`/clip/${channelID}`, {reconnection: true});
+        
+        socket.on('play-clip', data => {
+            console.log({data});
+            const duration = Number(data.duration);
+            let vplayer = document.getElementById('vplayer');
+            if(!vplayer) {
+                vplayer = document.createElement('video');
+                vplayer.setAttribute('width', '400px');
+                vplayer.setAttribute('height', '300px');
+                vplayer.id = 'vplayer';
+                container.appendChild(vplayer);
+            }
+
+            let profileImg = document.getElementById('profile-img');
+            if(!profileImg) {
+                profileImg = document.createElement('img');
+                profileImg.id = 'profile-img';
+                let rgb = hexToRgb(data.streamerColor);
+                if(rgb.r <= 40 && rgb.g <= 40 && rgb.b <= 40) {
+                    rightContainer.style.backgroundColor = 'rgba(204, 204, 204, 0.5)';
+                    rightContainer.style.backdropFilter = 'blur(10px)';
+                    rightContainer.style.border = '3px solid #000';
+                } else {
+                    rightContainer.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`;
+                    rightContainer.style.backdropFilter = 'blur(10px)';
+                    rightContainer.style.color = '#000'
+                    rightContainer.style.border = `3px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
+                }
+                imgContainer.appendChild(profileImg);
+            }
+
+            profileImg.setAttribute('src', data.profileImage);
+            
+            const clipLink = `https://api.domdimabot.com/video/clip/${channelID}?t=${Date.now()}`;
+
+            const videoSource = document.createElement('source');
+            videoSource.setAttribute('src', clipLink);
+            videoSource.setAttribute('type', 'video/mp4');
+            vplayer.appendChild(videoSource);
+            vplayer.load();
+
+            vplayer.addEventListener('canplaythrough', () => {
+                vplayer.play().then(() => {
+                    streamerName.textContent = data.streamer;
+                    streamGame.textContent = data.game;
+                    streamDescription.textContent = data.description;
+                    vplayer.style.opacity = 1;
+                    rightContainer.style.transform = 'translateX(400px)';
+                    rightContainer.style.opacity = 1;
+                    imgContainer.style.transform = 'scale(1)';
+                    imgContainer.style.opacity = 1;
+
+                    setTimeout(() => {
+                        vplayer.style.opacity = 0;
+                        rightContainer.style.transform = 'translateX(0px)';
+                        rightContainer.style.opacity = 0;
+                        rightContainer.style.backdropFilter = 'blur(0px)';
+                        imgContainer.style.transform = 'scale(0)';
+                        imgContainer.style.opacity = 0;
+                    }, (1000 * duration) - (500));
+
+                    setTimeout(() => {
+                        videoSource.remove();
+                        vplayer.remove();
+                        profileImg.remove();
+                        imgContainer.style.background = 'none';
+                        console.log('clip ended');
+                    }, (1000 * duration) + (1000));
+                    
+                    console.log('clip started');
+                    
+                }).catch(err => {
+                    console.log(err);
+                });
+            });
+            
+        })
+
+        function hexToRgb(hex) {
+            if (!hex) return { r: 255, g: 255, b: 255 };
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+        
+    </script>
+</body>
+</html>

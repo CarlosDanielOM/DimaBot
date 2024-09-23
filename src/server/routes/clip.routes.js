@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const { getIO } = require('../websocket');
+const fetch = require('node-fetch');
 
 const HTMLPATH = `${__dirname}/public`;
 const DOWNLOADPATH = `${__dirname}/public/downloads`;

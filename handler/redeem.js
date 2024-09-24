@@ -97,10 +97,13 @@ async function sendTrigger(channelID, triggerData) {
         headers: streamerHeaders
     }); // Fetch the trigger
 
-    if (res.error) {
+    if (!res.ok) {
         console.log({ res, where: 'sendTrigger', for: 'triggerData' })
         return { error: true, message: 'Error sending trigger' }
     };
+
+    const responseData = await res.json();
+    console.log({ responseData })
 
     return { error: false, message: 'Trigger sent' }
 }

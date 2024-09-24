@@ -106,7 +106,7 @@ async function sendTrigger(channelID, triggerData) {
     };
 
     const responseData = await res.json();
-    console.log({ responseData })
+    console.log({ responseData, body: responseData.body, where: 'sendTrigger', for: 'triggerData' })
 
     return { error: false, message: 'Trigger sent' }
 }

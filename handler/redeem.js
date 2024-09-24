@@ -89,6 +89,7 @@ module.exports = redeem;
 
 
 async function sendTrigger(channelID, triggerData) {
+    console.log({ triggerData })
     let streamerHeaders = await getStreamerHeaderById(channelID);
     let res = await fetch(`${getUrl()}/triggers/${channelID}/send`, {
         method: 'POST',

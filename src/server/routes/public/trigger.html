@@ -22,11 +22,9 @@
         const channelID = window.location.pathname.split('/')[3];
         const triggerContainer = document.getElementById('triggerContainer');
 
-        const socket = io(`/overlays/triggers/${channelID}`, {reconnection: true});
-        const testsocket = io(`/overlays/triggers/533538623`, {reconnection: true});
-
-        testsocket.on('connect', () => {
-            console.log('Connected to triggers main');
+        const socket = io(`/overlays/triggers/${channelID}`, {
+            transports: ['websocket', 'polling'],
+            reconnection: true
         });
 
         socket.on('connect', () => {

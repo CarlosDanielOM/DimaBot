@@ -50,6 +50,10 @@ async function websocket(app) {
             console.log(`${channelID} disconnected from sumimetro ${type}`);
         });
     });
+
+    io.on('error', (error) => {
+        console.error('Websocket error:', error);
+    });
     
     return server;
 }

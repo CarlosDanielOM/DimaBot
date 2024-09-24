@@ -4,7 +4,7 @@ const router = express.Router();
 
 const htmlPath = `${__dirname}/public`
 
-router.get('/triggers/:channel', (req, res) => {
+router.get('/triggers/:channelID', (req, res) => {
     res.status(200).sendFile(`${htmlPath}/trigger.html`);
 });
 

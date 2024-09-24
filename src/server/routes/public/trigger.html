@@ -28,6 +28,11 @@
             console.log('Connected to triggers');
         });
 
+        socket.on('error', (error) => {
+            console.log({error});
+            console.log('Error:', error);
+        });
+
         let triggerCount = 0;
 
         socket.on('trigger', (data) => {

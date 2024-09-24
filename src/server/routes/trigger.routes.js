@@ -14,7 +14,7 @@ const { getIO } = require('../websocket');
 
 const acceptableMimeTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/flv', 'video/wmv', 'video/webm', 'video/mkv', 'image/gif', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/tiff', 'image/svg', 'image/webp', 'audio/mp3', 'audio/flac', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/wma', 'audio/m4a'];
 
-// router.use(auth);
+router.use(auth);
 
 router.get('/:channelID', async (req, res) => {
     const channelID = req.params.channelID;

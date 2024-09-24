@@ -123,7 +123,7 @@ router.post('/:channelID/send', async (req, res) => {
     const {channelID} = req.params;
     console.log({req: req});
     const body = req.body;
-    // console.log(body);
+    console.log(body);
 
     io.of(`/overlays/triggers/${channelID}`).emit('trigger', body);
 });

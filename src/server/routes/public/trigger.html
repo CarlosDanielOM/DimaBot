@@ -23,7 +23,6 @@
         const triggerContainer = document.getElementById('triggerContainer');
 
         const socket = io(`/overlays/triggers/${channelID}`, {
-            transports: ['websocket'],
             reconnection: true
         });
 

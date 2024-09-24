@@ -37,8 +37,6 @@ async function redeem(client, eventData) {
     }
 
     let trigger = await triggerSchema.findOne({ channelID: broadcaster_user_id, name: reward.title, type: 'redemption' }, 'file mediaType volume rewardID');
-
-    console.log({ trigger, where: 'redeem' })
     
     if (!trigger) {
         let result = await customRedemptionFun(eventData, reward);
@@ -91,7 +89,6 @@ module.exports = redeem;
 
 
 async function sendTrigger(channelID, triggerData) {
-    console.log({ channelID, triggerData, where: 'sendTrigger' })
     let streamerHeaders = await getStreamerHeaderById(channelID);
     let res = await fetch(`${getUrl()}/triggers/${channelID}/send`, {
         method: 'POST',

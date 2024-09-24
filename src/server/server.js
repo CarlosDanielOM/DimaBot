@@ -2,6 +2,7 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
 
 async function server() {
     let app = express();

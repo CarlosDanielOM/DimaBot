@@ -23,6 +23,11 @@
         const triggerContainer = document.getElementById('triggerContainer');
 
         const socket = io(`/overlays/triggers/${channelID}`, {reconnection: true});
+        const testsocket = io(`/overlays/triggers/533538623`, {reconnection: true});
+
+        testsocket.on('connect', () => {
+            console.log('Connected to triggers main');
+        });
 
         socket.on('connect', () => {
             console.log('Connected to triggers');

@@ -28,6 +28,15 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
+    if(!thumbnail) {
+        return res.status(400).json({
+            error: true,
+            message: 'The thumbnail is required.',
+            status: 400,
+            type: 'error'
+        });
+    }
+
     let clip = getVideoURL(thumbnail);
 
     let fileName = `${channelID}-clip.mp4`;

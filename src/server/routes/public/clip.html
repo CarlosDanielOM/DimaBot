@@ -164,7 +164,7 @@
 <body>
     <div id="container">
         <div class="left-container" id="left">
-            <video src="" id="vplayer"></video>
+            <video id="vplayer"></video>
         </div>
         <div class="img" id="img"></div>
         <div class="right-container" id="right">
@@ -236,9 +236,10 @@
             videoSource.setAttribute('src', clipLink);
             videoSource.setAttribute('type', 'video/mp4');
             vplayer.appendChild(videoSource);
-            vplayer.load();
+            // vplayer.load();
 
             vplayer.addEventListener('canplaythrough', () => {
+                console.log('can play through');
                 vplayer.play().then(() => {
                     streamerName.textContent = data.streamer;
                     streamGame.textContent = data.game;

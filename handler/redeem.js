@@ -38,6 +38,8 @@ async function redeem(client, eventData) {
 
     let trigger = await triggerSchema.findOne({ channelID: broadcaster_user_id, name: reward.title, type: 'redemption' }, 'file mediaType volume rewardID');
 
+    console.log({ trigger, where: 'redeem' })
+    
     if (!trigger) {
         let result = await customRedemptionFun(eventData, reward);
         if (result.error) return client.say(broadcaster_user_login, `${result.message}`);

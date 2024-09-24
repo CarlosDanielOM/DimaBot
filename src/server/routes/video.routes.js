@@ -16,7 +16,7 @@ router.get('/trigger/:channelID/:triggerName', (req, res) => {
             message: `The file ${triggerName} does not exist in the ${channelID} channel`
         });
     }
-    res.status(200).sendFile(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}`);
+    res.status(200).sendFile(`${__dirname}/public/uploads/triggers/${channelID}/${triggerName}`);
 });
 
 module.exports = router;

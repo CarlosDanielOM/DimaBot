@@ -23,7 +23,7 @@
         const triggerContainer = document.getElementById('triggerContainer');
 
         const socket = io(`/overlays/triggers/${channelID}`, {
-            transports: ['websocket', 'polling'],
+            transports: ['websocket'],
             reconnection: true
         });
 

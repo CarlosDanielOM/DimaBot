@@ -121,7 +121,7 @@ router.post('/:channelID', async (req, res) => {
 router.post('/:channelID/send', async (req, res) => {
     const io = getIO();
     const {channelID} = req.params;
-    console.log({req: req.body});
+    console.log({req: req});
     const body = req.body;
     console.log(body);
 

@@ -29,13 +29,13 @@ async function server() {
     app.get('/media/:channelID/:triggerName', (req, res) => {
         const channelID = req.params.channelID;
         const triggerName = req.params.triggerName;
-        if(!fs.existsSync(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}.mp4`)) {
+        if(!fs.existsSync(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}`)) {
             return res.status(404).send({
                 error: 'File not found',
                 message: `The file ${triggerName} does not exist in the ${channelID} channel`
             });
         }
-        res.status(200).sendFile(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}.mp4`);
+        res.status(200).sendFile(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}`);
     });
     
     return app;

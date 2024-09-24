@@ -22,8 +22,13 @@
         const channelID = window.location.pathname.split('/')[3];
         const triggerContainer = document.getElementById('triggerContainer');
 
-        const socket = io(`/overlays/triggers/${channelID}`, {
+        const socket = io(`https://api.domdimabot.com/overlays/triggers/${channelID}`, {
+            transports: ['websocket'],
             reconnection: true
+        });
+
+        socket.on('connect_error', (error) => {
+            console.log('Error:', error);
         });
 
         socket.on('connect', () => {

@@ -5,6 +5,7 @@ const vipRedemtionFun = require('../redemption_functions/vip')
 const songRequestFun = require('../redemption_functions/songrequest')
 const customRedemptionFun = require('../redemption_functions/custom')
 const { getUrl } = require('../util/dev');
+const STREAMERS = require('../class/streamer')
 
 const textConvertor = require('./text');
 const { getStreamerHeaderById } = require('../util/header');
@@ -89,21 +90,20 @@ module.exports = redeem;
 
 
 async function sendTrigger(channelID, triggerData) {
-    console.log({ triggerData })
-    let streamerHeaders = await getStreamerHeaderById(channelID);
+    let streamerToken = STREAMERS.getStreamerTokenById(channelID);
     let res = await fetch(`${getUrl()}/triggers/${channelID}/send`, {
         method: 'POST',
-        body: JSON.stringify(triggerData),
-        headers: streamerHeaders
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${streamerToken}`
+        },
+        body: JSON.stringify(triggerData)
     }); // Fetch the trigger
 
-    if (!res.ok) {
+    if (res.error) {
         console.log({ res, where: 'sendTrigger', for: 'triggerData' })
         return { error: true, message: 'Error sending trigger' }
     };
-
-    const responseData = await res.json();
-    console.log({ responseData })
 
     return { error: false, message: 'Trigger sent' }
 }

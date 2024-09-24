@@ -24,6 +24,10 @@
 
         const socket = io(`/overlays/triggers/${channelID}`, {reconnection: true});
 
+        socket.on('connect', () => {
+            console.log('Connected to triggers');
+        });
+
         let triggerCount = 0;
 
         socket.on('trigger', (data) => {

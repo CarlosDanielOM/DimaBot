@@ -5,7 +5,7 @@ const router = express.Router();
 const htmlPath = `${__dirname}/public`
 
 router.get('/triggers/:channel', (req, res) => {
-    res.sendFile(`${htmlPath}/trigger.html`);
+    res.status(200).sendFile(`${htmlPath}/trigger.html`);
 });
 
 router.get('/furry/:channel', (req, res) => {

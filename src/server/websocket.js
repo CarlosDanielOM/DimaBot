@@ -9,6 +9,18 @@ async function websocket(app) {
     io = new Server(server, {
         connectionStateRecovery: {}
     });
+
+    //? Overlay
+    io.of(/^\/overlay\/\w+$/).on('connection', async (socket) => {
+        const channelID = socket.nsp.name.split('/')[2];
+        console.log(`${channelID} connected to overlay`);
+    });
+
+    //? Clip
+    io.of(/^\/clip\/\w+$/).on('connection', async (socket) => {
+        const channelID = socket.nsp.name.split('/')[2];
+        console.log(`${channelID} connected to clip`);
+    });
     
     //? Sumimetro
     io.of(/^\/sumimetro\/\w+\/\w+$/).on('connection', async (socket) => {

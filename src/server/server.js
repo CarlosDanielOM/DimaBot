@@ -26,7 +26,7 @@ async function server() {
     app.use('/sumimetro', require('./routes/sumimetro.routes'));
     app.use('/user', require('./routes/user.routes'));
 
-    app.get('/media/:channelID/:media', (req, res) => {
+    app.get('/media/:channelID/:triggerName', (req, res) => {
         const channelID = req.params.channelID;
         const triggerName = req.params.triggerName;
         if(!fs.existsSync(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}.mp4`)) {

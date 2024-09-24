@@ -24,6 +24,19 @@ async function server() {
     app.use('/overlays', require('./routes/overlay.routes'));
     app.use('/sumimetro', require('./routes/sumimetro.routes'));
     app.use('/user', require('./routes/user.routes'));
+
+    app.get('/media/:channelID/:media', (req, res) => {
+        const channelID = req.params.channelID;
+        const triggerName = req.params.triggerName;
+        if(!fs.existsSync(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}.mp4`)) {
+            return res.status(404).send({
+                error: 'File not found',
+                message: `The file ${triggerName} does not exist in the ${channelID} channel`
+            });
+        }
+        res.status(200).sendFile(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}.mp4`);
+    });
+    
     return app;
 }
 

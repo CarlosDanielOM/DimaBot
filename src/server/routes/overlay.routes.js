@@ -8,11 +8,11 @@ router.get('/triggers/:channelID', (req, res) => {
     res.status(200).sendFile(`${htmlPath}/trigger.html`);
 });
 
-router.get('/furry/:channel', (req, res) => {
+router.get('/furry/:channelID', (req, res) => {
     res.sendFile(`${htmlPath}/furry.html`);
 });
 
-router.post('/furry/:channel', (req, res) => {
+router.post('/furry/:channelID', (req, res) => {
     const { channel } = req.params;
     const { username, value } = req.body;
 

@@ -10,10 +10,10 @@ async function websocket(app) {
         connectionStateRecovery: {}
     });
 
-    //? Overlay
-    io.of(/^\/overlay\/\w+$/).on('connection', async (socket) => {
-        const channelID = socket.nsp.name.split('/')[2];
-        console.log(`${channelID} connected to overlay`);
+    //? Overlay triggers
+    io.of(/^\/overlays\/triggers\/\w+$/).on('connection', async (socket) => {
+        const channelID = socket.nsp.name.split('/')[3];
+        console.log(`${channelID} connected to triggers`);
     });
 
     //? Clip

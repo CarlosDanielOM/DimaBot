@@ -1,7 +1,7 @@
 const { getUrl } = require("../util/dev");
 
 async function speach(messageID, message, channelID) {
-    let response = await fetch(`${getUrl()}/speach/${channelID}`, {
+    let response = await fetch(`${getUrl()}/speech/${channelID}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'

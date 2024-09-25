@@ -16,10 +16,14 @@ async function customRedemptionReward(eventData, rewardData) {
             prompt: reward.rewardPrompt,
             cost: newCost,
         }
+
+        let streamerToken = await STREAMERS.getStreamerTokenById(broadcaster_user_id);
+        
         let response = await fetch(`${getUrl()}/rewards/${broadcaster_user_id}/${rewardData.id}`, {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `${streamerToken}`
             },
             body: JSON.stringify(data)
         })

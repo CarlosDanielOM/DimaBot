@@ -13,12 +13,12 @@
 
         let lastMsgId = '';
 
-        const socket = io(`/speach/${channelID}`, {reconnection: true});
+        const socket = io(`/speech/${channelID}`, {reconnection: true});
 
         socket.on('speach', (data) => {
             if (lastMsgId === data.id) return;
             lastMsgId = data.id;
-            audioPlayer.src = `https://api.domdimabot.com/speach/${channelID}/${data.id}`;
+            audioPlayer.src = `https://api.domdimabot.com/speech/${channelID}/${data.id}`;
             audioPlayer.play();
         });
     </script>

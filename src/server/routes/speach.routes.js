@@ -11,14 +11,14 @@ const { getIO } = require('../websocket');
 let speachMap = new Map();
 
 router.get('/:channelID', (req, res) => {
-    res.status(200).sendFile(`${__dirname}/routes/public/speach.html`);
+    res.status(200).sendFile(`${__dirname}/public/speach.html`);
 });
 
 router.get('/:channelID/:msgID', (req, res) => {
     const channelID = req.params.channelID;
     const msgID = req.params.msgID;
 
-    res.status(200).sendFile(`${__dirname}/routes/public/speach/${msgID}.mp3`);
+    res.status(200).sendFile(`${__dirname}/public/speach/${msgID}.mp3`);
 });
 
 router.post('/:channelID', (req, res) => {
@@ -29,7 +29,7 @@ router.post('/:channelID', (req, res) => {
 
     let io = getIO();
 
-    tts.save(`${__dirname}/routes/public/speach/${msgID}.mp3`, (err, result) => {
+    tts.save(`${__dirname}/public/speach/${msgID}.mp3`, (err, result) => {
         if(err) {
             console.log(err);
             return res.status(500).send({
@@ -45,7 +45,7 @@ router.post('/:channelID', (req, res) => {
 
         let channelMap = speachMap.get(channelID);
         if(channelMap.length === 0) {
-            md(`${__dirname}/routes/public/speach/${msgID}.mp3`, (err, duration) => {
+            md(`${__dirname}/public/speach/${msgID}.mp3`, (err, duration) => {
                 if(err) {
                     console.log(err);
                     return res.status(500).send({
@@ -91,7 +91,7 @@ router.post('/send/:channelID', (req, res) => {
     let newMsgID = channelMap.shift();
     speachMap.set(channelID, channelMap);
 
-    md(`${__dirname}/routes/public/speach/${newMsgID}.mp3`, (err, duration) => {
+    md(`${__dirname}/public/speach/${newMsgID}.mp3`, (err, duration) => {
         if(err) {
             console.log(err);
             return res.status(500).send({
@@ -104,7 +104,7 @@ router.post('/send/:channelID', (req, res) => {
         io.of(`/speach/${channelID}`).emit('speach', { id: newMsgID });
         //? Removes the file from the folder
         setTimeout(() => {
-            fs.unlinkSync(`${__dirname}/routes/public/speach/${newMsgID}.mp3`);
+            fs.unlinkSync(`${__dirname}/public/speach/${newMsgID}.mp3`);
         }, (duration * 1000) - 1000);
         
         //? Send the next speach

@@ -19,7 +19,7 @@ async function server() {
     app.use('/triggers', require('./routes/trigger.routes'));
     app.use('/clip', require('./routes/clip.routes'));
     app.use('/video', require('./routes/video.routes'));
-    app.use('/speach', require('./routes/speach.routes'));
+    app.use('/speech', require('./routes/speach.routes'));
     app.use('/auth', require('./routes/auth.routes'));
     app.use('/twitch', require('./routes/twitch.routes'));
     app.use('/overlays', require('./routes/overlay.routes'));

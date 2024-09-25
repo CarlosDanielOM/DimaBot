@@ -3,7 +3,7 @@ const { getClient } = require("../util/database/dragonfly");
 async function auth(req, res, next) {
     let cacheClient = getClient();
 
-    let token = req.headers['authorization'];
+    let token = req.headers['Authorization'];
     if (!token) {
         return res.status(401).send({
             error: 'Unauthorized',

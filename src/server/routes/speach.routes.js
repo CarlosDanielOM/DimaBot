@@ -55,9 +55,9 @@ router.post('/:channelID', (req, res) => {
                     });
                 }
 
-                io.of(`/speach/${channelID}`).emit('speach', { id: msgID });
+                io.of(`/speech/${channelID}`).emit('speach', { id: msgID });
                 setTimeout(() => {
-                    fetch(`${getUrl()}/speach/send/${channelID}`, {
+                    fetch(`${getUrl()}/speech/send/${channelID}`, {
                         method: 'POST',
                         body: JSON.stringify({
                             id: msgID
@@ -101,7 +101,7 @@ router.post('/send/:channelID', (req, res) => {
             });
         }
 
-        io.of(`/speach/${channelID}`).emit('speach', { id: newMsgID });
+        io.of(`/speech/${channelID}`).emit('speach', { id: newMsgID });
         //? Removes the file from the folder
         setTimeout(() => {
             fs.unlinkSync(`${__dirname}/public/speach/${newMsgID}.mp3`);
@@ -109,7 +109,7 @@ router.post('/send/:channelID', (req, res) => {
         
         //? Send the next speach
         setTimeout(() => {
-            fetch(`${getUrl()}/speach/send/${channelID}`, {
+            fetch(`${getUrl()}/speech/send/${channelID}`, {
                 method: 'POST',
                 body: JSON.stringify({
                     id: newMsgID

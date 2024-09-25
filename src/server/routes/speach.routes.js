@@ -79,6 +79,8 @@ router.post('/:channelID', (req, res) => {
 router.post('/send/:channelID', (req, res) => {
     const channelID = req.params.channelID;
     const { id } = req.body;
+
+    let io = getIO();
     
     let channelMap = speachMap.get(channelID);
     if(channelMap.length === 0) {

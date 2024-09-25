@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const channelSchema = require('../../../schema/channel');
 
 router.get('/', (req, res) => {
     res.send('User');
@@ -7,12 +8,8 @@ router.get('/', (req, res) => {
 
 router.get('/:channelID', (req, res) => {});
 
-module.exports = router;
-
-/*
-  app.post('/premium', async (req, res) => {
-    let { channel, channelID } = req.body;
-
+router.post('/premium', async (req, res) => {
+    const { channel, channelID } = req.body;
     let exists = await channelSchema.findOne({ name: channel, twitch_user_id: channelID }, 'premium premium_plus');
 
     if (!exists) {
@@ -21,25 +18,25 @@ module.exports = router;
     }
 
     if (exists.premium_plus) {
-      return res.status(200).json({ error: false, message: 'Channel is premium plus', premium: 'premium_plus' });
-    } else if (exists.premium) {
-      return res.status(200).json({ error: false, message: 'Channel is premium', premium: 'premium' });
-    } else {
-      return res.status(200).json({ error: false, message: 'Channel is not premium', premium: 'none' });
-    }
-  });
+        return res.status(200).json({ error: false, message: 'Channel is premium plus', premium: 'premium_plus' });
+      } else if (exists.premium) {
+        return res.status(200).json({ error: false, message: 'Channel is premium', premium: 'premium' });
+      } else {
+        return res.status(200).json({ error: false, message: 'Channel is not premium', premium: 'none' });
+      }
+});
 
-  app.get('/active/:channel', async (req, res) => {
-    const { channel } = req.params;
-    let exists = await channelSchema.findOne({ name: channel });
+router.get('/active/:channel', async (req, res) => {
+  const { channel } = req.params;
+  let exists = await channelSchema.findOne({ name: channel });
 
-    if (!exists) return res.status(404).json({ message: 'Channel not found', error: true });
+  if (!exists) return res.status(404).json({ message: 'Channel not found', error: true });
 
-    if (exists.actived) {
-      res.status(200).json({ message: 'Channel is active', active: true, error: false });
-    } else {
-      res.status(200).json({ message: 'Channel is not active', active: false, error: false });
-    }
+  if (exists.actived) {
+    res.status(200).json({ message: 'Channel is active', active: true, error: false });
+  } else {
+    res.status(200).json({ message: 'Channel is not active', active: false, error: false });
+  }
+});
 
-  })
-*/
+module.exports = router;

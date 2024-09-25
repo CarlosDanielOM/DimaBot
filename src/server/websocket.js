@@ -10,6 +10,12 @@ async function websocket(app) {
         connectionStateRecovery: {}
     });
 
+    //? Speach
+    io.of(/^\/speech\/\w+$/).on('connection', async (socket) => {
+        const channelID = socket.nsp.name.split('/')[2];
+        console.log(`${channelID} connected to speech`);
+    });
+
     //? Overlay triggers
     io.of(/^\/overlays\/triggers\/\w+$/).on('connection', async (socket) => {
         const channelID = socket.nsp.name.split('/')[3];

@@ -118,16 +118,6 @@ router.post('/:channelID', async (req, res) => {
     
 });
 
-router.post('/:channelID/send', async (req, res) => {
-    const io = getIO();
-    const {channelID} = req.params;
-    console.log({req: req});
-    const body = req.body;
-    console.log(body);
-
-    io.of(`/overlays/triggers/${channelID}`).emit('trigger', body);
-});
-
 router.post('/:channelID/upload', async (req, res) => {
     const { channelID } = req.params;
     const streamer = await STREAMERS.getStreamerById(channelID);

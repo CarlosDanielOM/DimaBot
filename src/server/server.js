@@ -4,6 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 
+const { getIO } = require('./socket');
+
 async function server() {
     let app = express();
     app.use(cors());
@@ -36,6 +38,14 @@ async function server() {
             });
         }
         res.status(200).sendFile(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}`);
+    });
+
+    app.post('/triggers/:channelID/send', async (req, res) => {
+        const io = getIO();
+        const {channelID} = req.params;
+        const body = req.body;
+    
+        io.of(`/overlays/triggers/${channelID}`).emit('trigger', body);
     });
     
     return app;

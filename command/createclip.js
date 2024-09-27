@@ -40,14 +40,13 @@ async function createChannelClip(channelID) {
 
 module.exports = createChannelClip;
 
-async function checkClipStatus(channelID, clipID) {
-    let retries = 0;
+async function checkClipStatus(channelID, clipID, retries = 0) {
     let getClipFun = await getClip(channelID, clipID);
 
     if(getClipFun.error) {
         if(getClipFun.status === 404 && retries < 8) {
             await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
-            return checkClipStatus(channelID, clipID, retries++); // Retry
+            return checkClipStatus(channelID, clipID, retries + 1); // Retry
         }
         return getClipFun;
     }

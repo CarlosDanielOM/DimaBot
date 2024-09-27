@@ -3,7 +3,7 @@ const { getClient } = require("../util/database/dragonfly");
 async function auth(req, res, next) {
     let cacheClient = getClient();
 
-    let token = req.headers['Authorization'];
+    let token = req.headers['authorization'];
     console.log({token, where: 'auth'})
     if (!token) {
         return res.status(401).send({

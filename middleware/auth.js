@@ -4,6 +4,7 @@ async function auth(req, res, next) {
     let cacheClient = getClient();
 
     let token = req.headers['Authorization'];
+    console.log({token, where: 'auth'})
     if (!token) {
         return res.status(401).send({
             error: 'Unauthorized',

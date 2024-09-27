@@ -39,14 +39,6 @@ async function server() {
         res.status(200).sendFile(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}`);
     });
 
-    app.post('/trigger/:channelID/send', async (req, res) => {
-        const io = getIO();
-        const {channelID} = req.params;
-        const body = req.body;
-    
-        io.of(`/overlays/triggers/${channelID}`).emit('trigger', body);
-    });
-    
     return app;
 }
 

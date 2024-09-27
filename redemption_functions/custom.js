@@ -1,6 +1,7 @@
 const CHANNEL = require('../function/channel')
 const rewardSchema = require('../schema/redemptionreward');
 const { getUrl } = require('../util/dev');
+const STREAMERS = require('../class/streamer');
 
 async function customRedemptionReward(eventData, rewardData) {
     const { broadcaster_user_id, broadcaster_user_login} = eventData;

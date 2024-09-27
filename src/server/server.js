@@ -8,7 +8,6 @@ const { getIO } = require('./websocket');
 
 async function server() {
     let app = express();
-    app.use(cors());
 
     app.use(bodyParser.json());
     app.use(bodyParser.urlencoded({ extended: true }));
@@ -40,7 +39,7 @@ async function server() {
         res.status(200).sendFile(`${__dirname}/routes/public/uploads/triggers/${channelID}/${triggerName}`);
     });
 
-    app.post('/triggers/:channelID/send', async (req, res) => {
+    app.post('/trigger/:channelID/send', async (req, res) => {
         const io = getIO();
         const {channelID} = req.params;
         const body = req.body;

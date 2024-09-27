@@ -4,7 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 
-const { getIO } = require('./socket');
+const { getIO } = require('./websocket');
 
 async function server() {
     let app = express();

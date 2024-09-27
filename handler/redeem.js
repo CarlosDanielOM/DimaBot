@@ -105,7 +105,7 @@ async function sendTrigger(channelID, triggerData) {
     }); // Fetch the trigger
 
     if (!res.ok) {
-        console.log({ res, body: res.body, where: 'sendTrigger', for: 'triggerData' })
+        console.log({ res, body: res.body, where: 'sendTrigger', for: 'triggerData', channelID, streamerToken})
         return { error: true, message: 'Error sending trigger' }
     };
 

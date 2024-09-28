@@ -26,6 +26,7 @@ async function server() {
     app.use('/overlays', require('./routes/overlay.routes'));
     app.use('/sumimetro', require('./routes/sumimetro.routes'));
     app.use('/user', require('./routes/user.routes'));
+    app.use('/commands', require('./routes/command.routes'));
 
     app.get('/media/:channelID/:triggerName', (req, res) => {
         const channelID = req.params.channelID;

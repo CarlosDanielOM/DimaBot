@@ -1,6 +1,7 @@
 const rewardSchema = require('../schema/redemptionreward');
 const channelSchema = require('../schema/channel');
 const { getUrl } = require('../util/dev');
+const STREAMERS = require('../class/streamer');
 
 async function resetRedemptionCost(client, channelID) {
     let channel = await channelSchema.findOne({twitch_user_id: channelID});
@@ -18,10 +19,13 @@ async function resetRedemptionCost(client, channelID) {
             cost: rewards[i].rewardOriginalCost,
         }
 
+        let streamerToken = await STREAMERS.getStreamerTokenById(channelID);
+
         let response = await fetch(`${getUrl()}/rewards/${channelID}/${rewards[i].rewardID}`, {
             method: 'PATCH',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `${streamerToken}`
             },
             body: JSON.stringify(data)
         });

@@ -10,8 +10,13 @@ const { getClient } = require('../../../util/database/dragonfly');
 router.use(auth);
 
 router.get('/', async (req, res) => {
+    let query = req.query;
+
+    let limit = query.limit ? parseInt(query.limit) : 100;
+    let skip = query.skip ? parseInt(query.skip) : 0;
+
     try {
-        const commands = await commandSchema.find();
+        const commands = await commandSchema.find().skip(skip).limit(limit);
         res.send({
             message: 'Commands fetched',
             commands: commands,
@@ -29,9 +34,13 @@ router.get('/', async (req, res) => {
 
 router.get('/:channelID', async (req, res) => {
     const { channelID } = req.params;
+    let query = req.query;
+
+    let limit = query.limit ? parseInt(query.limit) : 100;
+    let skip = query.skip ? parseInt(query.skip) : 0;
 
     try {
-        const commands = await commandSchema.find({ channelID: channelID });
+        const commands = await commandSchema.find({ channelID: channelID }).skip(skip).limit(limit);
 
         res.send({
             message: 'Commands fetched from database',

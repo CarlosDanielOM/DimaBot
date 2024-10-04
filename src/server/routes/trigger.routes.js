@@ -61,7 +61,7 @@ router.post('/:channelID', async (req, res) => {
     delete body.name;
     if(!body.rewardType) body.rewardType = 'trigger';
 
-    let streamerToken = awaitSTREAMERS.getStreamerTokenById(channelID);
+    let streamerToken = await STREAMERS.getStreamerTokenById(channelID);
 
     let response = await fetch(`${getUrl()}/rewards/${channelID}`, {
         method: 'POST',

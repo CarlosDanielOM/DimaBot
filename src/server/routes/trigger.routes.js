@@ -63,8 +63,6 @@ router.post('/:channelID', async (req, res) => {
 
     let streamerToken = await STREAMERS.getStreamerTokenById(channelID);
 
-    console.log({body, where: 'trigger'});
-
     let response = await fetch(`${getUrl()}/rewards/${channelID}`, {
         method: 'POST',
         headers: {

@@ -140,7 +140,12 @@ router.post('/login', async (req, res) => {
     let exists = await channelSchema.findOne({ twitch_user_id: id });
 
     if(exists) {
-        let token = decrypt(exists.twitch_user_token);
+        let token = null;
+
+        if(exists.twitch_user_token.iv && exists.twitch_user_token.content) {
+            token = decrypt(exists.twitch_user_token);
+        }
+        
         return res.status(200).send({
             error: false,
             message: 'User already exists',

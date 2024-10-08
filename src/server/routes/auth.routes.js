@@ -62,7 +62,7 @@ router.get('/register', async (req, res) => {
         let addedModerator = await CHANNEL.addModerator(streamer.user_id);
 
         if(addedModerator.error) {
-            if(addedMod.message == 'user is already a mod') {
+            if(addedModerator.message == 'user is already a mod') {
                 console.log({error: addedModerator});
             } else {
                 logger(addedModerator, true, streamer.user_id, 'auth_moderator');

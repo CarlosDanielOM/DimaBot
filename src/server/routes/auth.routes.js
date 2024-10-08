@@ -87,9 +87,11 @@ router.get('/register', async (req, res) => {
             }
         }
 
+        let jsonCommands = JSONCOMMANDS.commands;
+        
         //? Add all reserved commands to the channel
-        for(const command of JSONCOMMANDS) {
-            let commandExists = await commandSchema.exists({name: JSONCOMMANDS[command].name, channelID: streamer.user_id});
+        for(const command of jsonCommands) {
+            let commandExists = await commandSchema.exists({name: jsonCommands[command].name, channelID: streamer.user_id});
 
             if(commandExists) {
                 console.log(`Command ${command} already exists in ${streamer.user_id}`);
@@ -97,17 +99,17 @@ router.get('/register', async (req, res) => {
             }
 
             let newCommand = new commandSchema({
-                name: commandsJSON[command].name,
-                cmd: commandsJSON[command].cmd,
-                func: commandsJSON[command].func,
-                type: commandsJSON[command].type,
+                name: jsonCommands[command].name,
+                cmd: jsonCommands[command].cmd,
+                func: jsonCommands[command].func,
+                type: jsonCommands[command].type,
                 channel: updatedChannel.name,
                 channelID: updatedChannel.twitch_user_id,
-                cooldown: commandsJSON[command].cooldown,
-                enabled: commandsJSON[command].enabled,
-                userLevel: commandsJSON[command].userLevel,
-                userLevelName: commandsJSON[command].userLevelName,
-                reserved: commandsJSON[command].reserved,
+                cooldown: jsonCommands[command].cooldown,
+                enabled: jsonCommands[command].enabled,
+                userLevel: jsonCommands[command].userLevel,
+                userLevelName: jsonCommands[command].userLevelName,
+                reserved: jsonCommands[command].reserved,
             });
 
             try {

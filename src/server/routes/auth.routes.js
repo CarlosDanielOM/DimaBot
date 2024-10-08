@@ -84,7 +84,6 @@ router.get('/register', async (req, res) => {
 
             if(response.error) {
                 logger(response, true, streamer.user_id, 'auth_event_sub');
-                return res.status(response.status).send(response);
             }
         }
 

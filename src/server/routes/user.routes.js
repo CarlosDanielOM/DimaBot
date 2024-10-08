@@ -1,12 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const channelSchema = require('../../../schema/channel');
+const STREAMERS = require('../../../class/streamer');
+
 
 router.get('/', (req, res) => {
     res.send('User');
 });
 
-router.get('/:channelID', (req, res) => {});
+router.get('/:channelID', (req, res) => {
+  const { channelID } = req.params;
+
+  let streamer = STREAMERS.getStreamerById(channelID);
+
+  if(!streamer) return res.status(404).json({ error: true, reason: 'Streamer not found' });
+
+  return res.status(200).json({ error: false, streamer: streamer });
+});
 
 router.post('/premium', async (req, res) => {
     const { channel, channelID } = req.body;

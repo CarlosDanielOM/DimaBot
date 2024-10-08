@@ -14,7 +14,7 @@ const {connectChannel} = require('../../../util/client')
 const {subcriptionsTypes, subscribeTwitchEvent} = require('../../../util/eventsub')
 const JSONCOMMANDS = require('../../../config/reservedcommands.json')
 
-router.post('/register', async (req, res) => {
+router.get('/register', async (req, res) => {
     const token = req.query.code;
     const username = req.query.state;
 

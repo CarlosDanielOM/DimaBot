@@ -38,6 +38,7 @@ async function connectChannels() {
 }
 
 function connectChannel(channel) {
+    let client = getClient();
     try {
         client.join(channel);
     } catch (error) {

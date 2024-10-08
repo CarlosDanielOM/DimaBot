@@ -8,10 +8,10 @@ router.get('/', (req, res) => {
     res.send('User');
 });
 
-router.get('/:channelID', (req, res) => {
+router.get('/:channelID', async (req, res) => {
   const { channelID } = req.params;
 
-  let streamer = STREAMERS.getStreamerById(channelID);
+  let streamer = await STREAMERS.getStreamerById(channelID);
 
   if(!streamer) return res.status(404).json({ error: true, reason: 'Streamer not found' });
 

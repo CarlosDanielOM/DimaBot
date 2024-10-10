@@ -24,7 +24,9 @@
             audioPlayer.play();
 
             audioPlayer.addEventListener('ended', () => {
-                socket.emit('end', {id: data.id});
+                if (lastMsgId === data.id) {
+                    socket.emit('end', {id: data.id});
+                }
             });
         });
     </script>

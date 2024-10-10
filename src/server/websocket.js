@@ -25,7 +25,7 @@ async function websocket(app) {
             console.log(`Current id: ${data.id}`);
             console.log(`${channelID} ended speech`);
 
-            fs.unlink(`${__dirname}/routes/public/speach/${data.id}.mp3`, async (err) => {
+            fs.unlinkSync(`${__dirname}/routes/public/speach/${data.id}.mp3`, async (err) => {
                 if (err) {
                     console.error(err);
                     return;
@@ -40,7 +40,7 @@ async function websocket(app) {
 
             console.log(`Messages: ${messages}`);
 
-            if(messages > 0) {
+            if(messages > 1) {
                 let messageQueue = await cacheClient.smembers(`${channelID}:speach`);
                 console.log(`Queue: ${messageQueue}`);
                 let id = messageQueue[0];

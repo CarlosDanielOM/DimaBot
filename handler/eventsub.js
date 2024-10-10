@@ -17,6 +17,7 @@ const { getEditors } = require('../function/channel')
 const { getClient } = require('../util/database/dragonfly')
 const resetCacheAtOffline = require('../handler_function/clearcache')
 const logger = require('../util/logger')
+const clearSpeachFiles = require('../handler_function/clearspeachfiles')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -77,6 +78,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             resetSumimetro(eventData.broadcaster_user_id);
             resetCommandsFromCache(client, eventData.broadcaster_user_id);
             resetCacheAtOffline(eventData.broadcaster_user_id);
+            clearSpeachFiles(eventData.broadcaster_user_id);
             try {
                 await cacheClient.del(`${eventData.broadcaster_user_id}:channel:editors`);
             } catch (error) {

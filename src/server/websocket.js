@@ -17,6 +17,14 @@ async function websocket(app) {
         const channelID = socket.nsp.name.split('/')[2];
         console.log(`${channelID} connected to speech`);
 
+        let messages = await cacheClient.scard(`${channelID}:speach`);
+
+        if(messages > 0) {
+            let messageQueue = await cacheClient.smembers(`${channelID}:speach`);
+            let id = messageQueue[0];
+            io.of(`/speech/${channelID}`).emit('speach', { id });
+        }
+
         socket.on('disconnect', () => {
             console.log(`${channelID} disconnected from speech`);
         });
@@ -34,7 +42,7 @@ async function websocket(app) {
                 await cacheClient.srem(`${channelID}:speach`, data.id);
                 
                 console.log(`${data.id}.mp3 was deleted`);
-                
+
                 let messages = await cacheClient.scard(`${channelID}:speach`);
     
                 console.log(`Messages: ${messages}`);

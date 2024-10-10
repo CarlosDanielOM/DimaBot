@@ -44,6 +44,8 @@ router.post('/:channelID', async (req, res) => {
         }
 
         await cacheClient.sadd(`${channelID}:speach`, msgID);
+
+        console.log(`Message ${msgID} saved`);
         
         if(messages === 0) {
             io.of(`/speech/${channelID}`).emit('speach', { id: msgID });

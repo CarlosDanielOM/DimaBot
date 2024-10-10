@@ -25,7 +25,7 @@ async function websocket(app) {
             console.log(`Current id: ${data.id}`);
             console.log(`${channelID} ended speech`);
 
-            fs.unlinkSync(`${__dirname}/routes/public/speach/${data.id}.mp3`, async (err) => {
+            fs.unlink(`${__dirname}/routes/public/speach/${data.id}.mp3`, async (err) => {
                 if (err) {
                     console.error(err);
                     return;
@@ -34,18 +34,19 @@ async function websocket(app) {
                 await cacheClient.srem(`${channelID}:speach`, data.id);
                 
                 console.log(`${data.id}.mp3 was deleted`);
+                
+                let messages = await cacheClient.scard(`${channelID}:speach`);
+    
+                console.log(`Messages: ${messages}`);
+    
+                if(messages > 0) {
+                    let messageQueue = await cacheClient.smembers(`${channelID}:speach`);
+                    console.log(`Queue: ${messageQueue}`);
+                    let id = messageQueue[0];
+                    io.of(`/speech/${channelID}`).emit('speach', { id });
+                }
             });
 
-            let messages = await cacheClient.scard(`${channelID}:speach`);
-
-            console.log(`Messages: ${messages}`);
-
-            if(messages > 0) {
-                let messageQueue = await cacheClient.smembers(`${channelID}:speach`);
-                console.log(`Queue: ${messageQueue}`);
-                let id = messageQueue[0];
-                io.of(`/speech/${channelID}`).emit('speach', { id });
-            }
             
         });
     });

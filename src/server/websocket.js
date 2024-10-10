@@ -38,6 +38,8 @@ async function websocket(app) {
 
             let messages = await cacheClient.scard(`${channelID}:speach`);
 
+            console.log(`Messages: ${messages}`);
+
             if(messages > 0) {
                 let messageQueue = await cacheClient.smembers(`${channelID}:speach`);
                 console.log(`Queue: ${messageQueue}`);

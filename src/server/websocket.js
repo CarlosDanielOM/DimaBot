@@ -40,7 +40,7 @@ async function websocket(app) {
 
             console.log(`Messages: ${messages}`);
 
-            if(messages > 1) {
+            if(messages > 0) {
                 let messageQueue = await cacheClient.smembers(`${channelID}:speach`);
                 console.log(`Queue: ${messageQueue}`);
                 let id = messageQueue[0];

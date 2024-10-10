@@ -16,10 +16,16 @@
         const socket = io(`/speech/${channelID}`, {reconnection: true});
 
         socket.on('speach', (data) => {
+            console.log({data});
             if (lastMsgId === data.id) return;
             lastMsgId = data.id;
             audioPlayer.src = `https://api.domdimabot.com/speech/${channelID}/${data.id}`;
+            // audioPlayer.src = `http://localhost:3000/speech/${channelID}/${data.id}`;
             audioPlayer.play();
+
+            audioPlayer.addEventListener('ended', () => {
+                socket.emit('end', {id: data.id});
+            });
         });
     </script>
 </body>

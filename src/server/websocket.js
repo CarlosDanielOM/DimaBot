@@ -1,6 +1,7 @@
 const { Server } = require('socket.io');
 const http = require('http');
 const { getClient } = require('../../util/database/dragonfly');
+const fs = require('fs');
 
 let io = null;
 
@@ -12,8 +13,38 @@ async function websocket(app) {
 
     //? Speach
     io.of(/^\/speech\/\w+$/).on('connection', async (socket) => {
+        let cacheClient = getClient();
         const channelID = socket.nsp.name.split('/')[2];
         console.log(`${channelID} connected to speech`);
+
+        socket.on('disconnect', () => {
+            console.log(`${channelID} disconnected from speech`);
+        });
+
+        socket.on('end', async (data) => {
+            console.log(data.id);
+            console.log(`${channelID} ended speech`);
+
+            fs.unlink(`${__dirname}/routes/public/speach/${data.id}.mp3`, async (err) => {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+
+                await cacheClient.srem(`${channelID}:speach`, data.id);
+                
+                console.log(`${data.id}.mp3 was deleted`);
+            });
+
+            let messages = await cacheClient.scard(`${channelID}:speach`);
+
+            if(messages > 0) {
+                let messageQueue = await cacheClient.smembers(`${channelID}:speach`);
+                let id = messageQueue[0];
+                io.of(`/speech/${channelID}`).emit('speach', { id });
+            }
+            
+        });
     });
 
     //? Overlay triggers

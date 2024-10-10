@@ -15,6 +15,8 @@ router.get('/:channelID', async (req, res) => {
 
   if(!streamer) return res.status(404).json({ error: true, reason: 'Streamer not found' });
 
+  delete streamer.refresh_token;
+
   return res.status(200).json({ error: false, streamer: streamer });
 });
 

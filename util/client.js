@@ -9,7 +9,7 @@ const options = getClientOpts();
 
 async function clientConnect() {
     try {
-        client = new tmi.client(options);
+        client = new tmi.Client(options);
         await client.connect();
 
         client.on('connected', (address, port) => {

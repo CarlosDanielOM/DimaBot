@@ -105,6 +105,8 @@ router.post('/:channelID', async (req, res) => {
         volume,
     });
 
+    console.log({triggerData: newTrigger});
+
     try {
         await newTrigger.save();
     } catch (error) {

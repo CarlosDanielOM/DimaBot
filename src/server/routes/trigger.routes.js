@@ -49,8 +49,8 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
-    let exists = await triggerFileSchema.exists({name: file, channelID: channelID, fileType: mediaType});
-    if(!exists) {
+    let fileData = await triggerFileSchema.findOne({name: file, channelID: channelID, fileType: mediaType});
+    if(!fileData) {
         return res.status(400).send({
             error: 'Bad Request',
             message: 'File not found',
@@ -90,8 +90,6 @@ router.post('/:channelID', async (req, res) => {
     
     let rewardData = response.data;
 
-    console.log({responseData: rewardData});
-
     let newTrigger = new triggerSchema({
         name: name,
         channel: streamer.name,
@@ -103,6 +101,7 @@ router.post('/:channelID', async (req, res) => {
         cost,
         cooldown,
         volume,
+        fileID: fileData._id,
     });
 
     console.log({triggerData: newTrigger});

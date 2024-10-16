@@ -63,9 +63,6 @@ router.post('/:channelID', async (req, res) => {
 
     let streamerToken = await STREAMERS.getStreamerTokenById(channelID);
 
-    console.log('ChannelID: ' + channelID);
-    console.log({body, where: `before fetch`});
-
     let response = await fetch(`${getUrl()}/rewards/${channelID}`, {
         method: 'POST',
         headers: {
@@ -75,9 +72,7 @@ router.post('/:channelID', async (req, res) => {
         body: JSON.stringify(body)
     })
 
-    console.log({responseOrigin: response})
     response = await response.json();
-    console.log({response: response});
     if(response.error) {
         console.log({
             error: 'Bad Request',
@@ -103,8 +98,6 @@ router.post('/:channelID', async (req, res) => {
         volume,
         fileID: fileData._id,
     });
-
-    console.log({triggerData: newTrigger});
 
     try {
         await newTrigger.save();

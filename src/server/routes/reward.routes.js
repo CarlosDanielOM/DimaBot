@@ -53,7 +53,6 @@ router.get('/:channelID', async (req, res) => {
 router.post('/:channelID', async (req, res) => {
     const {channelID} = req.params;
     const body = req.body;
-    console.log(body);
 
     const streamer = await STREAMERS.getStreamerById(channelID);
     if(!streamer) {

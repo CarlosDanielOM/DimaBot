@@ -4,6 +4,7 @@ const STREAMERS = require('../class/streamer');
 const { getClientOpts } = require('./dev');
 
 let client = null;
+let isClientConnected = false;
 
 const options = getClientOpts();
 
@@ -11,10 +12,11 @@ async function clientConnect() {
     try {
         client = new tmi.Client(options);
         await client.connect();
+        isClientConnected = true;
 
-        client.on('connected', (address, port) => {
-            console.log(`* Twitch CLient Connected to ${address}:${port}`);
-        })
+        // client.on('connected', (address, port) => {
+        //     console.log(`* Twitch CLient Connected to ${address}:${port}`);
+        // })
     } catch (error) {
         console.error('Error connecting to Twitch: ', error);
     }
@@ -26,7 +28,10 @@ function getClient() {
 
 async function connectChannels() {
     const joinableChannels = await STREAMERS.getStreamerNames();
-
+    if(!isClientConnected) {
+        console.error('Client not connected');
+        return;
+    }
     for (let i = 0; i < joinableChannels.length; i++) {
         try {
             await new Promise(resolve => setTimeout(resolve, 500)); // 0.5 second delay
@@ -38,7 +43,7 @@ async function connectChannels() {
 }
 
 async function connectChannel(channel) {
-    if(!client) {
+    if(!isClientConnected) {
         console.error('Client not connected');
         return;
     }

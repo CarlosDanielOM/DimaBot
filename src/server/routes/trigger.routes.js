@@ -75,7 +75,9 @@ router.post('/:channelID', async (req, res) => {
         body: JSON.stringify(body)
     })
 
-    // response = await response.json();
+    console.log({responseOrigin: response})
+    response = await response.json();
+    console.log({response: response});
     if(response.error) {
         console.log({
             error: 'Bad Request',
@@ -85,7 +87,6 @@ router.post('/:channelID', async (req, res) => {
         });
         return res.status(response.status).send(response);
     }
-    console.log({responseOrigin: response})
     
     let rewardData = response.data;
 

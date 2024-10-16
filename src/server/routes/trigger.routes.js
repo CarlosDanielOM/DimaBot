@@ -85,9 +85,11 @@ router.post('/:channelID', async (req, res) => {
         });
         return res.status(response.status).send(response);
     }
-    console.log("responseData" + response);
+    console.log({responseOrigin: response})
     
     let rewardData = response.data;
+
+    console.log({responseData: rewardData});
 
     let newTrigger = new triggerSchema({
         name: name,

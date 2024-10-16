@@ -10,7 +10,7 @@ const CHANNEL = require('../../../function/channel');
 
 const logger = require('../../../util/logger');
 const { encrypt, decrypt } = require('../../../util/crypto');
-const {connectChannel, getClient} = require('../../../util/client');
+const {connectChannel} = require('../../../util/client');
 const {subcriptionsTypes, subscribeTwitchEvent} = require('../../../util/eventsub')
 const JSONCOMMANDS = require('../../../config/reservedcommands.json')
 
@@ -120,7 +120,6 @@ router.get('/register', async (req, res) => {
             }
         }
 
-        console.log({client: getClient()});
         await connectChannel(streamer.name);
 
         // Return the login.html file (local development)

@@ -3,10 +3,13 @@ const mongodb = require("../../util/database/mongodb");
 const server = require("./server");
 const websocket = require("./websocket");
 const STREAMERS = require("../../class/streamer")
+const CLIENT = require('../../util/client');
 
 async function serverInit() {
   try {
 
+    await CLIENT.clientConnect();
+    
     await dragonfly.init();
     await mongodb.init();
     await STREAMERS.init();

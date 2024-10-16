@@ -14,12 +14,16 @@ async function clientConnect() {
         await client.connect();
         isClientConnected = true;
 
-        client.on('Connecting', (address, port) => {
+        client.on('connecting', (address, port) => {
             console.log(`* Twitch client trying to Connect to ${address}:${port}`);
         })
 
-        client.on('Connected', (address, port) => {
+        client.on('connected', (address, port) => {
             console.log(`* Twitch CLient Connected to ${address}:${port}`);
+        })
+
+        client.on('connect', (address, port) => {
+            console.log(`* Twitch Client Connect to ${address}:${port}`);
         })
     } catch (error) {
         console.error('Error connecting to Twitch: ', error);

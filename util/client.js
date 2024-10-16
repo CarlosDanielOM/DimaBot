@@ -40,6 +40,7 @@ async function connectChannels() {
 async function connectChannel(channel) {
     // let client = getClient();
     try {
+        console.log(`Connecting to channel: ${channel}`);
         await client.join(channel);
     } catch (error) {
         console.error(`Error connecting to channel ${channel}: ${error}`);

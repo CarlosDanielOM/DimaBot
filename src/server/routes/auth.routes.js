@@ -120,7 +120,7 @@ router.get('/register', async (req, res) => {
             }
         }
 
-        connectChannel(streamer.name);
+        await connectChannel(streamer.name);
 
         // Return the login.html file (local development)
         // return res.status(200).sendFile(path.join(__dirname, '../../../routes/public/login.html'));

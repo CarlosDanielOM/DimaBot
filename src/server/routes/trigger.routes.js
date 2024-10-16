@@ -69,7 +69,8 @@ router.post('/:channelID', async (req, res) => {
     let response = await fetch(`${getUrl()}/rewards/${channelID}`, {
         method: 'POST',
         headers: {
-            'Authorization': `${streamerToken}`
+            'Authorization': `${streamerToken}`,
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify(body)
     })

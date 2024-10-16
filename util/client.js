@@ -38,6 +38,10 @@ async function connectChannels() {
 }
 
 async function connectChannel(channel) {
+    if(!client) {
+        console.error('Client not connected');
+        return;
+    }
     try {
         await client.join(channel);
     } catch (error) {

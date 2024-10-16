@@ -63,6 +63,9 @@ router.post('/:channelID', async (req, res) => {
 
     let streamerToken = await STREAMERS.getStreamerTokenById(channelID);
 
+    console.log('ChannelID: ' + channelID);
+    console.log({body, where: `before fetch`});
+
     let response = await fetch(`${getUrl()}/rewards/${channelID}`, {
         method: 'POST',
         headers: {
@@ -71,7 +74,7 @@ router.post('/:channelID', async (req, res) => {
         body: JSON.stringify(body)
     })
 
-    response = await response.json();
+    // response = await response.json();
     if(response.error) {
         console.log({
             error: 'Bad Request',
@@ -81,6 +84,7 @@ router.post('/:channelID', async (req, res) => {
         });
         return res.status(response.status).send(response);
     }
+    console.log("responseData" + response);
     
     let rewardData = response.data;
 

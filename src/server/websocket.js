@@ -30,6 +30,15 @@ async function websocket(app) {
         });
 
         socket.on('end', async (data) => {
+
+            let fileExists = fs.existsSync(`${__dirname}/routes/public/speach/${data.id}.mp3`);
+
+            if(!fileExists) {
+                let messages = await cacheClient.smembers(`${channelID}:speach`);
+                let id = messages[0];
+                io.of(`/speech/${channelID}`).emit('speach', { id: id });
+            }
+            
             fs.unlink(`${__dirname}/routes/public/speach/${data.id}.mp3`, async (err) => {
                 if (err) {
                     console.error(err);

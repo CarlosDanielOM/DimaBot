@@ -66,6 +66,12 @@ async function websocket(app) {
         console.log(`${channelID} connected to triggers`);
     });
 
+    //? Overlay Furry
+    io.of(/^\/overlays\/furry\/\w+$/).on('connection', async (socket) => {
+        const channelID = socket.nsp.name.split('/')[3];
+        console.log(`${channelID} connected to furry`);
+    });
+
     //? Clip
     io.of(/^\/clip\/\w+$/).on('connection', async (socket) => {
         const channelID = socket.nsp.name.split('/')[2];

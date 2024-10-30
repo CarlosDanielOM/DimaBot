@@ -155,9 +155,20 @@ router.post('/login', async (req, res) => {
         });
     } else {
         if(action == 'login') {
-            return res.status(404).send({
-                error: 'Not found',
-                message: 'User not found'
+            let newChannel = new channelSchema({
+                name: name,
+                email: email,
+                twitch_user_id: id
+            });
+
+            await newChannel.save();
+
+            return res.status(200).send({
+                error: false,
+                message: 'User created',
+                data: newChannel,
+                saved: true,
+                token: null
             });
         } else {
             return res.status(404).send({

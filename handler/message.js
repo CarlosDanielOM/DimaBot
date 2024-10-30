@@ -13,6 +13,7 @@ const linkRegex = new RegExp(/((http|https):\/\/)?(www\.)?[a-zA-Z-]+(\.[a-zA-Z-]
 
 const commandHandler = require('./command');
 const { getClient } = require('../util/database/dragonfly');
+const logger = require('../util/logger');
 
 const modID = 698614112;
 let channelInstances = new Map();
@@ -48,6 +49,8 @@ async function message(client, channel, tags, message) {
     const [raw, command, argument] = message.match(commandsRegex) || [];
 
     if(!command) return;
+
+    logger({command, argument, channel, channelID}, true, channelID, 'command');
 
     let commandFunc = await cacheClient.hget(`${channelID}:commands:${command}`, 'func');
     let commandUserLevel = await cacheClient.hget(`${channelID}:commands:${command}`, 'level');

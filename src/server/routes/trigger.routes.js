@@ -286,11 +286,17 @@ router.delete('/:channelID/:triggerID', async (req, res) => {
         });
     }
 
+    let streamer = await STREAMERS.getStreamerById(channelID);
+
     let streamerHeaders = await getStreamerHeaderById(channelID);
+    let streamerToken = await streamer.getStreamerTokenById(channelID);
 
     let response = await fetch(`${getUrl()}/rewards/${channelID}/${trigger.rewardID}`, {
         method: 'DELETE',
-        headers: streamerHeaders
+        headers: {
+            'Authorization': `${streamerToken}`,
+            'Content-Type': 'application/json'
+        }
     });
 
     response = await response.json();

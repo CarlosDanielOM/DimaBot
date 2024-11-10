@@ -4,6 +4,8 @@ async function speachChat(channelID, tags, argument) {
     let user = tags.username;
     let message = argument || undefined;
 
+    if(user.toLowerCase() == "ziko_krok") return
+
     if(!message) {
         return {
             error: true,

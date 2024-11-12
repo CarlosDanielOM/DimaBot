@@ -55,19 +55,37 @@ async function message(client, channel, tags, message) {
     let commandFunc = await cacheClient.hget(`${channelID}:commands:${command}`, 'func');
     let commandUserLevel = await cacheClient.hget(`${channelID}:commands:${command}`, 'level');
     let commandCD = await cacheClient.hget(`${channelID}:commands:${command}`, 'cooldown');
+    let commandEnabled = await cacheClient.hget(`${channelID}:commands:${command}`, 'enabled');
     if(!commandFunc) {
-        let commandData = await commandSchema.findOne({channelID, cmd: command, enabled: true});
-        if(!commandData) return;
-        // Saves command to cache
-        await cacheClient.hset(`${channelID}:commands:${command}`, 'func', commandData.func);
-        // Saves user level to cache
-        await cacheClient.hset(`${channelID}:commands:${command}`, 'level', commandData.userLevel);
-        // Saves cooldown to cache
-        await cacheClient.hset(`${channelID}:commands:${command}`, 'cooldown', commandData.cooldown);
-        commandFunc = commandData.func;
-        commandUserLevel = commandData.userLevel;
-        commandCD = commandData.cooldown;
+        let commandData = await commandSchema.findOne({channelID, cmd: command});
+        if(!commandData) {
+            // Saves non existing command to cache as disabled
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'func', 'none');
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'level', 0);
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'cooldown', 0);
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'enabled', 0);
+            commandFunc = 'none';
+            commandUserLevel = 0;
+            commandCD = 0;
+            commandEnabled = 0;
+        } else {
+            // Saves command to cache
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'func', commandData.func);
+            // Saves user level to cache
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'level', commandData.userLevel);
+            // Saves cooldown to cache
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'cooldown', commandData.cooldown);
+            // Saves command status to cache
+            await cacheClient.hset(`${channelID}:commands:${command}`, 'enabled', commandData.enabled ? 1 : 0);
+            commandFunc = commandData.func;
+            commandUserLevel = commandData.userLevel;
+            commandCD = commandData.cooldown;
+            commandEnabled = commandData.enabled ? 1 : 0;
+        }
     }
+
+    if(commandEnabled == 0) return;
+    
     if(!commandUserLevel) commandUserLevel = 7;
 
     if(userLevel < commandUserLevel && command !== 'game' && command !== 'title') {

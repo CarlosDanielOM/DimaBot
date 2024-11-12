@@ -73,7 +73,7 @@ async function websocket(app) {
         let username = await cacheClient.hget(`${channelID}:supremeFurry`, 'user');
 
         if (value !== null && username !== null) {
-            socket.emit('furry', {username, value});
+            io.emit('furry', {username, value});
         }
         
     });

@@ -3,6 +3,7 @@ const commandSchema = require('../schema/command');
 async function enableCommand (channelID, argument) {
     let command = await commandSchema.findOne({channelID: channelID, cmd: argument});
 
+
     if (!command) {
         return {
             error: true,
@@ -22,6 +23,12 @@ async function enableCommand (channelID, argument) {
     }
 
     command.enabled = true;
+
+    let exists = await cacheClient.exists(`${channelID}:commands:${argument}`);
+    
+    if(exists) {
+        await cacheClient.hset(`${channelID}:commands:${argument}`, 'enabled', 1);
+    }
 
     await command.save();
 

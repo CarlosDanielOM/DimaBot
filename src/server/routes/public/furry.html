@@ -15,6 +15,7 @@
 
         socket.on('furry', (data) => {
             let { username, value } = data;
+            console.log({data});
             let text = `${username}: ${value}%`;
             document.getElementById('supremo').innerHTML = text;
         });

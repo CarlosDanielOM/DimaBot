@@ -14,7 +14,7 @@ async function furrometro(channelID, user) {
         };
     }
     
-    let supremeFurry = await cacheClient.get(`${channelID}:supremeFurry`);
+    let supremeFurry = await cacheClient.hget(`${channelID}:supremeFurry`, 'value');
 
     if(!supremeFurry) {
         supremeFurry = 0;
@@ -29,7 +29,11 @@ async function furrometro(channelID, user) {
 
     if(random > supremeFurry) {
         supremeFurry = random;
-        await cacheClient.set(`${channelID}:supremeFurry`, supremeFurry, 'EX', 60 * 60 * 8);
+        // await cacheClient.set(`${channelID}:supremeFurry`, supremeFurry, 'EX', 60 * 60 * 8);
+        await cacheClient.hset(`${channelID}:supremeFurry`, 'value', supremeFurry);
+        await cacheClient.hset(`${channelID}:supremeFurry`, 'username', user);
+
+        await cacheClient.expire(`${channelID}:supremeFurry`, 60 * 60 * 8);
 
         await fetch(`https://api.domdimabot.com/overlays/furry/${channelID}`, {
             method: 'POST',

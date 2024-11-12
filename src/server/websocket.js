@@ -65,8 +65,17 @@ async function websocket(app) {
 
     //? Overlay Furry
     io.of(/^\/overlays\/furry\/\w+$/).on('connection', async (socket) => {
+        let cacheClient = getClient();
         const channelID = socket.nsp.name.split('/')[3];
         console.log(`${channelID} connected to furry`);
+
+        let value = await cacheClient.hget(`${channelID}:supremeFurry`, 'value');
+        let username = await cacheClient.hget(`${channelID}:supremeFurry`, 'user');
+
+        if (value !== null && username !== null) {
+            socket.emit('furry', {username, value});
+        }
+        
     });
 
     //? Clip

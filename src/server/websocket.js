@@ -70,12 +70,17 @@ async function websocket(app) {
         console.log(`${channelID} connected to furry`);
 
         let value = await cacheClient.hget(`${channelID}:supremeFurry`, 'value');
-        let username = await cacheClient.hget(`${channelID}:supremeFurry`, 'user');
+        let username = await cacheClient.hget(`${channelID}:supremeFurry`, 'username');
+
+        socket.on('disconnect', () => {
+            console.log(`${channelID} disconnected from furry`);
+            io.of(`/overlays/furry/${channelID}`).emit('furry', {username: '', value: ''});
+            
+        });
 
         if (value !== null && username !== null) {
-            io.emit('furry', {username, value});
+            io.of(`/overlays/furry/${channelID}`).emit('furry', {username, value});
         }
-        
     });
 
     //? Clip

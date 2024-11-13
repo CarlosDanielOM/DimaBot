@@ -3,7 +3,6 @@ const commandSchema = require('../schema/command');
 async function enableCommand (channelID, argument) {
     let command = await commandSchema.findOne({channelID: channelID, cmd: argument});
 
-
     if (!command) {
         return {
             error: true,

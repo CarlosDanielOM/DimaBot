@@ -13,7 +13,7 @@ router.get('/furry/:channelID', (req, res) => {
 });
 
 router.post('/furry/:channelID', (req, res) => {
-    const { channel } = req.params;
+    const { channelID } = req.params;
     const { username, value } = req.body;
 
     if (!username || !value) {
@@ -22,7 +22,7 @@ router.post('/furry/:channelID', (req, res) => {
 
     let io = getIO();
 
-    io.of(`/overlays/furry/${channel}`).emit('furry', { username, value });
+    io.of(`/overlays/furry/${channelID}`).emit('furry', { username, value });
     res.status(200).json({ message: 'Furry event triggered' });
 });
 

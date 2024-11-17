@@ -6,7 +6,10 @@
             "func": "ruletarusa",
             "type": "command",
             "reserved": true,
-            "description": "Tiraras del gatillo y si tenia bala te da timeout por 150 segundos | Ejemplo: !ruletarusa | No necesita argumentos",
+            "description": {
+                "en": "Pulls the trigger and if the charge hits you you will get a timeout of 150 seconds | Example: !ruletarusa | No arguments needed",
+                "es": "Tiraras del gatillo y si tenia bala te da timeout por 150 segundos | Ejemplo: !ruletarusa | No necesita argumentos"
+            },
             "enabled": true,
             "cooldown": 10,
             "canTimeout": false,
@@ -14,7 +17,7 @@
             "canGiveMod": false
         },
         {
-            "name": "annoucement",
+            "name": "Announcement",
             "cmd": "anuncio",
             "func": "anuncio",
             "type": "command",
@@ -23,10 +26,13 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Anuncia algo en el canal | Ejemplo: !anuncio <mensaje> | Ejemplo: !anuncio Hola como estas | El mensaje no puede ser mayor a 300 caracteres | El mensaje solo se podra ver en navegadores WEB y no en Movil"
+            "description": {
+                "en": "Announce something in the channel | Example: !anuncio <message> | Example: !anuncio Hello how are you | The message cannot be longer than 300 characters | The message can only be seen in web browsers and not on mobile",
+                "es": "Anuncia algo en el canal | Ejemplo: !anuncio <mensaje> | Ejemplo: !anuncio Hola como estas | El mensaje no puede ser mayor a 300 caracteres | El mensaje solo se podra ver en navegadores WEB y no en Movil"
+            }
         },
         {
-            "name": "promo",
+            "name": "Promo",
             "cmd": "promo",
             "func": "promo",
             "type": "command",
@@ -35,11 +41,14 @@
             "userLevelName": "mod",
             "enabled": true,
             "userLevel": 7,
-            "description": "Es otra forma de lanzar un shoutout pero sin activar el shoutout y la respuesta es por texto en vez de por anuncio para que los que esten en movil puedan ver el mensaje",
+            "description": {
+                "en": "It's another way to shoutout but without activating the shoutout and the response is by text instead of by an announcement so that people who are on mobile can see the message",
+                "es": "Es otra forma de lanzar un shoutout pero sin activar el shoutout y la respuesta es por texto en vez de por anuncio para que los que esten en movil puedan ver el mensaje"
+            },
             "showClip": true
         },
         {
-            "name": "shoutout",
+            "name": "Shoutout",
             "cmd": "so",
             "func": "shoutout",
             "type": "command",
@@ -48,8 +57,11 @@
             "userLevelName": "mod",
             "enabled": true,
             "userLevel": 7,
-            "description": "Menciona a un usuario y si tienes activado lo de los clips mandara un clip al canal",
-            "showClip": false
+            "description": {
+                "en": "Mentions a user and if you have activated the clips it will send a clip to the channel",
+                "es": "Menciona a un usuario y si tienes activado lo de los clips mandara un clip al canal"
+            },
+            "showClip": true
         },
         {
             "name": "Create Prediction",
@@ -61,7 +73,10 @@
             "userLevelName": "mod",
             "enabled": true,
             "userLevel": 7,
-            "description": "Crea una prediccion con la siguiente sintaxis: !predi <titulo>;<opcion1>/<opcion2>;<tiempo en segundos> | Ejemplo: !predi ¿Ganara el streamer?;Si/No;60 | El tiempo maximo es de 5 minutos y minimo de 30 segundos | El titulo no puede ser mayor a 30 caracteres | Las opciones no pueden ser mayor a 20 caracteres | Minimo 2 opciones y maximo 10 opciones y deben ser separadas por /"
+            "description": {
+                "en": "Create a prediction with the following syntax: !predi <title>;<option1>/<option2>;<time in seconds> | Example: !predi ¿Will the streamer win?;Yes/No;60 | The maximum time is 5 minutes and the minimum is 30 seconds | The title cannot be longer than 30 characters | The options cannot be longer than 20 characters | Minimum 2 options and maximum 10 options and they must be separated by /",
+                "es": "Crea una prediccion con la siguiente sintaxis: !predi <titulo>;<opcion1>/<opcion2>;<tiempo en segundos> | Ejemplo: !predi ¿Ganara el streamer?;Si/No;60 | El tiempo maximo es de 5 minutos y minimo de 30 segundos | El titulo no puede ser mayor a 30 caracteres | Las opciones no pueden ser mayor a 20 caracteres | Minimo 2 opciones y maximo 10 opciones y deben ser separadas por /"
+            }
         },
         {
             "name": "End Prediction",
@@ -73,7 +88,10 @@
             "userLevelName": "mod",
             "enabled": true,
             "userLevel": 7,
-            "description": "Termina la prediccion actual y da el resultado ganador | Ejemplo: !endpredi <numero de opcion> | Ejemplo: !endpredi 1 | El numero de opcion debe ser el numero de la opcion ganadora"
+            "description": {
+                "en": "End the current prediction and give the winner result | Example: !endpredi <option number> | Example: !endpredi 1 | The option number must be the number of the winning option",
+                "es": "Termina la prediccion actual y da el resultado ganador | Ejemplo: !endpredi <numero de opcion> | Ejemplo: !endpredi 1 | El numero de opcion debe ser el numero de la opcion ganadora"
+            }
         },
         {
             "name": "Cancel Prediction",
@@ -85,7 +103,10 @@
             "userLevelName": "mod",
             "enabled": true,
             "userLevel": 7,
-            "description": "Cancela la prediccion actual | Ejemplo: !cancelpredi | No necesita argumentos | Solo funciona si la prediccion esta activa o si esta bloqueada"
+            "description": {
+                "en": "Cancel the current prediction | Example: !cancelpredi | No arguments needed | Only works if the prediction is active or blocked",
+                "es": "Cancela la prediccion actual | Ejemplo: !cancelpredi | No necesita argumentos | Solo funciona si la prediccion esta activa o si esta bloqueada"
+            }
         },
         {
             "name": "Lock Prediction",
@@ -97,7 +118,10 @@
             "userLevelName": "mod",
             "enabled": true,
             "userLevel": 7,
-            "description": "Bloquea la prediccion actual lo cual inhabilita que los usuarios puedan votar | Ejemplo: !lockpredi | No necesita argumentos | Solo funciona si la prediccion esta activa"
+            "description": {
+                "en": "Lock the current prediction so that users cannot vote | Example: !lockpredi | No arguments needed | Only works if the prediction is active",
+                "es": "Bloquea la prediccion actual lo cual inhabilita que los usuarios puedan votar | Ejemplo: !lockpredi | No necesita argumentos | Solo funciona si la prediccion esta activa"
+            }
         },
         {
             "name": "Create Poll",
@@ -109,7 +133,10 @@
             "userLevelName": "mod",
             "enabled": true,
             "userLevel": 7,
-            "description": "Crea una encuesta con la siguiente sintaxis: !poll <titulo>;<opcion1>/<opcion2>;<tiempo en segundos> | Ejemplo: !poll ¿Ganara el streamer?;Si/No;60 | El tiempo maximo es de 5 minutos y minimo de 30 segundos | El titulo no puede ser mayor a 25 caracteres | Las opciones no pueden ser mayor a 25 caracteres | Minimo 2 opciones y maximo 5 opciones y deben ser separadas por /"
+            "description": {
+                "en": "Create a poll with the following syntax: !poll <title>;<option1>/<option2>;<time in seconds> | Example: !poll ¿Will the streamer win?;Yes/No;60 | The maximum time is 5 minutes and the minimum is 30 seconds | The title cannot be longer than 25 characters | The options cannot be longer than 25 characters | Minimum 2 options and maximum 5 options and they must be separated by /",
+                "es": "Crea una encuesta con la siguiente sintaxis: !poll <titulo>;<opcion1>/<opcion2>;<tiempo en segundos> | Ejemplo: !poll ¿Ganara el streamer?;Si/No;60 | El tiempo maximo es de 5 minutos y minimo de 30 segundos | El titulo no puede ser mayor a 25 caracteres | Las opciones no pueden ser mayor a 25 caracteres | Minimo 2 opciones y maximo 5 opciones y deben ser separadas por /"
+            }
         },
         {
             "name": "End Poll",
@@ -121,7 +148,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Termina la encuesta actual | Ejemplo: !endpoll | No necesita argumentos | Solo funciona si la encuesta esta activa"
+            "description": {
+                "en": "End the current poll | Example: !endpoll | No arguments needed | Only works if the poll is active",
+                "es": "Termina la encuesta actual | Ejemplo: !endpoll | No necesita argumentos | Solo funciona si la encuesta esta activa"
+            }
         },
         {
             "name": "Cancel Poll",
@@ -133,7 +163,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Cancela la encuesta actual | Ejemplo: !cancelpoll | No necesita argumentos | Solo funciona si la encuesta esta activa"
+            "description": {
+                "en": "Cancel the current poll | Example: !cancelpoll | No arguments needed | Only works if the poll is active",
+                "es": "Cancela la encuesta actual | Ejemplo: !cancelpoll | No necesita argumentos | Solo funciona si la encuesta esta activa"
+            }
         },
         {
             "name": "Change Game",
@@ -145,7 +178,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Cambia el juego actual | Ejemplo: !game <nombre del juego> | Ejemplo: !game Fortnite"
+            "description": {
+                "en": "Change the current game | Example: !game <game name> | Example: !game Fortnite",
+                "es": "Cambia el juego actual | Ejemplo: !game <nombre del juego> | Ejemplo: !game Fortnite"
+            }
         },
         {
             "name": "Change Title",
@@ -157,7 +193,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Cambia el titulo actual | Ejemplo: !title <titulo> | Ejemplo: !title Hola como estas"
+            "description": {
+                "en": "Change the current title | Example: !title <title> | Example: !title Hello how are you",
+                "es": "Cambia el titulo actual | Ejemplo: !title <titulo> | Ejemplo: !title Hola como estas"
+            }
         },
         {
             "name": "Speach Chat",
@@ -167,7 +206,10 @@
             "reserved": true,
             "cooldown": 0,
             "enabled": false,
-            "description": "Habla en el chat | Ejemplo: !s <mensaje> | Ejemplo: !s Hola como estas"
+            "description": {
+                "en": "Speak in the chat | Example: !s <message> | Example: !s Hello how are you",
+                "es": "Habla en el chat | Ejemplo: !s <mensaje> | Ejemplo: !s Hola como estas"
+            }
         },
         {
             "name": "Sumimetro",
@@ -177,7 +219,10 @@
             "reserved": true,
             "enabled": true,
             "cooldown": 10,
-            "description": "Te da tu lectura de sumimetro que va desde 0% hasta 100% en cuanto a dominante o sumiso | Ejemplo: !sumimetro | Ejemplo de respuesta: (user) ha salido 65% sumiso y 35% dominante | Si se pasa un nombre de usuario como argumento te da la lectura de sumimetro de ese usuario | Ejemplo: !sumimetro (user) | Ejemplo de respuesta: (user) ha salido 65% sumiso y 35% dominante"
+            "description": {
+                "en": "Gives your sumimetro reading that goes from 0% to 100% as dominant or submissive | Example: !sumimetro | Example response: (user) has reached 65% submissive and 35% dominant | If you pass a username as an argument it gives the sumimetro reading of that user | Example: !sumimetro (user) | Example response: (user) has reached 65% submissive and 35% dominant",
+                "es": "Te da tu lectura de sumimetro que va desde 0% hasta 100% en cuanto a dominante o sumiso | Ejemplo: !sumimetro | Ejemplo de respuesta: (user) ha salido 65% sumiso y 35% dominante | Si se pasa un nombre de usuario como argumento te da la lectura de sumimetro de ese usuario | Ejemplo: !sumimetro (user) | Ejemplo de respuesta: (user) ha salido 65% sumiso y 35% dominante"
+            }
         },
         {
             "name": "Memide",
@@ -187,27 +232,36 @@
             "reserved": true,
             "enabled": true,
             "cooldown": 10,
-            "description": "Te da tu supuesta medida de tu imaginario miembro viril | Ejemplo: !memide | Ejemplo de respuesta: (user) le mide 15cm | No necesita argumentos"
+            "description": {
+                "en": "Gives your imaginary measure of your immortal member | Example: !memide | Example response: (user) measures 15cm | No arguments needed",
+                "es": "Te da tu supuesta medida de tu imaginario miembro viril | Ejemplo: !memide | Ejemplo de respuesta: (user) le mide 15cm | No necesita argumentos"
+            }
         },
         {
-            "name": "amor",
+            "name": "Amor",
             "cmd": "amor",
             "func": "amor",
             "type": "command",
             "reserved": true,
             "enabled": true,
             "cooldown": 10,
-            "description": "Te dice cuanto amor hay entre dos usuarios | Ejemplo: !amor (touser) | Ejemplo: !amor <nombre de usuario> | Ejemplo de respuesta: (user) y (touser) tienen 100% de amor | Si se pasan dos nombres de usuario como argumentos te dice cuanto amor hay entre esos dos usuarios | Ejemplo: !amor (user) (touser) | Ejemplo de respuesta: (user) y (touser) tienen 100% de amor | Si se pasa el mismo nombre de usuario que utilizo el comando como argumento le dira una frase negativa | Ejemplo: !amor (user) | Ejemplo de respuesta: (user) no se puede amar a si mismo | Si no se pasa ningun argumento se le dara un recordatorio de como se usa el comando y le dira algo negativo | Ejemplo: !amor | Ejemplo de respuesta: (user) debes pasar un nombre de usuario como argumento, por eso te quedaras solo"
+            "description": {
+                "en": "Tells how much love there is between two users | Example: !amor (touser) | Example: !amor <username> | Example response: (user) and (touser) have 100% of love | If you pass two usernames as arguments it tells how much love there is between those two users | Example: !amor (user) (touser) | Example response: (user) and (touser) have 100% of love | If you pass the same username as me as an argument it will tell you a negative phrase | Example: !amor (user) | Example response: (user) you cannot love yourself | If you do not pass any arguments it will give you a reminder on how to use the command and will tell you a negative phrase | Example: !amor | Example response: (user) you must pass a username as an argument, so you will only be left",
+                "es": "Te dice cuanto amor hay entre dos usuarios | Ejemplo: !amor (touser) | Ejemplo: !amor <nombre de usuario> | Ejemplo de respuesta: (user) y (touser) tienen 100% de amor | Si se pasan dos nombres de usuario como argumentos te dice cuanto amor hay entre esos dos usuarios | Ejemplo: !amor (user) (touser) | Ejemplo de respuesta: (user) y (touser) tienen 100% de amor | Si se pasa el mismo nombre de usuario que utilizo el comando como argumento le dira una frase negativa | Ejemplo: !amor (user) | Ejemplo de respuesta: (user) no se puede amar a si mismo | Si no se pasa ningun argumento se le dara un recordatorio de como se usa el comando y le dira algo negativo | Ejemplo: !amor | Ejemplo de respuesta: (user) debes pasar un nombre de usuario como argumento, por eso te quedaras solo"
+                }
         },
         {
-            "name": "ponerla",
+            "name": "Ponerla",
             "cmd": "ponerla",
             "func": "ponerla",
             "type": "command",
             "reserved": true,
             "enabled": true,
             "cooldown": 10,
-            "description": "Te dice el porcentaje de posibilidades de que pongas la | Ejemplo: !ponerla | Ejemplo de respuesta: (user) tiene 100% de posibilidades de ponerla | No necesita argumentos"
+            "description": {
+                "en": "Tells you the percentage of possibilities that you will put | Example: !ponerla | Example response: (user) has 100% of possibilities to put | No arguments needed",
+                "es": "Te dice el porcentaje de posibilidades de que pongas la | Ejemplo: !ponerla | Ejemplo de respuesta: (user) tiene 100% de posibilidades de ponerla | No necesita argumentos"
+            }
         },
         {
             "name": "Me cabe",
@@ -217,7 +271,10 @@
             "reserved": true,
             "enabled": true,
             "cooldown": 10,
-            "description": "Te dice que tan grande de un miembro viril te cabe mas un texto extra | Ejemplo: !mecabe | Ejemplo de respuesta: (user) te cabe 15cm | No necesita argumentos"
+            "description": {
+                "en": "Tells you how much bigger a member of immortality you can be compared to a text | Example: !mecabe | Example response: (user) can be 15cm | No arguments needed",
+                "es": "Te dice que tan grande de un miembro viril te cabe mas un texto extra | Ejemplo: !mecabe | Ejemplo de respuesta: (user) te cabe 15cm | No necesita argumentos"
+            }
         },
         {
             "name": "Only Emotes",
@@ -229,7 +286,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Activa o desactiva el modo solo emotes | Ejemplo: !onlyemotes | Ejemplo de respuesta: El modo solo emotes esta activado | No necesita argumentos"
+            "description": {
+                "en": "Activates or deactivates the only emotes mode | Example: !onlyemotes | Example response: The only emotes mode is activated | If you pass a number as an argument it will activate the only emotes mode for that number of seconds and then deactivate it | Example: !onlyemotes 10 | Example response: The only emotes mode is activated for 10 seconds",
+                "es": "Activa o desactiva el modo solo emotes | Ejemplo: !onlyemotes | Ejemplo de respuesta: El modo solo emotes esta activado | Si se le pasa un numero como argumento se activara el modo solo emotes durante ese numero de segundos y luego se desactivara | Ejemplo: !onlyemotes 10 | Ejemplo de respuesta: El modo solo emotes esta activado durante 10 segundos"
+            }
         },
         {
             "name": "Create Custom Command",
@@ -241,7 +301,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Crea un comando personalizado con la siguiente sintaxis: !cc <nombre del comando> <funcion del comando> | Ejemplo: !cc <nombre del comando> <respuesta que dara el comando> | Ejemplo: !cc discord Sigueme en mi discord: discord.cdom201.com | Ejemplo de uso: !discord | Ejemplo de respuesta: Sigueme en mi discord: discord.cdom201.com | El nombre del comando no puede tener espacios ni contener caracteres especiales y no puede ser mayor a 20 caracteres | La funcion del comando no puede ser mayor a 300 caracteres | se le puede pasar opciones de configuracion antes del nombre del comando | Ejemplo: !cc -cd=10 -ul=mod <nombre del comando> <funcion del comando> | Ejemplo: !cc -cd=10 -ul=mod discord Sigueme en mi discord: discord.cdom201.com | Las opciones de configuracion son: -cd=cooldown, -ul=userlevel, -enabled=enabled, -desc=description | Las opciones de configuracion son opcionales | Si no se pasa ninguna opcion de configuracion se usaran las opciones por defecto | Si se pasa una opcion de configuracion se usara esa opcion de configuracion | Si se pasan varias opciones de configuracion se usaran todas las opciones de configuracion que se pasaron"
+            "description": {
+                "en": "Creates a custom command with the following syntax: !cc <name of command> <function of command> | Example: !cc discord Follow me on my Discord Server: discord.cdom201.com | It will create a command that can be called like this: !discord | The name of the command can not contain spaces nor special characters and cannot be greater than 20 characters long. | The command function cannot be longer than 300 characters | You can pass configuration params before the command name to modify the command | Example: !cc -<param name>=<param value> <command name> <command function> | Example: !cc -cd=5 -ul=everyone discord Join my discord server at [link] | Param configs are as follow: -cd for colldown, and -ul for userlevel | Config params are optional, if none is passed the command will be created using the default values",
+                "es": "Crea un comando personalizado con la siguiente sintaxis: !cc <nombre del comando> <funcion del comando> | Ejemplo: !cc <nombre del comando> <respuesta que dara el comando> | Ejemplo: !cc discord Sigueme en mi discord: discord.cdom201.com | Ejemplo de uso: !discord | Ejemplo de respuesta: Sigueme en mi discord: discord.cdom201.com | El nombre del comando no puede tener espacios ni contener caracteres especiales y no puede ser mayor a 20 caracteres | La funcion del comando no puede ser mayor a 300 caracteres | se le puede pasar opciones de configuracion antes del nombre del comando | Ejemplo: !cc -cd=10 -ul=mod <nombre del comando> <funcion del comando> | Ejemplo: !cc -cd=10 -ul=mod discord Sigueme en mi discord: discord.cdom201.com | Las opciones de configuracion son: -cd=cooldown, y -ul=userlevel | Las opciones de configuracion son opcionales | Si no se pasa ninguna opcion de configuracion se usaran las opciones por defecto | Si se pasa una opcion de configuracion se usara esa opcion de configuracion | Si se pasan varias opciones de configuracion se usaran todas las opciones de configuracion que se pasaron"
+            }
         },
         {
             "name": "Delete Custom Command",
@@ -253,7 +316,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Elimina un comando personalizado | Ejemplo: !dc <nombre del comando> | Ejemplo: !dc discord | Ejemplo de respuesta: El comando !discord ha sido eliminado"
+            "description": {
+                "en": "Deletes a custom command | Example: !dc <command name> | Example: !dc discord | Example response: The command !discord has been deleted",
+                "es": "Elimina un comando personalizado | Ejemplo: !dc <nombre del comando> | Ejemplo: !dc discord | Ejemplo de respuesta: El comando !discord ha sido eliminado"
+            }
         },
         {
             "name": "Edit Custom Command",
@@ -265,7 +331,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Edita un comando personalizado con la siguiente sintaxis: !ec <nombre del comando> <funcion del comando> | Ejemplo: !ec <nombre del comando> <respuesta que dara el comando> | Ejemplo: !ec discord Sigueme en mi discord: discord.cdom201.com | Ejemplo de uso: !discord | Ejemplo de respuesta: Sigueme en mi discord: discord.cdom201.com | El nombre del comando no puede tener espacios ni contener caracteres especiales y no puede ser mayor a 20 caracteres | La funcion del comando no puede ser mayor a 300 caracteres | se le puede pasar opciones de configuracion antes del nombre del comando | Ejemplo: !ec -cd=10 -ul=mod <nombre del comando> <funcion del comando> | Ejemplo: !ec -cd=10 -ul=mod discord Sigueme en mi discord: discord.cdom201.com | Las opciones de configuracion son: -cd=cooldown, -ul=userlevel, -enabled=enabled, -desc=description | Las opciones de configuracion son opcionales | Si no se pasa ninguna opcion de configuracion se usaran las opciones por defecto | Si se pasa una opcion de configuracion se usara esa opcion de configuracion | Si se pasan varias opciones de configuracion se usaran todas las opciones de configuracion que se pasaron"
+            "description": {
+                "en": "Edits a custom command with the following syntax: !ec <command name> <command function> | Example: !ec <command name> <response that gives the command> | Example: !ec discord Follow me on my discord: discord.cdom201.com | Example of use: !discord | Example response: Follow me on my discord: discord.cdom201.com | The command name cannot have spaces or contain special characters and cannot be longer than 20 characters | The command function cannot be longer than 300 characters | you can pass configuration options before the command name | Example: !ec -cd=10 -ul=mod <command name> <command function> | Example: !ec -cd=10 -ul=mod discord Follow me on my discord: discord.cdom201.com | Configuration options are: -cd=cooldown, -ul=userlevel, -enabled=enabled, -desc=description | Configuration options are optional | If no configuration option is passed the default options will be used | If a configuration option is passed it will use that configuration option | If multiple configuration options are passed they will all be used",
+                "es": "Edita un comando personalizado con la siguiente sintaxis: !ec <nombre del comando> <funcion del comando> | Ejemplo: !ec <nombre del comando> <respuesta que dara el comando> | Ejemplo: !ec discord Sigueme en mi discord: discord.cdom201.com | Ejemplo de uso: !discord | Ejemplo de respuesta: Sigueme en mi discord: discord.cdom201.com | El nombre del comando no puede tener espacios ni contener caracteres especiales y no puede ser mayor a 20 caracteres | La funcion del comando no puede ser mayor a 300 caracteres | se le puede pasar opciones de configuracion antes del nombre del comando | Ejemplo: !ec -cd=10 -ul=mod <nombre del comando> <funcion del comando> | Ejemplo: !ec -cd=10 -ul=mod discord Sigueme en mi discord: discord.cdom201.com | Las opciones de configuracion son: -cd=cooldown, -ul=userlevel, -enabled=enabled, -desc=description | Las opciones de configuracion son opcionales | Si no se pasa ninguna opcion de configuracion se usaran las opciones por defecto | Si se pasa una opcion de configuracion se usara esa opcion de configuracion | Si se pasan varias opciones de configuracion se usaran todas las opciones de configuracion que se pasaron"
+            }
         },
         {
             "name": "Follow Age",
@@ -275,17 +344,23 @@
             "reserved": true,
             "enabled": true,
             "cooldown": 10,
-            "description": "Te dice cuanto tiempo llevas siguiendo al canal | Ejemplo: !followage | Ejemplo de respuesta: (user) lleva siguiendo al canal 1 año, 2 meses y 3 dias | Si se pasa un nombre de usuario como argumento te dice cuanto tiempo lleva siguiendo al canal ese usuario | Ejemplo: !followage (user) | Ejemplo de respuesta: (user) lleva siguiendo al canal 1 año, 2 meses y 3 dias"
+            "description": {
+                "en": "Tells you how long you have been following the channel | Example: !followage | Example response: (user) has been following the channel for 1 year, 2 months and 3 days | If you pass a username as an argument it will tell you how long you have been following that user | Example: !followage (user) | Example response: (user) has been following the channel for 1 year, 2 months and 3 days",
+                "es": "Te dice cuanto tiempo llevas siguiendo al canal | Ejemplo: !followage | Ejemplo de respuesta: (user) lleva siguiendo al canal 1 año, 2 meses y 3 dias | Si se pasa un nombre de usuario como argumento te dice cuanto tiempo lleva siguiendo al canal ese usuario | Ejemplo: !followage (user) | Ejemplo de respuesta: (user) lleva siguiendo al canal 1 año, 2 meses y 3 dias"
+            }
         },
         {
-            "name": "Create clip",
+            "name": "Create Clip",
             "cmd": "clip",
             "func": "createClip",
             "type": "command",
             "reserved": true,
             "cooldown": 10,
             "enabled": true,
-            "description": "Crea un clip del streamer con una duracion de 30 segundos despues de usar el comando | Ejemplo: !clip | Ejemplo de respuesta: Guardando clip... | Si la funcion es exitosa la respuesta dira Clip guardado con exito | No necesita argumentos"
+            "description": {
+                "en": "Creates a clip of the streamer with a duration of 30 seconds after using the command | Example: !clip | Example response: Saving clip... | If the function is successful the response will say Clip saved successfully | No arguments needed",
+                "es": "Crea un clip del streamer con una duracion de 30 segundos despues de usar el comando | Ejemplo: !clip | Ejemplo de respuesta: Guardando clip... | Si la funcion es exitosa la respuesta dira Clip guardado con exito | No necesita argumentos"
+            }
         },
         {
             "name": "VIP",
@@ -295,9 +370,12 @@
             "reserved": true,
             "enabled": true,
             "cooldown": 10,
-            "userLevelName": "broadcaster",
+            "userLevelName": "editor",
             "userLevel": 8,
-            "description": "Le da VIP sea permanente o temporal al usuario | Ejemplo: !vip <nombre de usuario> | Ejemplo: !vip (user) | Ejemplo de respuesta: (user) ahora es VIP | Si se le pasa un tiempo en dias como argumento le dara VIP temporal al usuario | Ejemplo: !vip <nombre de usuario> <tiempo en dias> | Ejemplo: !vip (user) 30 | Ejemplo de respuesta: (user) ahora es VIP por 30 dias"
+            "description": {
+                "en": "Gives VIP status to the user permanently or temporarily | Example: !vip <username> | Example: !vip (user) | Example response: (user) now is VIP | If you pass a number of days as an argument it will give VIP status to the user temporarily for that number of days | Example: !vip <username> <number of days> | Example: !vip (user) 30 | Example response: (user) now is VIP for 30 days",
+                "es": "Le da VIP sea permanente o temporal al usuario | Ejemplo: !vip <nombre de usuario> | Ejemplo: !vip (user) | Ejemplo de respuesta: (user) ahora es VIP | Si se le pasa un tiempo en dias como argumento le dara VIP temporal al usuario | Ejemplo: !vip <nombre de usuario> <tiempo en dias> | Ejemplo: !vip (user) 30 | Ejemplo de respuesta: (user) ahora es VIP por 30 dias"
+            }
         },
         {
             "name": "Commands List",
@@ -307,17 +385,10 @@
             "reserved": true,
             "cooldown": 10,
             "enabled": true,
-            "description": "Muestra una lista de todos los comandos disponibles al usuario dependiendo su nivel de permisos | Ejemplo: !commands | Ejemplo de respuesta: (user) los comandos disponibles para ti son: <Lista de comandos>"
-        },
-        {
-            "name": "Chistes",
-            "cmd": "chiste",
-            "func": "chiste",
-            "type": "command",
-            "reserved": true,
-            "cooldown": 10,
-            "enabled": true,
-            "description": "Te cuenta un chiste | Ejemplo: !chistes | Ejemplo de respuesta: (user) ¿Por que los pájaros no usan Facebook? Porque ya tienen Twitter | Si le pasas una categoria como argumento te contara un chiste de esa categoria | Ejemplo: !chistes <categoria> | Ejemplo: !chistes carros | Ejemplo de respuesta: (user) ¿Por qué los coches no pueden jugar al fútbol? Porque son descapotables"
+            "description": {
+                "en": "Shows a list of all commands available to the user depending on their permissions | Example: !commands | Example response: (user) the commands available to you are: <List of commands>",
+                "es": "Muestra una lista de todos los comandos disponibles al usuario dependiendo su nivel de permisos | Ejemplo: !commands | Ejemplo de respuesta: (user) los comandos disponibles para ti son: <Lista de comandos>"
+            }
         },
         {
             "name": "Clear Chat",
@@ -329,7 +400,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Limpia el chat | Ejemplo: !clearchat | Ejemplo de respuesta: Chat limpiado por <Mod> | No necesita argumentos"
+            "description": {
+                "en": "Clears the chat | Example: !clearchat | Example response: Chat cleared by <Mod> | No arguments needed",
+                "es": "Limpia el chat | Ejemplo: !clearchat | Ejemplo de respuesta: Chat limpiado por <Mod> | No necesita argumentos"
+            }
         },
         {
             "name": "Enable Command",
@@ -341,7 +415,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Activa un comando | Ejemplo: !enable <nombre del comando> | Ejemplo: !enable discord | Ejemplo de respuesta: El comando !discord ha sido activado"
+            "description": {
+                "en": "Enables a command | Example: !enable <command name> | Example: !enable discord | Example response: The command !discord has been enabled",
+                "es": "Activa un comando | Ejemplo: !enable <nombre del comando> | Ejemplo: !enable discord | Ejemplo de respuesta: El comando !discord ha sido activado"
+            }
         },
         {
             "name": "Disable Command",
@@ -353,7 +430,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Desactiva un comando | Ejemplo: !disable <nombre del comando> | Ejemplo: !disable discord | Ejemplo de respuesta: El comando !discord ha sido desactivado"
+            "description": {
+                "en": "Disables a command | Example: !disable <command name> | Example: !disable discord | Example response: The command !discord has been disabled",
+                "es": "Desactiva un comando | Ejemplo: !disable <nombre del comando> | Ejemplo: !disable discord | Ejemplo de respuesta: El comando !discord ha sido desactivado"
+            }
         },
         {
             "name": "Create Timer Command",
@@ -365,7 +445,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Haces que un comando ya hecho se pueda llamar a si solo cada cierta cantidad de minutos | Ejemplo: !cct <nombre del comando> <tiempo en minutos> | Ejemplo: !cct discord 5 | Ejemplo de respuesta: El comando !discord se activara cada 5 minutos | El tiempo en minutos no puede ser mayor a 60 minutos | El tiempo en minutos no puede ser menor a 1 minuto | Se le tiene que pasar un nombre de comando ya hecho como argumento | Se le tiene que pasar un tiempo en minutos como argumento | Si el temporizador ya existe se le dira que ya existe | Si el comando no existe se le dira que no existe"
+            "description": {
+                "en": "Makes a command you have made be able to be called every certain amount of minutes | Example: !cct <command name> <time in minutes> | Example: !cct discord 5 | Example response: The command !discord will be activated every 5 minutes | The time in minutes cannot be greater than 60 minutes | The time in minutes cannot be less than 1 minute | You must pass a command name as an argument | You must pass a time in minutes as an argument | If the timer already exists it will tell you that it already exists | If the command does not exist it will tell you that it does not exist",
+                "es": "Haces que un comando ya hecho se pueda llamar a si solo cada cierta cantidad de minutos | Ejemplo: !cct <nombre del comando> <tiempo en minutos> | Ejemplo: !cct discord 5 | Ejemplo de respuesta: El comando !discord se activara cada 5 minutos | El tiempo en minutos no puede ser mayor a 60 minutos | El tiempo en minutos no puede ser menor a 1 minuto | Se le tiene que pasar un nombre de comando ya hecho como argumento | Se le tiene que pasar un tiempo en minutos como argumento | Si el temporizador ya existe se le dira que ya existe | Si el comando no existe se le dira que no existe"
+            }
         },
         {
             "name": "Edit Command Timer",
@@ -377,7 +460,10 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Edita el tiempo de ejecucion de un temporadizador ya hecho | Ejemplo: !ect <nombre del comando> <tiempo en minutos> | Ejemplo: !ect discord 10 | Ejemplo de respuesta: El comando !discord ahora se activara cada 10 minutos | El tiempo en minutos no puede ser mayor a 60 minutos | El tiempo en minutos no puede ser menor a 1 minuto | Se le tiene que pasar un nombre de comando ya hecho como argumento | Se le tiene que pasar un tiempo en minutos como argumento | Si el temporizador no existe se le dira que no existe"
+            "description": {
+                "en": "Edits the time of execution of a made command | Example: !ect <command name> <time in minutes> | Example: !ect discord 10 | Example response: The command !discord will now be activated every 10 minutes | The time in minutes cannot be greater than 60 minutes | The time in minutes cannot be less than 1 minute | You must pass a command name as an argument | You must pass a time in minutes as an argument | If the timer does not exist it will tell you that it does not exist",
+                "es": "Edita el tiempo de ejecucion de un temporadizador ya hecho | Ejemplo: !ect <nombre del comando> <tiempo en minutos> | Ejemplo: !ect discord 10 | Ejemplo de respuesta: El comando !discord ahora se activara cada 10 minutos | El tiempo en minutos no puede ser mayor a 60 minutos | El tiempo en minutos no puede ser menor a 1 minuto | Se le tiene que pasar un nombre de comando ya hecho como argumento | Se le tiene que pasar un tiempo en minutos como argumento | Si el temporizador no existe se le dira que no existe"
+            }
         },
         {
             "name": "Delete Command Timer",
@@ -389,7 +475,85 @@
             "cooldown": 10,
             "userLevelName": "mod",
             "userLevel": 7,
-            "description": "Elimina un temporadizador ya hecho | Ejemplo: !dct <nombre del comando> | Ejemplo: !dct discord | Ejemplo de respuesta: El temporizador del comando !discord ha sido eliminado | Se le tiene que pasar un nombre de comando ya hecho como argumento | Si el temporizador no existe se le dira que no existe"
+            "description": {
+                "en": "Deletes a made command timer | Example: !dct <command name> | Example: !dct discord | Example response: The command timer for the command !discord has been deleted | You must pass a command name as an argument | If the timer does not exist it will tell you that it does not exist",
+                "es": "Elimina un temporadizador ya hecho | Ejemplo: !dct <nombre del comando> | Ejemplo: !dct discord | Ejemplo de respuesta: El temporizador del comando !discord ha sido eliminado | Se le tiene que pasar un nombre de comando ya hecho como argumento | Si el temporizador no existe se le dira que no existe"
+            }
+        },
+        {
+            "name": "Add Moderator",
+            "cmd": "mod",
+            "func": "mod",
+            "type": "command",
+            "reserved": true,
+            "enabled": true,
+            "cooldown": 10,
+            "userLevelName": "editor",
+            "userLevel": 8,
+            "description": {
+                "en": "Adds a moderator to the channel | Example: !mod <moderator name> | Example: !mod (user) | Example response: (user) now is a moderator of the channel | If you pass a number of days as an argument it will give moderator status to the user for that number of days | Example: !mod (user) 30 | Example response: (user) now is a moderator of the channel for 30 days",
+                "es": "Añade un moderador a la canal | Ejemplo: !mod <nombre del moderador> | Ejemplo: !mod (user) | Ejemplo de respuesta: (user) ahora eres moderador de la canal | Si se le pasa un tiempo en dias como argumento le dara moderador a la canal por ese tiempo | Ejemplo: !mod (user) 30 | Ejemplo de respuesta: (user) ahora eres moderador de la canal por 30 dias"
+            }
+        },
+        {
+            "name": "Remove Moderator",
+            "cmd": "unmod",
+            "func": "unmod",
+            "type": "command",
+            "reserved": true,
+            "enabled": true,
+            "cooldown": 10,
+            "userLevelName": "editor",
+            "userLevel": 8,
+            "description": {
+                "en": "Removes a moderator from the channel | Example: !unmod <moderator name> | Example: !unmod (user) | Example response: (user) now is not a moderator of the channel",
+                "es": "Elimina un moderador de la canal | Ejemplo: !unmod <nombre del moderador> | Ejemplo: !unmod (user) | Ejemplo de respuesta: (user) ahora no eres moderador de la canal"
+            }
+        },
+        {
+            "name": "Remove VIP",
+            "cmd": "unvip",
+            "func": "unvip",
+            "type": "command",
+            "reserved": true,
+            "enabled": true,
+            "cooldown": 10,
+            "userLevelName": "editor",
+            "userLevel": 8,
+            "description": {
+                "en": "Removes a VIP from the channel | Example: !unvip <username> | Example: !unvip (user) | Example response: (user) now is not a VIP of the channel",
+                "es": "Elimina un VIP de la canal | Ejemplo: !unvip <nombre del vip> | Ejemplo: !unvip (user) | Ejemplo de respuesta: (user) ahora no eres VIP de la canal"
+            }
+        },
+        {
+            "name": "Vanish",
+            "cmd": "vanish",
+            "func": "vanish",
+            "type": "command",
+            "reserved": true,
+            "enabled": true,
+            "cooldown": 0,
+            "userLevelName": "everyone",
+            "userLevel": 1,
+            "description": {
+                "en": "Makes the user vanish from the chat | Example: !vanish <username> | Example: !vanish (user) | Example response: (user) has vanished from the chat!",
+                "es": "Hace que el usuario desaparezca del chat | Ejemplo: !vanish <nombre de usuario> | Ejemplo: !vanish (user) | Ejemplo de respuesta: (user) ha desaparecido del chat!"
+            }
+        },
+        {
+            "name": "Duel",
+            "cmd": "duel",
+            "func": "duel",
+            "type": "command",
+            "reserved": true,
+            "enabled": true,
+            "cooldown": 10,
+            "userLevelName": "everyone",
+            "userLevel": 1,
+            "description": {
+                "en": "Duels the user | Example: !duel <username> | Example: !duel (user) | Example response: (user) is now dueling with (username) | The user being dueled as to accept the duel as follows: !duel accept | The user being dueled as to decline the duel as follows: !duel decline",
+                "es": "Duelea al usuario | Ejemplo: !duel <nombre de usuario> | Ejemplo: !duel (user) | Ejemplo de respuesta: (user) ahora duele con (username) | El usuario que ha sido duelado debe aceptar el duelo de la siguiente manera: !duel accept | El usuario que ha sido duelado debe declinar el duelo de la siguiente manera: !duel decline"
+            }
         }
     ]
 }

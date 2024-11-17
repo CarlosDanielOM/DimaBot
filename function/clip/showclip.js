@@ -1,10 +1,11 @@
 const CHAT = require('../chat');
 const { searchGameById } = require('../search/game');
 const { getUrl } = require('../../util/dev');
+const logger = require('../../util/logger');
 
 async function showClip(channelID, clipData, streamerData, streamerChannelData) {
     if(!clipData, !streamerData, !streamerChannelData) {
-        console.log({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID})
+        logger({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID}, true, channelID, 'showClip missing_parameters');
         return {
             error: true,
             message: "Missing parameters",
@@ -17,17 +18,28 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
 
     let streamerColor = await CHAT.getUserColor(streamerID);
     if(streamerColor.error) {
-        console.log(streamerColor)
+        logger(streamerColor, true, channelID, 'showClip streamerColor');
         return streamerColor;
     }
 
     let randomClipNumber = Math.floor(Math.random() * clipData.length);
     let randomClip = clipData[randomClipNumber];
+
+    if(!randomClip) {
+        logger({error: true, message: "Clip not found", status: 404, type: "clip_not_found", channelID}, true, channelID, 'showClip clip_not_found');
+        return {
+            error: true,
+            message: "Clip not found",
+            status: 404,
+            type: "clip_not_found"
+        }
+    }
+    
     let duration = randomClip.duration;
     let thumbnail = randomClip.thumbnail_url;
 
     if (!duration || !thumbnail) {
-        console.log({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID})
+        logger({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID}, true, channelID, 'showClip missing_parameters');
         return {
             error: true,
             message: "Missing parameters",
@@ -39,7 +51,7 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
     let clipGame = await searchGameById(randomClip.game_id);
 
     if(clipGame.error) {
-        console.log({error: true, message: "Game not found", status: 404, type: "game_not_found", channelID})
+        logger({error: true, message: "Game not found", status: 404, type: "game_not_found", channelID}, true, channelID, 'showClip game_not_found');
         return {
             error: true,
             message: "Game not found",
@@ -68,7 +80,7 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
     let data = await clipResponse.json();
 
     if(data.error) {
-        console.log(data)
+        logger(data, true, channelID, 'showClip');
         return data;
     }
 

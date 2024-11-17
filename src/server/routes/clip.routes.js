@@ -39,6 +39,13 @@ router.post('/:channelID', async (req, res) => {
 
     let clip = getVideoURL(thumbnail);
 
+    if(!clip) return res.status(400).json({
+        error: true,
+        message: 'The thumbnail is invalid.',
+        status: 400,
+        type: 'error'
+    });
+
     let fileName = `${channelID}-clip.mp4`;
 
     let path = `${DOWNLOADPATH}/${fileName}`;
@@ -91,9 +98,12 @@ router.post('/:channelID', async (req, res) => {
 module.exports = router;
 
 function getVideoURL(thumbnail) {
-    let firstPart = `${thumbnail.split('tv/')[0]}tv/`
+    if(!thumbnail) return null;
+    let firstPart = `${thumbnail.split('tv/')[0]}tv/`;
 
     let secondPart = thumbnail.split('tv/')[1];
+
+    if(!secondPart) return null;
 
     let clipID = secondPart.split('-preview')[0];
     let extension = secondPart.split('.')[1];

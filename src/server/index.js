@@ -4,6 +4,7 @@ const server = require("./server");
 const websocket = require("./websocket");
 const STREAMERS = require("../../class/streamer")
 const CLIENT = require('../../util/client');
+const CACHE = require('../../util/cache');
 
 async function serverInit() {
   try {
@@ -13,6 +14,7 @@ async function serverInit() {
     await dragonfly.init();
     await mongodb.init();
     await STREAMERS.init();
+    await CACHE.checkIfCacheExists();
     
     let app = await server();
     let ws = await websocket.websocket(app);

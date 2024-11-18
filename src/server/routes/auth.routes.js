@@ -91,7 +91,7 @@ router.get('/register', async (req, res) => {
         
         //? Add all reserved commands to the channel
         for(const command in jsonCommands) {
-            let commandExists = await commandSchema.exists({name: jsonCommands[command].name, channelID: streamer.user_id});
+            let commandExists = await commandSchema.exists({func: jsonCommands[command].func, channelID: streamer.user_id});
 
             if(commandExists) {
                 console.log(`Command ${command} already exists in ${streamer.user_id}`);

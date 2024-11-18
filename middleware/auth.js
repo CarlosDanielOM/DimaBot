@@ -35,8 +35,26 @@ async function auth(req, res, next) {
         });
     }
 
-    await cacheClient.set(`token:${token}`, 1);
-    await cacheClient.expire(`token:${token}`, 14000);
+    response = await fetch(`https://api.twitch.tv/helix/users`, {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Client-ID': process.env.TWITCH_CLIENT_ID
+        }
+    });
+
+    response = await response.json();
+
+    data = response.data[0];
+    
+    // await cacheClient.set(`token:${token}`, 1);
+
+    try {
+        await cacheClient.hmset(`token:${token}`, data)
+        await cacheClient.expire(`token:${token}`, 14000);
+    } catch (e) {
+        console.log(e);
+    }
+    
 
     next();
 

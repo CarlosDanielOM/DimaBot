@@ -39,12 +39,20 @@ async function auth(req, res, next) {
     response = await fetch(`https://api.twitch.tv/helix/users`, {
         headers: {
             'Authorization': `Bearer ${token}`,
-            'Client-ID': process.env.TWITCH_CLIENT_ID
+            'Client-ID': process.env.CLIENT_ID
         }
     });
 
     response = await response.json();
-    console.log({response, where: 'auth'});
+
+    if (response.error) {
+        return res.status(401).send({
+            error: 'Unauthorized',
+            message: 'Invalid token or user not found or invalid ID',
+            status: 401
+        });
+    }
+    
     if (response.data.length === 0) {
         return res.status(401).send({
             error: 'Unauthorized',

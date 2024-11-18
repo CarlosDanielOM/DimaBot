@@ -44,6 +44,14 @@ async function auth(req, res, next) {
     });
 
     response = await response.json();
+    console.log({response, where: 'auth'});
+    if (response.data.length === 0) {
+        return res.status(401).send({
+            error: 'Unauthorized',
+            message: 'Invalid token',
+            status: 401
+        });
+    }
 
     data = response.data[0];
     // await cacheClient.set(`token:${token}`, 1);

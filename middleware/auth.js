@@ -1,9 +1,10 @@
+require('dotenv').config();
 const { getClient } = require("../util/database/dragonfly");
 
 async function auth(req, res, next) {
     let cacheClient = getClient();
 
-    let token = req.headers['authorization'];
+    let token = req.headers['authorization'] || req.headers['Authorization'];
     console.log({token, where: 'auth'});
     if (!token) {
         return res.status(401).send({
@@ -43,11 +44,8 @@ async function auth(req, res, next) {
     });
 
     response = await response.json();
-    console.log({response, where: 'auth'})
 
     data = response.data[0];
-    console.log({data, where: 'auth'})
-    
     // await cacheClient.set(`token:${token}`, 1);
 
     try {

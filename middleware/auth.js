@@ -4,7 +4,7 @@ async function auth(req, res, next) {
     let cacheClient = getClient();
 
     let token = req.headers['authorization'];
-    console.log({token, where: 'auth'})
+    console.log({token, where: 'auth'});
     if (!token) {
         return res.status(401).send({
             error: 'Unauthorized',
@@ -15,7 +15,7 @@ async function auth(req, res, next) {
 
     let exists = await cacheClient.exists(`token:${token}`);
 
-    if(exists) {
+    if (exists) {
         return next();
     }
 
@@ -27,7 +27,7 @@ async function auth(req, res, next) {
 
     let data = await response.json();
 
-    if(data.status === 401) {
+    if (data.status === 401) {
         return res.status(401).send({
             error: 'Unauthorized',
             message: 'Invalid token',
@@ -43,8 +43,10 @@ async function auth(req, res, next) {
     });
 
     response = await response.json();
+    console.log({response, where: 'auth'})
 
     data = response.data[0];
+    console.log({data, where: 'auth'})
     
     // await cacheClient.set(`token:${token}`, 1);
 

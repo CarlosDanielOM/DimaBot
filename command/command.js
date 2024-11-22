@@ -50,6 +50,7 @@ let cmdOptions = {
 }
 
 async function createCommand(channelID, argument, type = null) {
+    const cacheClient = getClient();
     let streamer = await STREAMERS.getStreamerById(channelID);
 
     cmdOptions.channel = streamer.name;
@@ -132,6 +133,8 @@ async function createCommand(channelID, argument, type = null) {
             message: command.message
         }
     }
+
+    await cacheClient.del(`${channelID}:commands:${command.command.cmd}`);
 
     return {
         error: false,

@@ -1,10 +1,10 @@
 const speach = require('../function/speach');
 
+const linkRegex = new RegExp(/((http|https):\/\/)?(www\.)?[a-zA-Z-]+(\.[a-zA-Z-]{2})+(:\d+)?(\/\S*)?(\?\S+)?/gi);
+
 async function speachChat(channelID, tags, argument) {
     let user = tags.username;
     let message = argument || undefined;
-
-    if(user.toLowerCase() == "ziko_krok") return
 
     if(!message) {
         return {
@@ -32,6 +32,11 @@ async function speachChat(channelID, tags, argument) {
         emotesToReplace.forEach(emote => {
             message = message.replace(emote, '');
         });
+    }
+
+    let haslink = message.match(linkRegex);
+    if(haslink) {
+        message = message.replace(linkRegex, "[LINK]");
     }
 
     let msg = `${user} dice: ${message}`;

@@ -58,6 +58,7 @@ async function poll(action, channelID, argument) {
     
     let opt = argument.split(';');
 
+    //! TODO: Fix choices for better error handling if nothing to split
     let choices = opt[1].split('\/').map(choice => {
         return {
             title: choice

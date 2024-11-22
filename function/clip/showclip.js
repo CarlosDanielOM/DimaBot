@@ -4,7 +4,7 @@ const { getUrl } = require('../../util/dev');
 const logger = require('../../util/logger');
 
 async function showClip(channelID, clipData, streamerData, streamerChannelData) {
-    if(!clipData, !streamerData, !streamerChannelData) {
+    if(!clipData || !streamerData || !streamerChannelData) {
         logger({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID}, true, channelID, 'showClip missing_parameters');
         return {
             error: true,
@@ -35,8 +35,8 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
         }
     }
     
-    let duration = randomClip.duration;
-    let thumbnail = randomClip.thumbnail_url;
+    let duration = randomClip.duration || null;
+    let thumbnail = randomClip.thumbnail_url || null;
 
     if (!duration || !thumbnail) {
         logger({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID}, true, channelID, 'showClip missing_parameters');

@@ -84,18 +84,6 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
-    let testCommand = {
-        "name": "test",
-        "cmd": "test",
-        "func": "test",
-        "message": "test",
-        "responses": [],
-        "type": "command",
-        "reserved": false,
-        "description": "test",
-        "cooldown": 0
-    }
-
     let newCommand = new commandSchema({
         name: body.name,
         cmd: body.cmd,

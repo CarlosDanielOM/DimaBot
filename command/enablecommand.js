@@ -1,6 +1,8 @@
 const commandSchema = require('../schema/command');
+const { getClient } = require('../util/database/dragonfly');
 
 async function enableCommand (channelID, argument) {
+    const cacheClient = getClient();
     let command = await commandSchema.findOne({channelID: channelID, cmd: argument});
 
     if (!command) {

@@ -56,7 +56,6 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     let attempts = await cacheClient.get(`${channelID}:roulette:${userData.id}`);
 
     if(!dead) {
-        
         return {
             error: false,
             message: `${userData.display_name} ha jalado el gatillo y la bala no ha sido disparada. Lleva ${attempts} intentos.`,

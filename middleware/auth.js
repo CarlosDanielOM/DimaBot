@@ -62,7 +62,6 @@ async function auth(req, res, next) {
     }
 
     data = response.data[0];
-    // await cacheClient.set(`token:${token}`, 1);
 
     try {
         await cacheClient.hmset(`token:${token}`, data)
@@ -70,7 +69,6 @@ async function auth(req, res, next) {
     } catch (e) {
         console.log(e);
     }
-    
 
     next();
 

@@ -1,4 +1,5 @@
 const { getClient } = require("./database/dragonfly");
+const adminSchema = require('../schema/admin');
 
 async function checkIfCacheExists() {
     let cacheClient = getClient();

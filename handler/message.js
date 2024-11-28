@@ -5,6 +5,7 @@ const STREAMERS = require('../class/streamer');
 const CHAT = require('../function/chat');
 const CHANNEL = require('../function/channel');
 const commandSchema = require('../schema/command');
+const logger = require('../util/logger');
 
 const COOLDOWNS = require('../class/cooldown')
 
@@ -15,7 +16,7 @@ const commandHandler = require('./command');
 const { getClient } = require('../util/database/dragonfly');
 const logger = require('../util/logger');
 
-const modID = 698614112;
+const modID = '698614112';
 let channelInstances = new Map();
 
 let isMod = false;
@@ -59,24 +60,27 @@ async function message(client, channel, tags, message) {
     if(!commandFunc) {
         let commandData = await commandSchema.findOne({channelID, cmd: command});
         if(!commandData) {
+            let cacheCommandData = {
+                func: 'none',
+                level: 0,
+                cooldown: 0,
+                enabled: 0
+            }
             // Saves non existing command to cache as disabled
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'func', 'none');
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'level', 0);
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'cooldown', 0);
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'enabled', 0);
+            await cacheClient.hset(`${channelID}:commands:${command}`, cacheCommandData);
             commandFunc = 'none';
             commandUserLevel = 0;
             commandCD = 0;
             commandEnabled = 0;
         } else {
+            let cacheCommandData = {
+                func: commandData.func,
+                level: commandData.userLevel,
+                cooldown: commandData.cooldown,
+                enabled: commandData.enabled ? 1 : 0
+            }
             // Saves command to cache
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'func', commandData.func);
-            // Saves user level to cache
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'level', commandData.userLevel);
-            // Saves cooldown to cache
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'cooldown', commandData.cooldown);
-            // Saves command status to cache
-            await cacheClient.hset(`${channelID}:commands:${command}`, 'enabled', commandData.enabled ? 1 : 0);
+            await cacheClient.hset(`${channelID}:commands:${command}`, cacheCommandData);
             commandFunc = commandData.func;
             commandUserLevel = commandData.userLevel;
             commandCD = commandData.cooldown;
@@ -84,9 +88,13 @@ async function message(client, channel, tags, message) {
         }
     }
 
-    if(commandEnabled == 0) return;
+    if(commandEnabled == 0) {
+        return;
+    }
     
-    if(!commandUserLevel) commandUserLevel = 7;
+    if(!commandUserLevel) {
+        commandUserLevel = 7;
+    }
 
     if(userLevel < commandUserLevel && command !== 'game' && command !== 'title') {
         return;
@@ -262,7 +270,7 @@ async function message(client, channel, tags, message) {
     
     client.say(channel, res.message)
     if(res.error) {
-        console.log({res});
+        logger({error: true, message: res.message}, true, channelID, `command-${channelID}-${command}-${tags.username}`);
     }
     
 }
@@ -296,7 +304,11 @@ async function giveUserLevel(channel, tags, channelID) {
         userLevel = 8;
     }
 
-    //* TODO Super Mods level 9
+    // Admins level 9
+    let isAdmin = await cacheClient.sismember(`${channelID}:admins`, tags.username);
+    if(isAdmin == 1) {
+        userLevel = 9;
+    }
 
     if (tags.username === channel) {
         userLevel = 10;

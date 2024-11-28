@@ -104,6 +104,15 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
+    let exists = await adminSchema.findOne({channelID, adminName});
+    if(exists) {
+        return res.status(400).json({
+            error: true,
+            message: "Admin already exists",
+            status: 400
+        });
+    }
+
     let userData = await getUserByLogin(adminName);
     if (userData.error) {
         logger(userData, true, channelID, 'admin userData');
@@ -126,7 +135,14 @@ router.post('/:channelID', async (req, res) => {
         await cacheClient.sadd(`${channelID}:admins:ids`, userData.id);
         await cacheClient.sadd(`${channelID}:admins`, adminData.adminName);
 
-        await cacheClient.hset(`${channelID}:admins:${userData.id}`, adminData);
+        await cacheClient.hset(`${channelID}:admins:${userData.id}`, {
+            adminID: userData.id,
+            adminName: adminName,
+            channelID: channelID,
+            channelName: channelName,
+            permissions: ['*'],
+            actived: true
+        });
         
     } catch (error) {
         logger({error}, true, channelID, `admin-${channelID}-${adminName}`);
@@ -154,13 +170,22 @@ router.delete('/:channelID/:adminID', async (req, res) => {
         });
     }
 
+    let adminData = await cacheClient.hgetall(`${channelID}:admins:${adminID}`);
+
     try {
         await adminSchema.findOneAndDelete({channelID, adminID});
         await cacheClient.del(`${channelID}:admins:${adminID}`);
+        await cacheClient.srem(`${channelID}:admins`, adminData.adminName);
+        await cacheClient.srem(`${channelID}:admins:ids`, adminData.adminID);
     } catch (error) {
         logger({error: true, message: "Deleting document on DB went wrong"}, true, channelID, `admin-${channelID}-${adminID}-delete`);
     }
     
+    res.status(200).json({
+        error: false,
+        message: 'Admin deleted successfully',
+        status: 200
+    });
 })
 
 module.exports = router;

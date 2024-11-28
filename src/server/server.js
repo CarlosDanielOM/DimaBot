@@ -27,6 +27,17 @@ async function server() {
     app.use('/sumimetro', require('./routes/sumimetro.routes'));
     app.use('/user', require('./routes/user.routes'));
     app.use('/commands', require('./routes/command.routes'));
+    app.use('/admin', require('./routes/admin.routes'));
+    app.use('/validation', require('./routes/validation.routes'));
+
+    app.get('/commands/reserved', (req, res) => {
+        res.status(200).json({
+            error: false,
+            message: 'Commands fetched successfully',
+            status: 200,
+            data: require('../../config/reservedcommands.json')
+        });
+    });
 
     app.get('/media/:channelID/:triggerName', (req, res) => {
         const channelID = req.params.channelID;

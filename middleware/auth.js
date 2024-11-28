@@ -5,7 +5,6 @@ async function auth(req, res, next) {
     let cacheClient = getClient();
 
     let token = req.headers['authorization'] || req.headers['Authorization'];
-    console.log({token, where: 'auth'});
     if (!token) {
         return res.status(401).send({
             error: 'Unauthorized',
@@ -52,7 +51,6 @@ async function auth(req, res, next) {
             status: 401
         });
     }
-    
     if (response.data.length === 0) {
         return res.status(401).send({
             error: 'Unauthorized',
@@ -67,7 +65,7 @@ async function auth(req, res, next) {
         await cacheClient.hmset(`token:${token}`, data)
         await cacheClient.expire(`token:${token}`, 14000);
     } catch (e) {
-        console.log(e);
+        logger({error: true, message: "Error saving token to cache"}, true, channelID, `auth-${channelID}-${token}`);
     }
 
     next();

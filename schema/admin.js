@@ -33,10 +33,6 @@ const AdminSchema = new Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    },
-    timestamp: {
-        type: Date,
-        default: Date.now
     }
 });
 

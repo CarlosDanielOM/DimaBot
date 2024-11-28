@@ -30,7 +30,7 @@ async function server() {
     app.use('/admin', require('./routes/admin.routes'));
     app.use('/validation', require('./routes/validation.routes'));
 
-    app.get('/commands/reserved', (req, res) => {
+    app.get('/config/commands/reserved', (req, res) => {
         res.status(200).json({
             error: false,
             message: 'Commands fetched successfully',

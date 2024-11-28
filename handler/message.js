@@ -14,7 +14,6 @@ const linkRegex = new RegExp(/((http|https):\/\/)?(www\.)?[a-zA-Z-]+(\.[a-zA-Z-]
 
 const commandHandler = require('./command');
 const { getClient } = require('../util/database/dragonfly');
-const logger = require('../util/logger');
 
 const modID = '698614112';
 let channelInstances = new Map();

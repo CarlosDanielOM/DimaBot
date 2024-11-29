@@ -2,10 +2,43 @@ const express = require('express');
 const router = express.Router();
 const channelSchema = require('../../../schema/channel');
 const STREAMERS = require('../../../class/streamer');
+const { getClient } = require('../../../util/database/dragonfly');
 
+router.get('/', async (req, res) => {
+    const cacheClient = getClient();
+    let query = req.query;
 
-router.get('/', (req, res) => {
-    res.send('User');
+    let username = query.username || null;
+
+    if(!username) {
+        return res.status(400).json({
+            error: true,
+            message: "Missing parameters",
+            status: 400
+        });
+    }
+
+    let userData = await getUserByLogin(username);
+    if (userData.error) {
+        return res.status(userData.status).json(userData);
+    }
+
+    userData = userData.data;
+
+    let dataToSend = {
+      username: userData.login,
+      id: userData.id,
+      display_name: userData.display_name,
+      profile_image_url: userData.profile_image_url,
+      offline_image_url: userData.offline_image_url,
+    }
+
+    return res.status(200).json({
+        error: false,
+        data: dataToSend,
+        status: 200
+    });
+    
 });
 
 router.get('/:channelID', async (req, res) => {

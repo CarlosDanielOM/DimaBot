@@ -18,6 +18,7 @@ const { getClient } = require('../util/database/dragonfly')
 const resetCacheAtOffline = require('../handler_function/clearcache')
 const logger = require('../util/logger')
 const clearSpeachFiles = require('../handler_function/clearspeachfiles')
+const addCommandsToCache = require('../handler_function/addcommandstocache')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -63,6 +64,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             };
             defaultMessages(client, eventData, eventsubData.message);
             await getEditors(eventData.broadcaster_user_id, true);
+            await addCommandsToCache(eventData.broadcaster_user_id);
             //! SEPARATOR FOR FUNCTIONS
             unVIPExpiredUser(client, eventData);
             await startTimerCommands(client, eventData);

@@ -4,6 +4,8 @@ const channelSchema = require('../../../schema/channel');
 const STREAMERS = require('../../../class/streamer');
 const { getClient } = require('../../../util/database/dragonfly');
 
+const { getUserByLogin } = require('../../../function/user/getuser')
+
 router.get('/', async (req, res) => {
     const cacheClient = getClient();
     let query = req.query;

@@ -15,7 +15,7 @@ async function addCommandsToCache(channelID) {
     for(let i = 0; i < commands.length; i++) {
         let cacheCommandData = {
             func: commands[i].func,
-            commandUserLevel: commands[i].userLevel,
+            level: commands[i].userLevel,
             cooldown: commands[i].cooldown,
             enabled: commands[i].enabled,
         }

@@ -134,7 +134,7 @@ async function message(client, channel, tags, message) {
             res = await COMMANDS.prediction('CREATE', channelID, argument);
             break;
         case 'endpredi':
-            res = await COMMANDS.prediction('END', channelID, argument);
+            res = await COMMANDS.prediction('RESOLVED', channelID, argument);
             break;
         case 'cancelpredi':
             res = await COMMANDS.prediction('CANCELED', channelID, argument);

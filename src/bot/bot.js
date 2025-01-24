@@ -16,6 +16,7 @@ async function init() {
     // await refreshAllTokens(token.refreshAllTokens)
 
     client.on('resub', (channel, username, months, message, userstate, methods) => {
+        if(channel == '#ozbellvt') return;
         let tier = userstate['msg-param-sub-plan'];
         switch (tier) {
             case 'Prime':
@@ -38,6 +39,7 @@ async function init() {
     });
 
     client.on('subscription', (channel, username, method, message, userstate) => {
+        if(channel == '#ozbellvt') return;
         let tier = userstate['msg-param-sub-plan'];
         switch (tier) {
             case 'Prime':
@@ -63,6 +65,7 @@ async function init() {
     })
 
     client.on('cheer', (channel, tags, message) => {
+        if(channel == '#ozbellvt') return;
         client.say(channel, `Gracias por los ${tags.bits} bits ${tags['display-name']}!`)
     });
 }

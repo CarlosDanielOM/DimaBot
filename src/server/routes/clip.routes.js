@@ -3,6 +3,7 @@ const router = express.Router();
 const fs = require('fs');
 const { getIO } = require('../websocket');
 const fetch = require('node-fetch');
+const logger = require('../../../util/logger');
 
 const HTMLPATH = `${__dirname}/public`;
 const DOWNLOADPATH = `${__dirname}/public/downloads`;
@@ -39,12 +40,17 @@ router.post('/:channelID', async (req, res) => {
 
     let clip = getVideoURL(thumbnail);
 
-    if(!clip) return res.status(400).json({
-        error: true,
-        message: 'The thumbnail is invalid.',
-        status: 400,
-        type: 'error'
-    });
+    if(!clip) {
+        logger({error: true, message: 'The thumbnail is invalid.', status: 400, type: 'error', channelID, thumbnail}, true, channelID, 'clip invalid');
+        return res.status(400).json({
+            error: true,
+            message: 'The thumbnail is invalid.',
+            status: 400,
+            type: 'error'
+        });
+    }
+
+    logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, thumbnail}, true, channelID, 'clip sent');
 
     let fileName = `${channelID}-clip.mp4`;
 

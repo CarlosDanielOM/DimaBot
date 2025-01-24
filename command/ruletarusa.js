@@ -73,6 +73,12 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     }
 
     timeoutTime = timeoutTime * timeIncrease;
+
+    if(channelID == 81308976) {
+        if(timeoutTime < 300) {
+            timeoutTime = 300;
+        }
+    }
     
     if(!isMod) {
         let timeout = await ban(channelID, userData.id, modID, timeoutTime, 'Ruleta rusa');

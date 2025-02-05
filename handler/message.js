@@ -250,6 +250,9 @@ async function message(client, channel, tags, message) {
         case 'pechos':
             res = await COMMANDS.pechos(channelID, tags);
             break;
+        case 'miyuloot':
+            res = await COMMANDS.miyuloot(channelID, tags);
+            break;
         default:
             let cmdHandler = await commandHandler(channelID, tags, command, argument);
             if(cmdHandler.error) {

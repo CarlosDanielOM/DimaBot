@@ -29,6 +29,7 @@ const title = require("./title");
 const vanish = require("./vanish");
 const duel = require("./duel");
 const pechos = require("./pechos");
+const miyuloot = require("./miyuloot");
 
 module.exports = {
     addModerator,
@@ -65,5 +66,6 @@ module.exports = {
     title,
     vanish,
     duel,
-    pechos
+    pechos,
+    miyuloot
 }

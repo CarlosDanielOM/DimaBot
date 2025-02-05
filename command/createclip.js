@@ -19,6 +19,33 @@ async function createChannelClip(channelID) {
         }
     }
 
+    if(clipData.status === 503) {
+        return {
+            error: true,
+            message: 'Clip creation is currently unavailable.',
+            status: 503,
+            type: 'Clip creation unavailable'
+        }
+    }
+
+    if(clipData.status > 500) {
+        return {
+            error: true,
+            message: 'There was an internal Twitch server error that we cannot resolve.',
+            status: clipData.status,
+            type: 'Clip creation error'
+        };
+    }
+
+    if(clipData.status !== 202) {
+        return {
+            error: true,
+            message: 'There was an error creating the clip.',
+            status: clipData.status,
+            type: 'Clip creation error'
+        }
+    }
+    
     if(!clipData.data) {
         return {
             error: true,

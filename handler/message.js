@@ -265,14 +265,13 @@ async function message(client, channel, tags, message) {
         channelInstance.setCooldown(command, commandCD);
     }
 
-    logger({error: res.error, response: res, username: tags.username, channel: channel}, true, channelID, `command-${channelID}-${command}-${tags.username}`);
+    if(res.error) {
+        logger({error: true, message: res.message, response: res, username: tags.username, channel: channel}, true, channelID, `command-${channelID}-${command}-${tags.username}`);
+    }
     
     if(!res.message) return;
     
     client.say(channel, res.message)
-    if(res.error) {
-        logger({error: true, message: res.message}, true, channelID, `command-${channelID}-${command}-${tags.username}`);
-    }
     
 }
 

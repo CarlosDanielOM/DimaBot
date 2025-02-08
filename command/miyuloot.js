@@ -45,7 +45,7 @@ async function miyuloot(channelID, tags) {
             break;
         case 'Timeout 15m':
             message = `${tags['display-name']} ganó Timeout 15m, alli nos vemos!`;
-            await ban(channelID, tags['user-id'], 698614112, 15 * 60 * 1000, 'Miyu Loot');
+            await ban(channelID, tags['user-id'], 698614112, 15 * 60, 'Miyu Loot');
             break;
         case '10 Cofres':
             message = `${tags['display-name']} ganó 10 Cofres de StreamLoots!`;

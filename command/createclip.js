@@ -36,16 +36,6 @@ async function createChannelClip(channelID) {
             type: 'Clip not found'
         }
     }
-
-
-    if(clipData.status !== 202) {
-        return {
-            error: true,
-            message: 'There was an error creating the clip.',
-            status: clipData.status,
-            type: 'Clip creation error'
-        }
-    }
     
     if(!clipData.data) {
         return {
@@ -70,8 +60,6 @@ module.exports = createChannelClip;
 
 async function checkClipStatus(channelID, clipID, retries = 0) {
     let getClipFun = await getClip(channelID, clipID);
-
-    console.log({getClipFun, retries});
 
     if(getClipFun.error) {
         if(getClipFun.status === 404 && retries < 8) {

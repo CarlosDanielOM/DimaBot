@@ -4,8 +4,28 @@ const getClip = require("../function/clip/getclip");
 async function createChannelClip(channelID) {
     let createClipFun = await createClip(channelID);
 
+    console.log({createClipFun});
+    
     if(createClipFun.error) {
         return createClipFun;
+    }
+
+    if(createClipFun.status === 503) {
+        return {
+            error: true,
+            message: 'Clip creation is currently unavailable.',
+            status: 503,
+            type: 'Clip creation unavailable'
+        }
+    }
+
+    if(createClipFun.status > 500) {
+        return {
+            error: true,
+            message: 'There was an internal Twitch server error that we cannot resolve.',
+            status: clipData.status,
+            type: 'Clip creation error'
+        };
     }
 
     let clipData = await checkClipStatus(channelID, createClipFun.clipID);
@@ -19,23 +39,6 @@ async function createChannelClip(channelID) {
         }
     }
 
-    if(clipData.status === 503) {
-        return {
-            error: true,
-            message: 'Clip creation is currently unavailable.',
-            status: 503,
-            type: 'Clip creation unavailable'
-        }
-    }
-
-    if(clipData.status > 500) {
-        return {
-            error: true,
-            message: 'There was an internal Twitch server error that we cannot resolve.',
-            status: clipData.status,
-            type: 'Clip creation error'
-        };
-    }
 
     if(clipData.status !== 202) {
         return {

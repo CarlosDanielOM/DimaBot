@@ -4,12 +4,6 @@ const getClip = require("../function/clip/getclip");
 async function createChannelClip(channelID) {
     let createClipFun = await createClip(channelID);
 
-    console.log({createClipFun});
-    
-    if(createClipFun.error) {
-        return createClipFun;
-    }
-
     if(createClipFun.status === 503) {
         return {
             error: true,
@@ -28,12 +22,16 @@ async function createChannelClip(channelID) {
         };
     }
 
+    if(createClipFun.error) {
+        return createClipFun;
+    }
+
     let clipData = await checkClipStatus(channelID, createClipFun.clipID);
 
     if(clipData.status === 404) {
         return {
             error: true,
-            message: 'There was an error creating the clip.',
+            message: 'There was an error finding the clip, it may have been created.',
             status: 404,
             type: 'Clip not found'
         }
@@ -72,6 +70,8 @@ module.exports = createChannelClip;
 
 async function checkClipStatus(channelID, clipID, retries = 0) {
     let getClipFun = await getClip(channelID, clipID);
+
+    console.log({getClipFun, retries});
 
     if(getClipFun.error) {
         if(getClipFun.status === 404 && retries < 8) {

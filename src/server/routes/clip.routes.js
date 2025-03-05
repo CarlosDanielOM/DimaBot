@@ -54,40 +54,11 @@ router.post('/:channelID', async (req, res) => {
 
     logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, clipUrl}, true, channelID, 'clip sent');
 
-    console.log({message:'Finish', clip})
+    io.of(`/clip/${channelID}`).emit('play-clip', body);
     soSent.push(channelID);
     setTimeout(() => {
         soSent = soSent.filter(id => id !== channelID);
     }, 1000 * Number(duration));
-
-    // let fileName = `${channelID}-clip.mp4`;
-
-    // let path = `${DOWNLOADPATH}/${fileName}`;
-
-    // if(!fs.existsSync(DOWNLOADPATH)) {
-    //     fs.mkdirSync(DOWNLOADPATH, { recursive: true });
-    // }
-
-    // await new Promise((resolve, reject) => {
-    //     stream.on('finish', () => {
-    //         io.of(`/clip/${channelID}`).emit('play-clip', body);
-    //         soSent.push(channelID);
-    //         setTimeout(() => {
-    //             soSent = soSent.filter(id => id !== channelID);
-    //         }, 1000 * Number(duration));
-    //         resolve();
-    //     });
-    // });
-    
-    // file.on('error', (error) => {
-    //     console.log(error);
-    //     return res.status(400).json({
-    //         error: true,
-    //         message: 'The clip could not be downloaded.',
-    //         status: 400,
-    //         type: 'error'
-    //     });
-    // });
     
     res.status(200).json({
         error: false,

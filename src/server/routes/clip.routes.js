@@ -38,6 +38,13 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
+    //Delete old clip
+    try {
+        fs.unlinkSync(`${DOWNLOADPATH}/${channelID}-clip.mp4`);
+    } catch (error) {
+        console.log(error);
+    }
+
     try {
         let clip = await downloadClip(clipUrl, channelID);
         console.log(clip);

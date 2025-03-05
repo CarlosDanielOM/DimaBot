@@ -4,6 +4,7 @@ const fs = require('fs');
 const { getIO } = require('../websocket');
 const fetch = require('node-fetch');
 const logger = require('../../../util/logger');
+const { exec } = require('node:child_process');
 
 const HTMLPATH = `${__dirname}/public`;
 const DOWNLOADPATH = `${__dirname}/public/downloads`;
@@ -17,7 +18,7 @@ router.get('/:channelID', (req, res) => {
 router.post('/:channelID', async (req, res) => {
     let io = getIO();
     let channelID = req.params.channelID;
-    const { duration, thumbnail, title, game, streamer, profileImg, streamerColor, description } = req.body;
+    const { duration, clipUrl, title, game, streamer, profileImg, streamerColor, description } = req.body;
     let body = req.body;
     
     if(soSent.includes(channelID)) {
@@ -29,69 +30,64 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
-    if(!thumbnail) {
+    if(!clipUrl) {
         return res.status(400).json({
             error: true,
-            message: 'The thumbnail is required.',
+            message: 'The clipUrl is required.',
             status: 400,
             type: 'error'
         });
     }
 
-    let clip = getVideoURL(thumbnail);
+    // let clip = getVideoURL(thumbnail);
+    let clip = await downloadClip(clipUrl, channelID);
 
     if(!clip) {
-        logger({error: true, message: 'The thumbnail is invalid.', status: 400, type: 'error', channelID, thumbnail}, true, channelID, 'clip invalid');
+        logger({error: true, message: 'The clipUrl is invalid.', status: 400, type: 'error', channelID, clipUrl}, true, channelID, 'clip invalid');
         return res.status(400).json({
             error: true,
-            message: 'The thumbnail is invalid.',
+            message: 'The clipUrl is invalid.',
             status: 400,
             type: 'error'
         });
     }
 
-    logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, thumbnail}, true, channelID, 'clip sent');
+    logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, clipUrl}, true, channelID, 'clip sent');
 
-    let fileName = `${channelID}-clip.mp4`;
+    console.log({message:'Finish', clip})
+    soSent.push(channelID);
+    setTimeout(() => {
+        soSent = soSent.filter(id => id !== channelID);
+    }, 1000 * Number(duration));
 
-    let path = `${DOWNLOADPATH}/${fileName}`;
+    // let fileName = `${channelID}-clip.mp4`;
 
-    if(!fs.existsSync(DOWNLOADPATH)) {
-        fs.mkdirSync(DOWNLOADPATH, { recursive: true });
-    }
+    // let path = `${DOWNLOADPATH}/${fileName}`;
 
-    const response = await fetch(clip);
-    if(!response.ok) {
-        return res.status(400).json({
-            error: true,
-            message: 'The clip could not be downloaded.',
-            status: 400,
-            type: 'error'
-        });
-    }
-    const file = fs.createWriteStream(path);
-    const stream = response.body.pipe(file);
+    // if(!fs.existsSync(DOWNLOADPATH)) {
+    //     fs.mkdirSync(DOWNLOADPATH, { recursive: true });
+    // }
 
-    await new Promise((resolve, reject) => {
-        stream.on('finish', () => {
-            io.of(`/clip/${channelID}`).emit('play-clip', body);
-            soSent.push(channelID);
-            setTimeout(() => {
-                soSent = soSent.filter(id => id !== channelID);
-            }, 1000 * Number(duration));
-            resolve();
-        });
-    });
+    // await new Promise((resolve, reject) => {
+    //     stream.on('finish', () => {
+    //         io.of(`/clip/${channelID}`).emit('play-clip', body);
+    //         soSent.push(channelID);
+    //         setTimeout(() => {
+    //             soSent = soSent.filter(id => id !== channelID);
+    //         }, 1000 * Number(duration));
+    //         resolve();
+    //     });
+    // });
     
-    file.on('error', (error) => {
-        console.log(error);
-        return res.status(400).json({
-            error: true,
-            message: 'The clip could not be downloaded.',
-            status: 400,
-            type: 'error'
-        });
-    });
+    // file.on('error', (error) => {
+    //     console.log(error);
+    //     return res.status(400).json({
+    //         error: true,
+    //         message: 'The clip could not be downloaded.',
+    //         status: 400,
+    //         type: 'error'
+    //     });
+    // });
     
     res.status(200).json({
         error: false,
@@ -102,6 +98,22 @@ router.post('/:channelID', async (req, res) => {
 });
 
 module.exports = router;
+
+function downloadClip(url, channelID) {
+    return new Promise((resolve, reject) => {
+        exec(`youtube-dl -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`, (error, stdout, stderr) => {
+            if(error) {
+                console.log(error);
+                return reject(error);
+            }
+            if(stderr) {
+                console.log(stderr);
+                return reject(stderr);
+            }
+            resolve(true);
+        });
+    });
+}
 
 function getVideoURL(thumbnail) {
     if(!thumbnail) return null;

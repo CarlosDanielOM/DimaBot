@@ -36,9 +36,9 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
     }
     
     let duration = randomClip.duration || null;
-    let thumbnail = randomClip.thumbnail_url || null;
+    let clipUrl = randomClip.url || null;
 
-    if (!duration || !thumbnail) {
+    if (!duration || !clipUrl) {
         logger({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID}, true, channelID, 'showClip missing_parameters');
         return {
             error: true,
@@ -67,7 +67,7 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
         },
         body: JSON.stringify({
             duration,
-            thumbnail,
+            clipUrl,
             title: streamerChannelData.title,
             game: clipGame.data.name,
             streamer: streamerData.display_name,

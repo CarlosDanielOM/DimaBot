@@ -70,7 +70,7 @@ router.post('/:channelID', async (req, res) => {
 
 module.exports = router;
 
-function downloadClip(url, channelID) {
+async function downloadClip(url, channelID) {
     return new Promise((resolve, reject) => {
         exec(`twitch-dl download -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`, (error, stdout, stderr) => {
             if(error) {

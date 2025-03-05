@@ -101,7 +101,7 @@ module.exports = router;
 
 function downloadClip(url, channelID) {
     return new Promise((resolve, reject) => {
-        exec(`youtube-dl -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`, (error, stdout, stderr) => {
+        exec(`twitch-dl -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`, (error, stdout, stderr) => {
             if(error) {
                 console.log(error);
                 return reject(error);

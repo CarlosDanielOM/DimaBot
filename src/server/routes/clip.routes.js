@@ -42,12 +42,11 @@ router.post('/:channelID', async (req, res) => {
     try {
         fs.unlinkSync(`${DOWNLOADPATH}/${channelID}-clip.mp4`);
     } catch (error) {
-        console.log(error);
+        logger({error: true, message: 'Clip file to delete not found.', status: 404, type: 'error', channelID, clipUrl}, true, channelID, 'clip file to delete not found');
     }
 
     try {
         let clip = await downloadClip(clipUrl, channelID);
-        console.log(clip);
         if(!clip) {
             logger({error: true, message: 'The clipUrl is invalid.', status: 400, type: 'error', channelID, clipUrl}, true, channelID, 'clip invalid');
             return res.status(400).json({
@@ -87,8 +86,6 @@ module.exports = router;
 
 async function downloadClip(url, channelID) {
     return new Promise((resolve, reject) => {
-        console.log(`Downloading clip from ${url} for ${channelID}`);
-
         const downloadProcess = exec(`twitch-dl download -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`);
 
         const timeout = setTimeout(() => {
@@ -98,19 +95,17 @@ async function downloadClip(url, channelID) {
         }, 10000);
 
         downloadProcess.on('exit', (code) => {
-            console.log(`Exit code for ${channelID}: ${code}`);
             clearTimeout(timeout);
             if(code === 0) {
-                console.log(`Clip downloaded for ${channelID}`);
                 resolve(true);
             } else {
-                console.log(`Clip download failed for ${channelID}`);
+                logger({error: true, message: 'Clip download failed', status: 500, type: 'error', channelID, clipUrl}, true, channelID, 'clip download failed');
                 reject(new Error('Clip download failed'));
             }
         });
 
         downloadProcess.on('error', (err) => {
-            console.log(`Error for ${channelID}: ${err}`);
+            logger({error: true, message: 'Clip download failed', status: 500, type: 'error', channelID, clipUrl}, true, channelID, 'clip download failed');
             clearTimeout(timeout);
             reject(new Error('Clip download failed'));
         });

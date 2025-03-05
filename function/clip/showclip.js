@@ -77,8 +77,6 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
         })
     })
 
-    console.log(clipResponse);
-    
     let data = await clipResponse.json();
 
     if(data.error) {

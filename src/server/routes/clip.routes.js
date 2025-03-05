@@ -41,6 +41,30 @@ router.post('/:channelID', async (req, res) => {
     try {
         let clip = await downloadClip(clipUrl, channelID);
         console.log(clip);
+        if(!clip) {
+            logger({error: true, message: 'The clipUrl is invalid.', status: 400, type: 'error', channelID, clipUrl}, true, channelID, 'clip invalid');
+            return res.status(400).json({
+                error: true,
+                message: 'The clipUrl is invalid.',
+                status: 400,
+                type: 'error'
+            });
+        }
+    
+        logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, clipUrl}, true, channelID, 'clip sent');
+    
+        io.of(`/clip/${channelID}`).emit('play-clip', body);
+        soSent.push(channelID);
+        setTimeout(() => {
+            soSent = soSent.filter(id => id !== channelID);
+        }, 1000 * Number(duration));
+        
+        res.status(200).json({
+            error: false,
+            message: 'The clip has been sent successfully. To: ' + channelID,
+            status: 200,
+            type: 'success'
+        });
     } catch (error) {
         logger({error: true, message: 'Something went wrong on our end.', status: 500, type: 'error', channelID, clipUrl}, true, channelID, 'clip error');
         return res.status(500).json({
@@ -50,31 +74,6 @@ router.post('/:channelID', async (req, res) => {
             type: 'error'
         });
     }
-
-    if(!clip) {
-        logger({error: true, message: 'The clipUrl is invalid.', status: 400, type: 'error', channelID, clipUrl}, true, channelID, 'clip invalid');
-        return res.status(400).json({
-            error: true,
-            message: 'The clipUrl is invalid.',
-            status: 400,
-            type: 'error'
-        });
-    }
-
-    logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, clipUrl}, true, channelID, 'clip sent');
-
-    io.of(`/clip/${channelID}`).emit('play-clip', body);
-    soSent.push(channelID);
-    setTimeout(() => {
-        soSent = soSent.filter(id => id !== channelID);
-    }, 1000 * Number(duration));
-    
-    res.status(200).json({
-        error: false,
-        message: 'The clip has been sent successfully. To: ' + channelID,
-        status: 200,
-        type: 'success'
-    });
 });
 
 module.exports = router;
@@ -96,7 +95,7 @@ async function downloadClip(url, channelID) {
             clearTimeout(timeout);
             if(code === 0) {
                 console.log(`Clip downloaded for ${channelID}`);
-                resolve(getVideoURL(`${DOWNLOADPATH}/${channelID}-clip.mp4`));
+                resolve(true);
             } else {
                 console.log(`Clip download failed for ${channelID}`);
                 reject(new Error('Clip download failed'));
@@ -109,22 +108,4 @@ async function downloadClip(url, channelID) {
             reject(new Error('Clip download failed'));
         });
     });
-}
-
-function getVideoURL(thumbnail) {
-    if(!thumbnail) return null;
-    let firstPart = `${thumbnail.split('tv/')[0]}tv/`;
-
-    let secondPart = thumbnail.split('tv/')[1];
-
-    if(!secondPart) return null;
-
-    let clipID = secondPart.split('-preview')[0];
-    let extension = secondPart.split('.')[1];
-
-    if(extension == 'jpg' || extension == 'jpeg' || extension == 'png') {
-        extension = 'mp4';
-    }
-
-    return `${firstPart}${clipID}.${extension}`;
 }

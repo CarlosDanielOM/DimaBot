@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const fs = require('fs');
 const { getIO } = require('../websocket');
-const fetch = require('node-fetch');
 const logger = require('../../../util/logger');
 const { exec } = require('node:child_process');
 
@@ -39,9 +38,18 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
-    // let clip = getVideoURL(thumbnail);
-    let clip = await downloadClip(clipUrl, channelID);
-    console.log(clip);
+    try {
+        let clip = await downloadClip(clipUrl, channelID);
+        console.log(clip);
+    } catch (error) {
+        logger({error: true, message: 'Something went wrong on our end.', status: 500, type: 'error', channelID, clipUrl}, true, channelID, 'clip error');
+        return res.status(500).json({
+            error: true,
+            message: 'Something went wrong on our end.',
+            status: 500,
+            type: 'error'
+        });
+    }
 
     if(!clip) {
         logger({error: true, message: 'The clipUrl is invalid.', status: 400, type: 'error', channelID, clipUrl}, true, channelID, 'clip invalid');
@@ -73,16 +81,32 @@ module.exports = router;
 
 async function downloadClip(url, channelID) {
     return new Promise((resolve, reject) => {
-        exec(`twitch-dl download -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`, (error, stdout, stderr) => {
-            if(error) {
-                console.log(error);
-                return reject(error);
+        console.log(`Downloading clip from ${url} for ${channelID}`);
+
+        const downloadProcess = exec(`twitch-dl download -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`);
+
+        const timeout = setTimeout(() => {
+            console.log(`Timeout for ${channelID}`);
+            downloadProcess.kill();
+            reject(new Error('Download timeout'));
+        }, 10000);
+
+        downloadProcess.on('exit', (code) => {
+            console.log(`Exit code for ${channelID}: ${code}`);
+            clearTimeout(timeout);
+            if(code === 0) {
+                console.log(`Clip downloaded for ${channelID}`);
+                resolve(getVideoURL(`${DOWNLOADPATH}/${channelID}-clip.mp4`));
+            } else {
+                console.log(`Clip download failed for ${channelID}`);
+                reject(new Error('Clip download failed'));
             }
-            if(stderr) {
-                console.log(stderr);
-                return reject(stderr);
-            }
-            resolve(true);
+        });
+
+        downloadProcess.on('error', (err) => {
+            console.log(`Error for ${channelID}: ${err}`);
+            clearTimeout(timeout);
+            reject(new Error('Clip download failed'));
         });
     });
 }

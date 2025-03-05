@@ -41,6 +41,7 @@ router.post('/:channelID', async (req, res) => {
 
     // let clip = getVideoURL(thumbnail);
     let clip = await downloadClip(clipUrl, channelID);
+    console.log(clip);
 
     if(!clip) {
         logger({error: true, message: 'The clipUrl is invalid.', status: 400, type: 'error', channelID, clipUrl}, true, channelID, 'clip invalid');

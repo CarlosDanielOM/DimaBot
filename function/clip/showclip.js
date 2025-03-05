@@ -76,6 +76,8 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
             streamerColor: streamerColor,
         })
     })
+
+    console.log(clipResponse);
     
     let data = await clipResponse.json();
 

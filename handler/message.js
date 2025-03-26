@@ -21,6 +21,9 @@ let channelInstances = new Map();
 let isMod = false;
 let user = null;
 
+//? Test imports
+const flash8b = require('../util/ai/google/flash.8b');
+
 async function message(client, channel, tags, message) {
     let cacheClient = getClient();
     let streamer = await STREAMERS.getStreamerByName(channel);
@@ -48,7 +51,13 @@ async function message(client, channel, tags, message) {
 
     const [raw, command, argument] = message.match(commandsRegex) || [];
 
-    if(!command) return;
+    if(!command) {
+        if(message.startsWith('@domdimabot')) {
+            let message = message.replace('@domdimabot', '');
+            client.say(channel, await flash8b(message));
+        }
+        return;
+    };
 
     logger({command, argument, channel, channelID, user: tags.username}, true, channelID, 'command');
 

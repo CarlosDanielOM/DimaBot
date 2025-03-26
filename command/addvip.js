@@ -82,7 +82,8 @@ async function addVIPCommand(channelID, argument, tags) {
             channel: streamer.name,
             channelID,
             duration,
-            expireDate
+            expireDate,
+            expireTimestamp: expireTime,
         }
 
         try {

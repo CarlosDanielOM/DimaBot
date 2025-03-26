@@ -18,7 +18,8 @@ const vipSchema = new Schema({
         day: { type: Number, required: true },
         month: { type: Number, required: true },
         year: { type: Number, required: true }
-    }
+    },
+    expireTimestamp: { type: Date, required: true },
 })
 
 module.exports = mongoose.model('vip', vipSchema)

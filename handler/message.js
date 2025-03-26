@@ -52,7 +52,7 @@ async function message(client, channel, tags, message) {
     const [raw, command, argument] = message.match(commandsRegex) || [];
 
     if(!command) {
-        if(message.startsWith('@domdimabot')) {
+        if(message.startsWith('@domdimabot') || message.startsWith('@DomDimaBot')) {
             let aiInput = message.replace('@domdimabot', '');
             client.say(channel, await flash8b(aiInput));
         }

@@ -54,7 +54,7 @@ async function message(client, channel, tags, message) {
     if(!command) {
         if(message.startsWith('@domdimabot') || message.startsWith('@DomDimaBot')) {
             let aiInput = message.replace('@domdimabot', '');
-            client.say(channel, await flash8b(aiInput));
+            client.say(channel, `@${tags.username} ${await flash8b(aiInput)}`);
         }
         return;
     };

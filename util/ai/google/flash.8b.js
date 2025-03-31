@@ -296,28 +296,32 @@ async function handleAITimeout(channelID, username, message, personality) {
         return null;
     }
 
-    // Determine timeout duration based on severity and channel rules
-    let timeoutSeconds = 300; // Default 5 minutes
+    // Check for violations with more specific patterns
+    let timeoutSeconds = 0;
     let reason = '';
 
-    // Check for severe violations
-    if (message.match(/hate speech|harassment|threats|spam/i)) {
-        timeoutSeconds = 3600; // 1 hour
+    // Severe violations (1 hour)
+    if (message.match(/\b(hate speech|harassment|threats|spam)\b/i)) {
+        timeoutSeconds = 3600;
         reason = 'Severe rule violation';
     }
-    // Check for moderate violations
-    else if (message.match(/excessive caps|repeated emotes|offensive language/i)) {
-        timeoutSeconds = 900; // 15 minutes
+    // Moderate violations (15 minutes)
+    else if (message.match(/\b(excessive caps|repeated emotes|offensive language)\b/i)) {
+        timeoutSeconds = 900;
         reason = 'Moderate rule violation';
     }
-    // Check for minor violations
-    else if (message.match(/excessive punctuation|single emote spam/i)) {
-        timeoutSeconds = 300; // 5 minutes
+    // Minor violations (5 minutes)
+    else if (message.match(/\b(excessive punctuation|single emote spam)\b/i)) {
+        timeoutSeconds = 300;
         reason = 'Minor rule violation';
     }
 
-    // Execute timeout
-    return await ban(channelID, userData.data.id, '698614112', timeoutSeconds, reason || 'AI timeout');
+    // Only execute timeout if we found a violation
+    if (timeoutSeconds > 0) {
+        return await ban(channelID, userData.data.id, '698614112', timeoutSeconds, reason || 'AI timeout');
+    }
+
+    return null;
 }
 
 async function flash8b(input, channelID, recentMessages = [], username, tags) {
@@ -342,7 +346,7 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
         const [_, command, argument] = commandMatch;
         commandResult = await handleCommand(channelID, command, argument, username, tags);
     } else {
-        // Check for rule violations in the message
+        // Only check for violations if the message is not a command
         const timeoutResult = await handleAITimeout(channelID, username, input, personality);
         if (timeoutResult) {
             commandResult = timeoutResult;
@@ -383,7 +387,7 @@ You also have the ability to autonomously detect and act on rule violations. Whe
 3. Do not timeout moderators or higher-level users
 4. Respond with a friendly but firm message explaining the action
 
-When a command is executed, you should respond with a friendly message in the respective language of the channel that:
+When a command is executed, you should respond with a friendly message in Spanish that:
 1. Acknowledges the action taken
 2. Uses the command's result message
 3. Maintains your personality and tone

@@ -70,6 +70,35 @@ async function getChannelPersonality(channelID) {
                     }
                 ]
             })
+        }
+        // Special case for ariascarletvt's channel
+        else if (channelID === 'ariascarletvt') {
+            personality = await ChannelAIPersonality.create({
+                channelID,
+                channel: channel.name,
+                contextWindow: channel.premium_plus ? 15 : 3,
+                personality: "You are a friendly and playful Twitch chat moderator for ariascarletvt's channel. You speak in Spanish by default but can adapt to other languages. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary.",
+                rules: [
+                    "Be respectful and friendly with all users",
+                    "Maintain chat order and enforce channel rules",
+                    "Use appropriate moderator actions when needed",
+                    "Keep responses concise and engaging"
+                ],
+                knownUsers: [
+                    {
+                        username: "soyaner",
+                        description: "the boyfriend of the channel owner",
+                        relationship: "romantic",
+                        lastInteraction: new Date()
+                    },
+                    {
+                        username: "cdom201",
+                        description: "the channel's developer and coder",
+                        relationship: "professional",
+                        lastInteraction: new Date()
+                    }
+                ]
+            })
         } else {
             // Create default personality based on channel tier
             personality = await ChannelAIPersonality.create({

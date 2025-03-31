@@ -7,6 +7,7 @@ const STREAMERS = require('../../class/streamer');
 const bot = require('./bot');
 const dev = require('../../util/dev');
 const {refreshAllTokens, getNewAppToken} = require('../../util/token');
+const chatHistory = require('../../class/chatHistory');
 
 async function init() {
     try {
@@ -15,6 +16,7 @@ async function init() {
         await DragonFlyDB.init();
         await MongDB.init();
         await STREAMERS.init();
+        await chatHistory.init();
 
         eventsub.init();
         await bot();

@@ -167,14 +167,7 @@ class STREAMERS {
     }
 
     async getStreamerNames() {
-        const keys = await this.cache.keys('*:streamer:data');
-        let names = [];
-
-        keys.forEach(key => {
-            names.push(key.split(':')[0]);
-        });
-
-        return names;
+        return await this.cache.smembers('streamers:by:name');
     }
     
     async updateStreamers() {

@@ -43,7 +43,7 @@ async function getChannelPersonality(channelID) {
         }
 
         // Special case for d0jiart's channel
-        if (channelID === 'd0jiart') {
+        if (channel.name === 'd0jiart') {
             personality = await ChannelAIPersonality.create({
                 channelID,
                 channel: channel.name,
@@ -72,7 +72,7 @@ async function getChannelPersonality(channelID) {
             })
         }
         // Special case for ariascarletvt's channel
-        else if (channelID === 426580588) {
+        else if (channel.name === 'ariascarletvt') {
             personality = await ChannelAIPersonality.create({
                 channelID,
                 channel: channel.name,

@@ -4,6 +4,7 @@ const ChannelAIPersonality = require('../../../schema/channelAIPersonality')
 const COMMANDS = require('../../../command')
 const { getClient } = require('../../../util/database/dragonfly')
 const ban = require('../../../function/moderation/ban')
+const {getUserByLogin} = require('../../../function/user/getuser')
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY })
 

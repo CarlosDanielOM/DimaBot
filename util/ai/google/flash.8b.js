@@ -3,6 +3,7 @@ const Channel = require('../../../schema/channel')
 const ChannelAIPersonality = require('../../../schema/channelAIPersonality')
 const COMMANDS = require('../../../command')
 const { getClient } = require('../../../util/database/dragonfly')
+const ban = require('../../../function/moderation/ban')
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY })
 
@@ -204,6 +205,69 @@ async function handleCommand(channelID, command, argument, username, tags) {
         case 'game':
             commandResult = await COMMANDS.game(channelID, argument, userLevel);
             break;
+        case 'timeout':
+            // Parse timeout duration and reason
+            const [targetUser, duration, ...reasonParts] = argument.split(' ');
+            const reason = reasonParts.join(' ');
+            
+            if (!targetUser || !duration) {
+                return {
+                    error: true,
+                    message: 'Usage: !timeout <username> <duration> [reason]',
+                    status: 400,
+                    type: 'invalid_arguments'
+                };
+            }
+
+            // Convert duration to seconds (e.g., "5m" -> 300 seconds)
+            let timeoutSeconds = 0;
+            const durationMatch = duration.match(/^(\d+)([smhd])$/);
+            if (durationMatch) {
+                const [, amount, unit] = durationMatch;
+                switch (unit) {
+                    case 's': timeoutSeconds = parseInt(amount); break;
+                    case 'm': timeoutSeconds = parseInt(amount) * 60; break;
+                    case 'h': timeoutSeconds = parseInt(amount) * 3600; break;
+                    case 'd': timeoutSeconds = parseInt(amount) * 86400; break;
+                }
+            } else {
+                timeoutSeconds = parseInt(duration);
+            }
+
+            if (isNaN(timeoutSeconds) || timeoutSeconds <= 0) {
+                return {
+                    error: true,
+                    message: 'Invalid duration format. Use number followed by s/m/h/d (e.g., 5m, 1h)',
+                    status: 400,
+                    type: 'invalid_duration'
+                };
+            }
+
+            // Get target user's ID
+            const targetUserData = await getUserByLogin(targetUser);
+            if (targetUserData.error) {
+                return {
+                    error: true,
+                    message: `User ${targetUser} not found`,
+                    status: 404,
+                    type: 'user_not_found'
+                };
+            }
+
+            // Check if target is a moderator or higher
+            const targetUserLevel = await getUserLevel(channelID, targetUser, { username: targetUser });
+            if (targetUserLevel >= 7) {
+                return {
+                    error: true,
+                    message: 'Cannot timeout moderators or higher',
+                    status: 403,
+                    type: 'cannot_timeout_mod'
+                };
+            }
+
+            // Execute timeout
+            commandResult = await ban(channelID, targetUserData.data.id, tags['user-id'], timeoutSeconds, reason || 'Timeout by AI moderator');
+            break;
         default:
             return {
                 error: true,
@@ -214,6 +278,45 @@ async function handleCommand(channelID, command, argument, username, tags) {
     }
 
     return commandResult;
+}
+
+async function handleAITimeout(channelID, username, message, personality) {
+    // Get user's level
+    const userLevel = await getUserLevel(channelID, username, { username });
+    
+    // Don't timeout moderators or higher
+    if (userLevel >= 7) {
+        return null;
+    }
+
+    // Get user's ID
+    const userData = await getUserByLogin(username);
+    if (userData.error) {
+        return null;
+    }
+
+    // Determine timeout duration based on severity and channel rules
+    let timeoutSeconds = 300; // Default 5 minutes
+    let reason = '';
+
+    // Check for severe violations
+    if (message.match(/hate speech|harassment|threats|spam/i)) {
+        timeoutSeconds = 3600; // 1 hour
+        reason = 'Severe rule violation';
+    }
+    // Check for moderate violations
+    else if (message.match(/excessive caps|repeated emotes|offensive language/i)) {
+        timeoutSeconds = 900; // 15 minutes
+        reason = 'Moderate rule violation';
+    }
+    // Check for minor violations
+    else if (message.match(/excessive punctuation|single emote spam/i)) {
+        timeoutSeconds = 300; // 5 minutes
+        reason = 'Minor rule violation';
+    }
+
+    // Execute timeout
+    return await ban(channelID, userData.data.id, '698614112', timeoutSeconds, reason || 'AI timeout');
 }
 
 async function flash8b(input, channelID, recentMessages = [], username, tags) {
@@ -237,6 +340,12 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
     if (commandMatch) {
         const [_, command, argument] = commandMatch;
         commandResult = await handleCommand(channelID, command, argument, username, tags);
+    } else {
+        // Check for rule violations in the message
+        const timeoutResult = await handleAITimeout(channelID, username, input, personality);
+        if (timeoutResult) {
+            commandResult = timeoutResult;
+        }
     }
 
     // Build system instructions with personality, rules, and command awareness
@@ -252,15 +361,26 @@ ${knownUsersContext}
 Available Commands:
 - !title [new title] - Change the stream title (Moderator+ only)
 - !game [game name] - Change the current game category (Moderator+ only)
+- !timeout [username] [duration] [reason] - Timeout a user (Moderator+ only)
+  Duration format: number followed by s/m/h/d (e.g., 5m, 1h)
+  Example: !timeout user123 5m Spam in chat
 
 Recent Chat Context:
 ${recentContext}
 
-You are able to understand and execute Twitch commands. When a moderator asks to change the title or game, you should use the appropriate command. For example:
+You are able to understand and execute Twitch commands. When a moderator asks to change the title, game, or timeout a user, you should use the appropriate command. For example:
 - If asked to change title: Use !title command
 - If asked to change game: Use !game command
+- If asked to timeout a user: Use !timeout command with appropriate duration based on severity
 
-Always verify the user has moderator privileges before executing commands.
+You also have the ability to autonomously detect and act on rule violations. When you detect a violation:
+1. Assess the severity of the violation
+2. Apply appropriate timeout duration:
+   - Minor violations: 5 minutes
+   - Moderate violations: 15 minutes
+   - Severe violations: 1 hour
+3. Do not timeout moderators or higher-level users
+4. Respond with a friendly but firm message explaining the action
 
 When a command is executed, you should respond with a friendly message in the respective language of the channel that:
 1. Acknowledges the action taken
@@ -271,6 +391,7 @@ When a command is executed, you should respond with a friendly message in the re
 For example:
 - If title change succeeds: "¡Listo! [command result message]"
 - If game change succeeds: "¡Listo! [command result message]"
+- If timeout succeeds: "¡Listo! [command result message]"
 - If command fails: "Lo siento, [command error message]"
 `
 

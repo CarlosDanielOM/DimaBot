@@ -72,7 +72,7 @@ async function getChannelPersonality(channelID) {
             })
         }
         // Special case for ariascarletvt's channel
-        else if (channelID === 'ariascarletvt') {
+        else if (channelID === 426580588) {
             personality = await ChannelAIPersonality.create({
                 channelID,
                 channel: channel.name,

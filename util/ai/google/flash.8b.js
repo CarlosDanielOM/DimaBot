@@ -101,6 +101,35 @@ async function getChannelPersonality(channelID) {
                     }
                 ]
             })
+        } else if (channel.name === 'cdom201') {
+            personality = await ChannelAIPersonality.create({
+                channelID,
+                    channel: channel.name,
+                    contextWindow: channel.premium_plus ? 15 : 3,
+                    personality: "You are a friendly and playful Twitch chat moderator for CDOM201's channel. You are a bilingual moderator, speaking mostly in Spanish but can adapt to other languages like English. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary. You are able to understand and execute Twitch commands. If a user is rude to you or jokes about you, you can retaliate in a funny way, but if it a serious matter, you should use the appropriate moderator actions like giving a timeout of you considered time.",
+                    rules: [
+                        "Be respectful and friendly with all users",
+                        "Maintain chat order and enforce channel rules",
+                        "Use appropriate moderator actions when needed",
+                        "Keep responses concise and engaging",
+                        "If a user is rude to you or jokes about you, you can retaliate in a funny way, but if it a serious matter, you should use the appropriate moderator actions like giving a timeout of you considered time."
+
+                    ],
+                    knownUsers: [
+                        {
+                            username: "cdom201",
+                            description: "the channel's developer and coder",
+                            relationship: "professional",
+                            lastInteraction: new Date()
+                        },
+                        {
+                            username: "sleeples_panda",
+                            description: "He is the best friend of the channel owner",
+                            relationship: "best friend",
+                            lastInteraction: new Date()
+                        }
+                    ]
+                })
         } else {
             // Create default personality based on channel tier
             personality = await ChannelAIPersonality.create({
@@ -166,11 +195,15 @@ async function handleCommand(channelID, command, argument, username, tags) {
         };
     }
 
+    let commandResult;
+
     switch(command) {
         case 'title':
-            return await COMMANDS.title(channelID, argument, userLevel);
+            commandResult = await COMMANDS.title(channelID, argument, userLevel);
+            break;
         case 'game':
-            return await COMMANDS.game(channelID, argument, userLevel);
+            commandResult = await COMMANDS.game(channelID, argument, userLevel);
+            break;
         default:
             return {
                 error: true,
@@ -179,6 +212,8 @@ async function handleCommand(channelID, command, argument, username, tags) {
                 type: 'command_not_found'
             };
     }
+
+    return commandResult;
 }
 
 async function flash8b(input, channelID, recentMessages = [], username, tags) {
@@ -194,6 +229,15 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
     const knownUsersContext = personality.knownUsers
         .map(user => `${user.username} is ${user.description} and has a ${user.relationship} relationship with the bot`)
         .join('\n')
+
+    // Check if the input contains a command request
+    const commandMatch = input.match(/!(\w+)\s*(.*)/);
+    let commandResult = null;
+    
+    if (commandMatch) {
+        const [_, command, argument] = commandMatch;
+        commandResult = await handleCommand(channelID, command, argument, username, tags);
+    }
 
     // Build system instructions with personality, rules, and command awareness
     const systemInstructions = `
@@ -217,23 +261,24 @@ You are able to understand and execute Twitch commands. When a moderator asks to
 - If asked to change game: Use !game command
 
 Always verify the user has moderator privileges before executing commands.
+
+When a command is executed, you should respond with a friendly message in the respective language of the channel that:
+1. Acknowledges the action taken
+2. Uses the command's result message
+3. Maintains your personality and tone
+4. Is concise and engaging
+
+For example:
+- If title change succeeds: "¡Listo! [command result message]"
+- If game change succeeds: "¡Listo! [command result message]"
+- If command fails: "Lo siento, [command error message]"
 `
 
     const response = await ai.models.generateContent({
         model: 'gemini-1.5-flash-8b',
-        contents: `${systemInstructions}\n\nThe following user message is: ${input}`,
+        contents: `${systemInstructions}\n\nThe following user message is: ${input}${commandResult ? `\n\nCommand result: ${commandResult.message}` : ''}`,
         config: generationConfig
     })
-
-    // Check if the response contains a command request
-    const commandMatch = response.text.match(/!(\w+)\s*(.*)/);
-    if (commandMatch) {
-        const [_, command, argument] = commandMatch;
-        const commandResult = await handleCommand(channelID, command, argument, username, tags);
-        if (!commandResult.error) {
-            return commandResult.message;
-        }
-    }
 
     return response.text
 }

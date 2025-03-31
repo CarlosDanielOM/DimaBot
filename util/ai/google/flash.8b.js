@@ -1,6 +1,8 @@
 const { GoogleGenAI, HarmCategory, HarmBlockThreshold } = require("@google/genai")
 const Channel = require('../../../schema/channel')
 const ChannelAIPersonality = require('../../../schema/channelAIPersonality')
+const COMMANDS = require('../../../command')
+const { getClient } = require('../../../util/database/dragonfly')
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY })
 
@@ -114,7 +116,72 @@ async function getChannelPersonality(channelID) {
     return personality
 }
 
-async function flash8b(input, channelID, recentMessages = []) {
+async function getUserLevel(channelID, username, tags) {
+    let userLevel = 1;
+    let cacheClient = getClient();
+
+    if(tags.subscriber) {
+        userLevel = tags['badge-info'].subscriber + 1;
+    }
+
+    if(tags.vip) {
+        userLevel = 5;
+    }
+
+    if (tags.subscriber) {
+        if (tags['badge-info-raw'].split('/')[0] === 'founder') {
+            userLevel = 6;
+        }
+    }
+
+    if (tags.mod) {
+        userLevel = 7;
+    }
+
+    let isEditor = await cacheClient.sismember(`${channelID}:channel:editors`, username);
+    if(isEditor == 1) {
+        userLevel = 8;
+    }
+
+    // Admins level 9
+    let isAdmin = await cacheClient.sismember(`${channelID}:admins`, username);
+    if(isAdmin == 1) {
+        userLevel = 9;
+    }
+
+    return userLevel;
+}
+
+async function handleCommand(channelID, command, argument, username, tags) {
+    // Get user's level
+    const userLevel = await getUserLevel(channelID, username, tags);
+    
+    // Check if user has required level (7 for mod commands)
+    if (userLevel < 7) {
+        return {
+            error: true,
+            message: 'You do not have permission to use this command. Only moderators and above can use it.',
+            status: 403,
+            type: 'insufficient_permissions'
+        };
+    }
+
+    switch(command) {
+        case 'title':
+            return await COMMANDS.title(channelID, argument, userLevel);
+        case 'game':
+            return await COMMANDS.game(channelID, argument, userLevel);
+        default:
+            return {
+                error: true,
+                message: 'Command not recognized',
+                status: 404,
+                type: 'command_not_found'
+            };
+    }
+}
+
+async function flash8b(input, channelID, recentMessages = [], username, tags) {
     const personality = await getChannelPersonality(channelID)
     
     // Build context from recent messages
@@ -128,7 +195,7 @@ async function flash8b(input, channelID, recentMessages = []) {
         .map(user => `${user.username} is ${user.description} and has a ${user.relationship} relationship with the bot`)
         .join('\n')
 
-    // Build system instructions with personality and rules
+    // Build system instructions with personality, rules, and command awareness
     const systemInstructions = `
 ${personality.personality}
 
@@ -138,8 +205,18 @@ ${personality.rules.join('\n')}
 Known Users:
 ${knownUsersContext}
 
+Available Commands:
+- !title [new title] - Change the stream title (Moderator+ only)
+- !game [game name] - Change the current game category (Moderator+ only)
+
 Recent Chat Context:
 ${recentContext}
+
+You are able to understand and execute Twitch commands. When a moderator asks to change the title or game, you should use the appropriate command. For example:
+- If asked to change title: Use !title command
+- If asked to change game: Use !game command
+
+Always verify the user has moderator privileges before executing commands.
 `
 
     const response = await ai.models.generateContent({
@@ -147,6 +224,16 @@ ${recentContext}
         contents: `${systemInstructions}\n\nThe following user message is: ${input}`,
         config: generationConfig
     })
+
+    // Check if the response contains a command request
+    const commandMatch = response.text.match(/!(\w+)\s*(.*)/);
+    if (commandMatch) {
+        const [_, command, argument] = commandMatch;
+        const commandResult = await handleCommand(channelID, command, argument, username, tags);
+        if (!commandResult.error) {
+            return commandResult.message;
+        }
+    }
 
     return response.text
 }

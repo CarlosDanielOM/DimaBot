@@ -35,17 +35,20 @@ function getClient() {
 }
 
 async function connectChannels() {
-    const joinableChannels = await STREAMERS.getStreamerNames();
+    const streamers = await STREAMERS.getStreamers();
     if(!isClientConnected) {
         console.error('Client not connected');
         return;
     }
-    for (let i = 0; i < joinableChannels.length; i++) {
+    for (let i = 0; i < streamers.length; i++) {
         try {
-            await new Promise(resolve => setTimeout(resolve, 500)); // 0.5 second delay
-            await client.join(joinableChannels[i]);
+            // Only join channels that have chat_enabled set to true
+            if (streamers[i].chat_enabled === 'true') {
+                await new Promise(resolve => setTimeout(resolve, 500)); // 0.5 second delay
+                await client.join(streamers[i].name);
+            }
         } catch (error) {
-            console.error(`Error connecting to channel ${joinableChannels[i]}: ${error}`);
+            console.error(`Error connecting to channel ${streamers[i].name}: ${error}`);
         }
     }
 }

@@ -141,34 +141,59 @@ router.post('/login', async (req, res) => {
     let exists = await channelSchema.findOne({ twitch_user_id: id });
 
     if(exists) {
-        let token = null;
-
-        if(exists.twitch_user_token.iv && exists.twitch_user_token.content) {
-            token = decrypt(exists.twitch_user_token);
-        }
-        
+        // Return user information without sensitive data
         return res.status(200).send({
             error: false,
             message: 'User already exists',
-            data: exists,
-            token: token
+            data: {
+                name: exists.name,
+                email: exists.email,
+                type: exists.type,
+                premium: exists.premium,
+                premium_plus: exists.premium_plus,
+                premium_until: exists.premium_until,
+                actived: exists.actived,
+                chat_enabled: exists.chat_enabled,
+                twitch_user_id: exists.twitch_user_id,
+                createdAt: exists.createdAt,
+                updatedAt: exists.updatedAt,
+                date: exists.date
+            }
         });
     } else {
         if(action == 'login') {
             let newChannel = new channelSchema({
                 name: name,
                 email: email,
-                twitch_user_id: id
+                twitch_user_id: id,
+                type: 'twitch',
+                premium: false,
+                premium_plus: false,
+                premium_until: null,
+                actived: false,
+                chat_enabled: false
             });
 
             await newChannel.save();
 
+            // Return the same structure as existing users
             return res.status(200).send({
                 error: false,
                 message: 'User created',
-                data: newChannel,
-                saved: true,
-                token: null
+                data: {
+                    name: newChannel.name,
+                    email: newChannel.email,
+                    type: newChannel.type,
+                    premium: newChannel.premium,
+                    premium_plus: newChannel.premium_plus,
+                    premium_until: newChannel.premium_until,
+                    actived: newChannel.actived,
+                    chat_enabled: newChannel.chat_enabled,
+                    twitch_user_id: newChannel.twitch_user_id,
+                    createdAt: newChannel.createdAt,
+                    updatedAt: newChannel.updatedAt,
+                    date: newChannel.date
+                }
             });
         } else {
             return res.status(404).send({
@@ -176,7 +201,6 @@ router.post('/login', async (req, res) => {
                 message: 'User not found'
             });
         }
-        
     }
 });
 

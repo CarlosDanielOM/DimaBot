@@ -29,6 +29,7 @@ async function server() {
     app.use('/commands', require('./routes/command.routes'));
     app.use('/admin', require('./routes/admin.routes'));
     app.use('/validation', require('./routes/validation.routes'));
+    app.use('/ai-personality', require('./routes/aiPersonality.routes'));
 
     app.get('/config/commands/reserved', (req, res) => {
         res.status(200).json({

@@ -17,7 +17,7 @@ class STREAMERS {
     async getStreamersFromDB() {
         try {
             this.cache = getClient();
-            const result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt');
+            const result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
 
             for(let i = 0; i < result.length; i++) {
                 let data = {
@@ -28,9 +28,16 @@ class STREAMERS {
                     actived: result[i].actived ? 'true' : 'false',
                     premium: result[i].premium ? 'true' : 'false',
                     premium_plus: result[i].premium_plus ? 'true' : 'false',
+                    chat_enabled: result[i].chat_enabled ? 'true' : 'false'
                 }
                 
+                // Store the data with both name and ID as keys
                 await this.cache.hset(`${result[i].name}:streamer:data`, data);
+                await this.cache.hset(`${result[i].twitch_user_id}:streamer:data`, data);
+                
+                // Add to index sets for quick lookups
+                await this.cache.sadd('streamers:by:name', result[i].name);
+                await this.cache.sadd('streamers:by:id', result[i].twitch_user_id);
             }
             
         } catch (error) {
@@ -41,7 +48,7 @@ class STREAMERS {
     async getStreamerFromDBByName(name) {
         try {
             this.cache = getClient();
-            const streamer = await channelSchema.findOne({name: name}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt');
+            const streamer = await channelSchema.findOne({name: name}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
 
             if (streamer) {
                 let data = {
@@ -52,9 +59,16 @@ class STREAMERS {
                     actived: streamer.actived ? 'true' : 'false',
                     premium: streamer.premium ? 'true' : 'false',
                     premium_plus: streamer.premium_plus ? 'true' : 'false',
+                    chat_enabled: streamer.chat_enabled ? 'true' : 'false'
                 }
 
+                // Store the data with both name and ID as keys
                 await this.cache.hset(`${streamer.name}:streamer:data`, data);
+                await this.cache.hset(`${streamer.twitch_user_id}:streamer:data`, data);
+                
+                // Add to index sets for quick lookups
+                await this.cache.sadd('streamers:by:name', streamer.name);
+                await this.cache.sadd('streamers:by:id', streamer.twitch_user_id);
             }
         } catch (error) {
             console.error(`Error getting streamer ${name} from DB: ${error}`);
@@ -64,7 +78,7 @@ class STREAMERS {
     async getStreamerFromDBById(id) {
         try {
             this.cache = getClient();
-            const streamer = await channelSchema.findOne({twitch_user_id: id}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt');
+            const streamer = await channelSchema.findOne({twitch_user_id: id}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
 
             if (streamer) {
                 let data = {
@@ -75,10 +89,16 @@ class STREAMERS {
                     actived: streamer.actived ? 'true' : 'false',
                     premium: streamer.premium ? 'true' : 'false',
                     premium_plus: streamer.premium_plus ? 'true' : 'false',
+                    chat_enabled: streamer.chat_enabled ? 'true' : 'false'
                 }
-                
 
+                // Store the data with both name and ID as keys
                 await this.cache.hset(`${streamer.name}:streamer:data`, data);
+                await this.cache.hset(`${streamer.twitch_user_id}:streamer:data`, data);
+                
+                // Add to index sets for quick lookups
+                await this.cache.sadd('streamers:by:name', streamer.name);
+                await this.cache.sadd('streamers:by:id', streamer.twitch_user_id);
             }
         } catch (error) {
             console.error(`Error getting streamer ${id} from DB: ${error}`);
@@ -96,24 +116,12 @@ class STREAMERS {
         return streamers;
     }
 
-    getStreamerByName(name) {
+    async getStreamerByName(name) {
         return this.cache.hgetall(`${name}:streamer:data`);
     }
 
     async getStreamerById(id) {
-        let cache = getClient();
-        const keys = await cache.keys('*:streamer:data');
-        let streamer = null;
-
-        for (const key of keys) {
-            const data = await cache.hgetall(key);
-            if (data.user_id === id) {
-                streamer = data;
-                break;
-            }
-        }
-
-        return streamer;
+        return this.cache.hgetall(`${id}:streamer:data`);
     }
 
     async setStreamer(streamer) {
@@ -124,11 +132,37 @@ class STREAMERS {
         }
     }
 
-    async deleteStreamer(name) {
+    async deleteStreamerByName(name) {
         try {
-            await this.cache.del(`${name}:streamer:data`);
+            const streamer = await this.getStreamerByName(name);
+            if (streamer) {
+                // Remove from both name and ID indexes
+                await this.cache.srem('streamers:by:name', name);
+                await this.cache.srem('streamers:by:id', streamer.user_id);
+                
+                // Delete both name and ID data entries
+                await this.cache.del(`${name}:streamer:data`);
+                await this.cache.del(`${streamer.user_id}:streamer:data`);
+            }
         } catch (error) {
             console.error(`Error deleting streamer ${name}: ${error}`);
+        }
+    }
+
+    async deleteStreamerById(id) {
+        try {
+            const streamer = await this.getStreamerById(id);
+            if (streamer) {
+                // Remove from both name and ID indexes
+                await this.cache.srem('streamers:by:name', streamer.name);
+                await this.cache.srem('streamers:by:id', id);
+                
+                // Delete both name and ID data entries
+                await this.cache.del(`${streamer.name}:streamer:data`);
+                await this.cache.del(`${id}:streamer:data`);
+            }
+        } catch (error) {
+            console.error(`Error deleting streamer ${id}: ${error}`);
         }
     }
 

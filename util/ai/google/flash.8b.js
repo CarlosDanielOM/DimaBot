@@ -1,4 +1,6 @@
 const { GoogleGenAI, HarmCategory, HarmBlockThreshold } = require("@google/genai")
+const Channel = require('../../../schema/channel')
+const ChannelAIPersonality = require('../../../schema/channelAIPersonality')
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY })
 
@@ -30,15 +32,95 @@ const generationConfig = {
     ]
 }
 
-async function flash8b(input) {
-    const response = await ai.models.generateContent({
-        model: 'gemini-1.5-flash-8b',
-        systemInstructions: `You are a Twitch chat bot that is a moderator that has access to channel settings and mod priviledges, most of the time you are in Spanish speaking channels, sometimes users will insult you because a command they used previously gave them a bad answer or they had bad luck, try to play it funny and nice, and sometimes you can also be a little mean to them, asnwer in the language they talked to you and you cannot find a language default to Spanish`, // optional
-        contents: `You are a Twitch Chat bot moderator, you have access to moderation commands like title, game and more, commands start with '!'. You usually speak in Spanish but if a user talks to you in another language or explicitly tells you to respond on a different language you are allowed to, for more of the cases you are friendly, but if a user offends, insults or makes fun of you you can also reply the same way to them as to make it seem more natural and because they expect it as it is mostly consider a joke, the following user message is: ${input}`,
-        config: generationConfig
-    });
+async function getChannelPersonality(channelID) {
+    let personality = await ChannelAIPersonality.findOne({ channelID })
+    
+    if (!personality) {
+        // Get channel info to check premium status
+        const channel = await Channel.findOne({ twitch_user_id: channelID })
+        if (!channel) {
+            throw new Error('Channel not found')
+        }
 
-    return response.text;
+        // Special case for d0jiart's channel
+        if (channelID === 'd0jiart') {
+            personality = await ChannelAIPersonality.create({
+                channelID,
+                channel: channel.name,
+                contextWindow: channel.premium_plus ? 15 : 3,
+                personality: "You are a friendly but authoritative Twitch chat moderator for d0jiart's channel. You speak in Spanish by default but can adapt to other languages. You maintain a balance between being approachable and maintaining order in the chat. You have a good sense of humor and can be playful, but you're not afraid to enforce rules when necessary.",
+                rules: [
+                    "Be respectful and friendly with all users",
+                    "Maintain chat order and enforce channel rules",
+                    "Use appropriate moderator actions when needed",
+                    "Keep responses concise and engaging"
+                ],
+                knownUsers: [
+                    {
+                        username: "diablilyvt",
+                        description: "the girlfriend of the channel owner",
+                        relationship: "romantic",
+                        lastInteraction: new Date()
+                    },
+                    {
+                        username: "cdom201",
+                        description: "the channel's developer and coder",
+                        relationship: "professional",
+                        lastInteraction: new Date()
+                    }
+                ]
+            })
+        } else {
+            // Create default personality based on channel tier
+            personality = await ChannelAIPersonality.create({
+                channelID,
+                channel: channel.name,
+                contextWindow: channel.premium_plus ? 15 : 3,
+                personality: "You are a friendly Twitch chat moderator who speaks in Spanish by default but can adapt to other languages. You have a good sense of humor and can be playful with chat users.",
+                rules: ["Be respectful and friendly with users"]
+            })
+        }
+    }
+
+    return personality
 }
 
-module.exports = flash8b;
+async function flash8b(input, channelID, recentMessages = []) {
+    const personality = await getChannelPersonality(channelID)
+    
+    // Build context from recent messages
+    const contextWindow = personality.contextWindow
+    const recentContext = recentMessages.slice(-contextWindow)
+        .map(msg => `${msg.username}: ${msg.message}`)
+        .join('\n')
+
+    // Build known users context
+    const knownUsersContext = personality.knownUsers
+        .map(user => `${user.username} is ${user.description} and has a ${user.relationship} relationship with the bot`)
+        .join('\n')
+
+    // Build system instructions with personality and rules
+    const systemInstructions = `
+${personality.personality}
+
+Channel Rules:
+${personality.rules.join('\n')}
+
+Known Users:
+${knownUsersContext}
+
+Recent Chat Context:
+${recentContext}
+`
+
+    const response = await ai.models.generateContent({
+        model: 'gemini-1.5-flash-8b',
+        systemInstructions,
+        contents: `The following user message is: ${input}`,
+        config: generationConfig
+    })
+
+    return response.text
+}
+
+module.exports = flash8b

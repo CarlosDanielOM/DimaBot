@@ -6,6 +6,7 @@ const CHAT = require('../function/chat');
 const CHANNEL = require('../function/channel');
 const commandSchema = require('../schema/command');
 const logger = require('../util/logger');
+const chatHistory = require('../class/chatHistory');
 
 const COOLDOWNS = require('../class/cooldown')
 
@@ -29,6 +30,9 @@ async function message(client, channel, tags, message) {
     let streamer = await STREAMERS.getStreamerByName(channel);
     let channelID = streamer.user_id;
     let userLevel = await giveUserLevel(channel, tags, channelID);
+
+    // Add message to chat history
+    await chatHistory.addMessage(channelID, tags.username, message);
 
     // Deletes links from chat if user is not a mod or streamer for certain channels
     let haslink = message.match(linkRegex);
@@ -54,7 +58,9 @@ async function message(client, channel, tags, message) {
     if(!command) {
         if(message.startsWith('@domdimabot') || message.startsWith('@DomDimaBot')) {
             let aiInput = message.replace('@domdimabot', '');
-            client.say(channel, `@${tags.username} ${await flash8b(aiInput)}`);
+            // Get recent messages based on channel tier
+            const recentMessages = await chatHistory.getRecentMessages(channelID, streamer.premium_plus ? 15 : 7);
+            client.say(channel, `@${tags.username} ${await flash8b(aiInput, channelID, recentMessages)}`);
         }
         return;
     };

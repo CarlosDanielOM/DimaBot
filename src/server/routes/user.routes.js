@@ -86,4 +86,45 @@ router.get('/active/:channel', async (req, res) => {
   }
 });
 
+router.post('/chat/:channelID', async (req, res) => {
+  const { channelID } = req.params;
+  const { enabled } = req.body;
+
+  if (typeof enabled !== 'boolean') {
+    return res.status(400).json({ 
+      message: 'Enabled parameter must be a boolean', 
+      error: true 
+    });
+  }
+
+  let exists = await channelSchema.findOne({ twitch_user_id: channelID });
+
+  if (!exists) {
+    return res.status(404).json({ 
+      message: 'Channel not found', 
+      error: true 
+    });
+  }
+
+  try {
+    await channelSchema.findOneAndUpdate(
+      { twitch_user_id: channelID },
+      { chat_enabled: enabled }
+    );
+
+    // Update the streamer in cache
+    await STREAMERS.updateStreamerById(channelID);
+
+    res.status(200).json({ 
+      message: `Chat ${enabled ? 'enabled' : 'disabled'} for channel`, 
+      error: false 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      message: 'Error updating chat status', 
+      error: true 
+    });
+  }
+});
+
 module.exports = router;

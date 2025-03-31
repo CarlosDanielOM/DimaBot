@@ -19,10 +19,11 @@ const resetCacheAtOffline = require('../handler_function/clearcache')
 const logger = require('../util/logger')
 const clearSpeachFiles = require('../handler_function/clearspeachfiles')
 const addCommandsToCache = require('../handler_function/addcommandstocache')
+const chatHistory = require('../class/chatHistory')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
-    const cacheClient = getClient();
+    let cacheClient = getClient();
     let streamer = await STREAMERS.getStreamerById(eventData.broadcaster_user_id);
     if(!streamer) {
         streamer = await STREAMERS.getStreamerById(eventData.to_broadcaster_user_id);
@@ -81,6 +82,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             resetCommandsFromCache(client, eventData.broadcaster_user_id);
             resetCacheAtOffline(eventData.broadcaster_user_id);
             clearSpeachFiles(eventData.broadcaster_user_id);
+            await chatHistory.clearHistory(eventData.broadcaster_user_id);
             try {
                 await cacheClient.del(`${eventData.broadcaster_user_id}:channel:editors`);
             } catch (error) {

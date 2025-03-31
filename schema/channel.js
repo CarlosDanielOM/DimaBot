@@ -8,7 +8,8 @@ const channelSchema = new schema({
     premium: { type: Boolean, default: false },
     premium_plus: { type: Boolean, default: false },
     premium_until: { type: Date, default: null },
-    actived: { type: Boolean, default: false },
+    actived: { type: Boolean, default: false }, // Bot token refresh status
+    chat_enabled: { type: Boolean, default: false }, // Bot chat activity status
     twitch_user_id: String,
     twitch_user_token: { iv: String, content: String },
     twitch_user_refresh_token: { iv: String, content: String },

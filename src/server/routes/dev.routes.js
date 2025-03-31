@@ -3,6 +3,7 @@ const router = express.Router();
 
 const commandSchema = require('../../../schema/command');
 const eventsubSchema = require('../../../schema/eventsub');
+const Channel = require('../../../schema/channel');
 
 const STREAMERS = require('../../../class/streamer');
 const JSONCOMMANDS = require('../../../config/reservedcommands.json');
@@ -14,6 +15,25 @@ router.get('/eventsubs', async(req, res) => {
     res.send(eventsubs);
 });
 
+router.post('/update/channels', async(req, res) => {
+    try {
+        // First, update channels that don't have chat_enabled field
+        const result1 = await Channel.updateMany(
+            { chat_enabled: { $exists: false } },
+            [{ $set: { chat_enabled: "$actived" } }]
+        );
+
+        // Then, update all channels to match their actived status
+        const result2 = await Channel.updateMany(
+            {},
+            [{ $set: { chat_enabled: "$actived" } }]
+        );
+
+        res.send(`Updated ${result1.modifiedCount} new channels and synchronized ${result2.modifiedCount} existing channels with actived status`);
+    } catch (error) {
+        res.status(500).send(`Error updating channels: ${error.message}`);
+    }
+});
 
 router.post('/create/commands', async(req, res) => {
     const streamer = await STREAMERS.getStreamerNames();

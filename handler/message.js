@@ -60,7 +60,7 @@ async function message(client, channel, tags, message) {
             let aiInput = message.replace('@domdimabot', '');
             // Get recent messages based on channel tier
             const recentMessages = await chatHistory.getRecentMessages(channelID, streamer.premium_plus ? 15 : 7);
-            client.say(channel, `@${tags.username} ${await flash8b(aiInput, channelID, recentMessages)}`);
+            client.say(channel, `@${tags.username} ${await flash8b(aiInput, channelID, recentMessages, tags.username, tags)}`);
         }
         return;
     };

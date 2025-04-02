@@ -14,7 +14,9 @@ const {connectChannel} = require('../../../util/client');
 const {subcriptionsTypes, subscribeTwitchEvent} = require('../../../util/eventsub')
 const JSONCOMMANDS = require('../../../config/reservedcommands.json')
 
-router.get('/register', async (req, res) => {
+const auth = require("../../../middleware/auth");
+
+router.get('/register', auth, async (req, res) => {
     const token = req.query.code;
     const username = req.query.state;
 
@@ -135,13 +137,13 @@ router.get('/register', async (req, res) => {
 
 });
 
-router.post('/login', async (req, res) => {
-    const {name, id, email, action} = req.body;
+router.post('/login', auth, async (req, res) => {
+    const {name, id, email} = req.body;
 
     let exists = await channelSchema.findOne({ twitch_user_id: id });
 
     if(exists) {
-        // Return user information without sensitive data
+        //? Return user information without sensitive data
         return res.status(200).send({
             error: false,
             message: 'User already exists',
@@ -155,53 +157,45 @@ router.post('/login', async (req, res) => {
                 actived: exists.actived,
                 chat_enabled: exists.chat_enabled,
                 twitch_user_id: exists.twitch_user_id,
-                createdAt: exists.createdAt,
-                updatedAt: exists.updatedAt,
-                date: exists.date
             }
         });
     } else {
-        if(action == 'login') {
-            let newChannel = new channelSchema({
-                name: name,
-                email: email,
-                twitch_user_id: id,
-                type: 'twitch',
-                premium: false,
-                premium_plus: false,
-                premium_until: null,
-                actived: false,
-                chat_enabled: false
-            });
+        let newChannel = new channelSchema({
+            name: name,
+            email: email,
+            twitch_user_id: id,
+            type: 'twitch',
+            premium: false,
+            premium_plus: false,
+            premium_until: null,
+            actived: false,
+            chat_enabled: false
+        });
 
+        try {
             await newChannel.save();
-
-            // Return the same structure as existing users
-            return res.status(200).send({
-                error: false,
-                message: 'User created',
-                data: {
-                    name: newChannel.name,
-                    email: newChannel.email,
-                    type: newChannel.type,
-                    premium: newChannel.premium,
-                    premium_plus: newChannel.premium_plus,
-                    premium_until: newChannel.premium_until,
-                    actived: newChannel.actived,
-                    chat_enabled: newChannel.chat_enabled,
-                    twitch_user_id: newChannel.twitch_user_id,
-                    createdAt: newChannel.createdAt,
-                    updatedAt: newChannel.updatedAt,
-                    date: newChannel.date
-                }
-            });
-        } else {
-            return res.status(404).send({
-                error: 'Not found',
-                message: 'User not found'
-            });
+        } catch (error) {
+            logger(error, true, id, 'auth_channel');
+            return res.status(500).send('Internal server error');
         }
+        
+        //? Return user information without sensitive data
+        return res.status(201).send({
+            error: false,
+            message: 'User created',
+            data: {
+                name: newChannel.name,
+                email: newChannel.email,
+                type: newChannel.type,
+                premium: newChannel.premium,
+                premium_plus: newChannel.premium_plus,
+                premium_until: newChannel.premium_until,
+                actived: newChannel.actived,
+                chat_enabled: newChannel.chat_enabled,
+                twitch_user_id: newChannel.twitch_user_id,
+            }
+        });
     }
-});
+})
 
 module.exports = router;

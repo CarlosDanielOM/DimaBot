@@ -140,6 +140,8 @@ router.get('/register', auth, async (req, res) => {
 router.post('/login', auth, async (req, res) => {
     const {name, id, email} = req.body;
 
+    if(!id) return res.status(400).send({error: true, message: 'Missing id'});
+
     let exists = await channelSchema.findOne({ twitch_user_id: id });
 
     if(exists) {
@@ -160,6 +162,8 @@ router.post('/login', auth, async (req, res) => {
             }
         });
     } else {
+        if(!name || !email) return res.status(400).send({error: true, message: 'Missing name or email'});
+
         let newChannel = new channelSchema({
             name: name,
             email: email,

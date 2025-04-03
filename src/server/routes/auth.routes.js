@@ -129,7 +129,7 @@ router.get('/register', async (req, res) => {
         // return res.status(200).sendFile(path.join(__dirname, '../../../routes/public/login.html'));
         
         // Redirect to the login page on the production domain (production environment)
-        return res.redirect(`https://domdimabot.com/login?streamer=${streamer.name}`);
+        return res.redirect(`https://domdimabot.com/login`);
 
     } catch (error) {
         logger(error, true, username, 'auth');

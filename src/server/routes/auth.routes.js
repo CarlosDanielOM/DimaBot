@@ -16,7 +16,7 @@ const JSONCOMMANDS = require('../../../config/reservedcommands.json')
 
 const auth = require("../../../middleware/auth");
 
-router.get('/register', auth, async (req, res) => {
+router.get('/register', async (req, res) => {
     const token = req.query.code;
     const username = req.query.state;
 

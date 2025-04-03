@@ -56,6 +56,7 @@ router.get('/register', async (req, res) => {
             twitch_user_refresh_token: encryptedRefreshToken,
             twitch_user_token_id: id_token,
             actived: true,
+            chat_enabled: true,
         });
 
         await STREAMERS.updateStreamers();

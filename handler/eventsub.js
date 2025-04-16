@@ -24,11 +24,13 @@ const chatHistory = require('../class/chatHistory')
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
     let cacheClient = getClient();
+    let chatEnabled = true;
     let streamer = await STREAMERS.getStreamerById(eventData.broadcaster_user_id);
     if(!streamer) {
         streamer = await STREAMERS.getStreamerById(eventData.to_broadcaster_user_id);
         if(!streamer) return;
     }
+    if(streamer.chat_enabled == false) chatEnabled = false;
     
     const {type, version, status, cost, id} = subscriptionData;
     let eventsubData = await eventsubSchema.findOne({type, channelID: streamer.user_id})
@@ -57,13 +59,13 @@ async function eventsubHandler(subscriptionData, eventData) {
 
             eventsubData.message = eventsubData.message + ` (Follow #${followDayCount})`;
             
-            defaultMessages(client, eventData, eventsubData.message);
+            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             break;
         case 'stream.online':
             if(eventsubData.message == '' || eventsubData.message == null) {
                 eventsubData.message = `Hey! $(twitch channel) is live! $(twitch title) playing $(twitch game)!`;
             };
-            defaultMessages(client, eventData, eventsubData.message);
+            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             await getEditors(eventData.broadcaster_user_id, true);
             await addCommandsToCache(eventData.broadcaster_user_id);
             //! SEPARATOR FOR FUNCTIONS
@@ -74,7 +76,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             if(eventsubData.message == '' || eventsubData.message == null) {
                 eventsubData.message = `Hey! $(twitch channel) has gone offline!`;
             };
-            defaultMessages(client, eventData, eventsubData.message);
+            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             //! SEPARATOR FOR FUNCTIONS
             resetRedemptionPrice(client, eventData.broadcaster_user_id);
             stopTimerCommands(client, eventData);
@@ -97,13 +99,13 @@ async function eventsubHandler(subscriptionData, eventData) {
             if(eventsubData.message == '' || eventsubData.message == null) {
                 eventsubData.message = `Hey! $(twitch channel) is having a $(ad time) seconds ad-break!`;
             };
-            defaultMessages(client, eventData, eventsubData.message);
+            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             if(!eventsubData.endEnabled) return;
             setTimeout(() => {
                 if(eventsubData.endMessage == '' || eventsubData.endMessage == null) {
                     eventsubData.endMessage = `Hey! the ad-break has ended!`;
                 };
-                defaultMessages(client, eventData, eventsubData.endMessage);
+                defaultMessages(client, eventData, eventsubData.endMessage, chatEnabled);
             }, eventData.duration_seconds * 1000);
             break;
         case 'channel.raid':
@@ -119,12 +121,12 @@ async function eventsubHandler(subscriptionData, eventData) {
                 if(eventsubData.temporalBanMessage == '' || eventsubData.temporalBanMessage == null) {
                     eventsubData.temporalBanMessage = `$(user) has been banned for $(ban time) seconds from the channel! by $(ban mod) for $(ban reason)`
                 }
-                defaultMessages(client, eventData, eventsubData.temporalBanMessage)
+                defaultMessages(client, eventData, eventsubData.temporalBanMessage, chatEnabled)
             } else {
                 if(eventsubData.message == '' || eventsubData.message == null) {
                     eventsubData.message = `$(user) has been banned for from the channel! by $(ban mod) for $(ban reason)`
                 }
-                defaultMessages(client, eventData, eventsubData.message)
+                defaultMessages(client, eventData, eventsubData.message, chatEnabled)
             }
             break;
     }

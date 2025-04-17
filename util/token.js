@@ -46,13 +46,13 @@ async function refreshAllTokens() {
                 let doc = await channelSchema.findOneAndUpdate({name: streamer}, {twitch_user_token: tokenEncrypt, twitch_user_refresh_token: refreshTokenEncrypt, refreshedAt: Date.now()});
 
                 if(doc.errors) {
-                    console.error(`Error refreshing token for ${streamer}: ${doc.errors}`);
+                    console.error(`Error refreshing token for ${streamer} Doc Errors: ${doc.errors}`);
                 }
             }
             
         }
         catch (error) {
-            console.error(`Error refreshing token for ${streamer}: ${error}`);
+            console.error(`Error refreshing token for ${streamer} Error: ${error}`);
         }
     });
 
@@ -86,7 +86,7 @@ async function refreshToken(refresh_token, independent = false, user = null) {
         response = await response.json();
 
         if(response.status === 400) {
-            console.error(`Error refreshing token for ${user}: ${response.message}`);
+            console.error(`Error refreshing token for ${user} HTTP Request: ${response.message}`);
             return {
                 tokenEncrypt: null,
                 refreshTokenEncrypt: null
@@ -118,7 +118,7 @@ async function refreshToken(refresh_token, independent = false, user = null) {
         
     }
     catch (error) {
-        console.error(`Error refreshing token for ${user}: ${error}`);
+        console.error(`Error refreshing token for ${user} HTTP Request Catch: ${error}`);
     }
 }
 
@@ -141,7 +141,7 @@ async function getNewAppToken() {
         response = await response.json();
 
         if(response.status === 400) {
-            console.error(`Error getting new app token: ${response.message}`);
+            console.error(`Error getting new app token HTTP Request: ${response.message}`);
             return null;
         }
 
@@ -156,7 +156,7 @@ async function getNewAppToken() {
         return {tokenEncrypt};
     }
     catch (error) {
-        console.error(`Error getting new app token: ${error}`);
+        console.error(`Error getting new app token HTTP Request Catch: ${error}`);
     }
 }
 
@@ -173,7 +173,7 @@ async function getAppToken() {
         return decrypt(doc.access_token);
     }
     catch (error) {
-        console.error(`Error getting app token: ${error}`);
+        console.error(`Error getting app token HTTP Request Catch: ${error}`);
     }
 }
 

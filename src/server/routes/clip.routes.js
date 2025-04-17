@@ -57,7 +57,7 @@ router.post('/:channelID', async (req, res) => {
             });
         }
     
-        logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, clipUrl}, true, channelID, 'clip sent');
+        // logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, clipUrl}, true, channelID, 'clip sent');
     
         io.of(`/clip/${channelID}`).emit('play-clip', body);
         soSent.push(channelID);
@@ -99,13 +99,13 @@ async function downloadClip(url, channelID) {
             if(code === 0) {
                 resolve(true);
             } else {
-                logger({error: true, message: 'Clip download failed', status: 500, type: 'error', channelID}, true, channelID, 'clip download failed');
+                logger({error: true, message: 'Clip download failed', status: 500, type: 'error', channelID, clipUrl: url}, true, channelID, 'clip download failed');
                 reject(new Error('Clip download failed'));
             }
         });
 
         downloadProcess.on('error', (err) => {
-            logger({error: true, message: 'Clip download failed', status: 500, type: 'error', channelID}, true, channelID, 'clip download failed');
+            logger({error: true, message: 'Clip download failed with error: ' + err, status: 500, type: 'error', channelID, clipUrl: url}, true, channelID, 'clip download failed');
             clearTimeout(timeout);
             reject(new Error('Clip download failed'));
         });

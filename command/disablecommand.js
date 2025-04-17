@@ -26,11 +26,8 @@ async function disableCommand (channelID, argument) {
 
     await command.save();
 
-    let exists = await cacheClient.exists(`${channelID}:commands:${argument}`);
-
-    if(exists) {
-        await cacheClient.hset(`${channelID}:commands:${argument}`, 'enabled', 0);
-    }
+    // Delete the entire command from cache to force a fresh fetch
+    await cacheClient.del(`${channelID}:commands:${argument}`);
     
     return {
         error: false,
@@ -38,7 +35,6 @@ async function disableCommand (channelID, argument) {
         status: 200,
         type: 'command_disabled'
     }
-
 }
 
 module.exports = disableCommand;

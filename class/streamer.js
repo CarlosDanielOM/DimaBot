@@ -106,14 +106,21 @@ class STREAMERS {
     }
 
     async getStreamers() {
-        const keys = await this.cache.keys('*:streamer:data');
-        let streamers = [];
+        try {
+            this.cache = getClient();
 
-        for (const key of keys) {
-            streamers.push(await this.cache.hgetall(key));
+            let streamerNames = await this.cache.smembers('streamers:by:name');
+            
+            let streamers = [];
+
+            for (const name of streamerNames) {
+                streamers.push(await this.cache.hgetall(`${name}:streamer:data`));
+            }
+
+            return streamers;
+        } catch (error) {
+            console.error(`Error getting streamers: ${error}`);
         }
-
-        return streamers;
     }
 
     async getStreamerByName(name) {

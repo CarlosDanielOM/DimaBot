@@ -65,7 +65,7 @@ async function message(client, channel, tags, message) {
         return;
     };
 
-    logger({command, argument, channel, channelID, user: tags.username}, true, channelID, 'command');
+    // logger({command, argument, channel, channelID, user: tags.username}, true, channelID, 'command');
 
     let commandFunc = await cacheClient.hget(`${channelID}:commands:${command}`, 'func');
     let commandUserLevel = await cacheClient.hget(`${channelID}:commands:${command}`, 'level');

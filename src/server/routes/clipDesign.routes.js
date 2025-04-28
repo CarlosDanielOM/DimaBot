@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const ClipDesign = require('../../schema/clipDesign');
+const ClipDesign = require('../../../schema/clipDesign');
 const logger = require('../../../util/logger');
-const { uploadCSS, deleteCSS } = require('../../util/s3');
+const { uploadCSS, deleteCSS } = require('../../../util/s3');
 const auth = require('../../../middleware/auth');
 const { validateCSS } = require('../../../util/cssValidator');
 

@@ -4,7 +4,7 @@ const fs = require('fs');
 const { getIO } = require('../websocket');
 const logger = require('../../../util/logger');
 const { exec } = require('node:child_process');
-const ClipDesign = require('../../schema/clipDesign');
+const ClipDesign = require('../../../schema/clipDesign');
 
 const HTMLPATH = `${__dirname}/public`;
 const DOWNLOADPATH = `${__dirname}/public/downloads`;

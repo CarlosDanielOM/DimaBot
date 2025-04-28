@@ -18,13 +18,15 @@ router.get('/:channelID', async (req, res) => {
         let design = null;
 
         if (designId) {
-            // Try to find custom design
-            design = await ClipDesign.findOne({
-                $or: [
-                    { _id: designId, channelID: req.params.channelID },
-                    { _id: designId, isPublic: true }
-                ]
-            });
+            if(designId != '1' && designId != '2' && designId != '3') {
+                // Try to find custom design
+                design = await ClipDesign.findOne({
+                    $or: [
+                        { _id: designId, channelID: req.params.channelID },
+                        { _id: designId, isPublic: true }
+                    ]
+                });
+            }
         }
 
         // If no custom design found, use default design
@@ -32,17 +34,7 @@ router.get('/:channelID', async (req, res) => {
             return res.status(200).sendFile(`${HTMLPATH}/clip.html`);
         }
 
-        // Read the base HTML file
-        let html = fs.readFileSync(`${HTMLPATH}/clip.html`, 'utf8');
-
-        // Inject the custom CSS link
-        const customStyle = `<link rel="stylesheet" href="${design.cssUrl}">`;
-        html = html.replace('</head>', `${customStyle}</head>`);
-
-        // Set the design class
-        html = html.replace('class="design-1"', `class="design-${design._id}"`);
-
-        res.status(200).send(html);
+        res.status(200).sendFile(`${HTMLPATH}/clip.html`);
     } catch (error) {
         logger({ error: true, message: error.message, status: 500, type: 'error' }, true, req.params.channelID, 'get clip error');
         res.status(500).json({

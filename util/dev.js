@@ -7,8 +7,8 @@ module.exports = {
         if (production) {
             url = "https://api.domdimabot.com"
         } else {
+            //url = "https://api.domdimabot.com"
             url = "http://localhost:3000";
-            // url = "https://api.domdimabot.com"
         }
         return url;
     },
@@ -37,7 +37,7 @@ module.exports = {
         if(production) {
             options = {
                 options: {
-                    debug: false
+                    debug: true
                 },
                 identity: {
                     username: process.env.TWITCH_USERNAME,

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon src/server"
+    "start": "nodemon src/server",
+    "bot": "nodemon src/bot"
   },
   "keywords": [
     "Bot",
@@ -16,9 +17,11 @@
   "author": "CDOM201",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.797.0",
     "@google/genai": "^0.6.1",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",
+    "css": "^3.0.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "gtts": "^0.2.1",

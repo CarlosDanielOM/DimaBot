@@ -4,14 +4,53 @@ const fs = require('fs');
 const { getIO } = require('../websocket');
 const logger = require('../../../util/logger');
 const { exec } = require('node:child_process');
+const ClipDesign = require('../../schema/clipDesign');
 
 const HTMLPATH = `${__dirname}/public`;
 const DOWNLOADPATH = `${__dirname}/public/downloads`;
 
 let soSent = [];
 
-router.get('/:channelID', (req, res) => {
-    res.status(200).sendFile(`${HTMLPATH}/clip.html`);
+router.get('/:channelID', async (req, res) => {
+    try {
+        // Get design from query parameter
+        const designId = req.query.design;
+        let design = null;
+
+        if (designId) {
+            // Try to find custom design
+            design = await ClipDesign.findOne({
+                $or: [
+                    { _id: designId, channelID: req.params.channelID },
+                    { _id: designId, isPublic: true }
+                ]
+            });
+        }
+
+        // If no custom design found, use default design
+        if (!design) {
+            return res.status(200).sendFile(`${HTMLPATH}/clip.html`);
+        }
+
+        // Read the base HTML file
+        let html = fs.readFileSync(`${HTMLPATH}/clip.html`, 'utf8');
+
+        // Inject the custom CSS link
+        const customStyle = `<link rel="stylesheet" href="${design.cssUrl}">`;
+        html = html.replace('</head>', `${customStyle}</head>`);
+
+        // Set the design class
+        html = html.replace('class="design-1"', `class="design-${design._id}"`);
+
+        res.status(200).send(html);
+    } catch (error) {
+        logger({ error: true, message: error.message, status: 500, type: 'error' }, true, req.params.channelID, 'get clip error');
+        res.status(500).json({
+            error: true,
+            message: 'Error loading clip page',
+            status: 500
+        });
+    }
 });
 
 router.post('/:channelID', async (req, res) => {

@@ -19,6 +19,7 @@ async function server() {
     app.use('/rewards', require('./routes/reward.routes'));
     app.use('/triggers', require('./routes/trigger.routes'));
     app.use('/clip', require('./routes/clip.routes'));
+    app.use('/clip-designs', require('./routes/clipDesign.routes'));
     app.use('/video', require('./routes/video.routes'));
     app.use('/speech', require('./routes/speach.routes'));
     app.use('/auth', require('./routes/auth.routes'));

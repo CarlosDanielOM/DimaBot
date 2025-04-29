@@ -22,10 +22,22 @@ let channelInstances = new Map();
 let isMod = false;
 let user = null;
 
+let isAndoni = false;
+
 //? Test imports
 const flash8b = require('../util/ai/google/flash.8b');
 
 async function message(client, channel, tags, message) {
+    if(channel == 'andonide') {
+        if(message == 'a' && !isAndoni) {
+            isAndoni = true;
+            client.say(channel, 'A la verga Power Rangerrrr!');
+            setTimeout(() => {
+                isAndoni = false;
+            }, 10000);
+        }
+    }
+    
     let cacheClient = getClient();
     let streamer = await STREAMERS.getStreamerByName(channel);
     let channelID = streamer.user_id;

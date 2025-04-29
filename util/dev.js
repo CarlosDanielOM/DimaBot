@@ -37,7 +37,7 @@ module.exports = {
         if(production) {
             options = {
                 options: {
-                    debug: true
+                    debug: false
                 },
                 identity: {
                     username: process.env.TWITCH_USERNAME,
@@ -55,7 +55,7 @@ module.exports = {
                     username: process.env.TWITCH_USERNAME,
                     password: process.env.User_Token_Auth
                 },
-                channels: ['domdimabot']
+                channels: ['cdom201']
             }
         }
         return options;

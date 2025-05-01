@@ -3,6 +3,8 @@ const http = require('http');
 const { getClient } = require('../../util/database/dragonfly');
 const fs = require('fs');
 
+const STREAMERS = require('../../class/streamer');
+
 let io = null;
 
 async function websocket(app) {
@@ -86,7 +88,19 @@ async function websocket(app) {
     //? Clip
     io.of(/^\/clip\/\w+$/).on('connection', async (socket) => {
         const channelID = socket.nsp.name.split('/')[2];
-        console.log(`${channelID} connected to clip`);
+        const cacheClient = getClient();
+
+        let userData = await STREAMERS.getStreamerById(channelID);
+
+        console.log(`${userData.name} (${channelID}) connected to clip`);
+
+        socket.on('disconnect', () => {
+            console.log(`${userData.name} (${channelID}) disconnected from clip`);
+        });
+
+        socket.on('clip-ended', async (data) => {
+            
+        });
     });
     
     //? Sumimetro

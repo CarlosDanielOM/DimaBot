@@ -19,7 +19,7 @@ async function refreshAllTokens() {
             let channel = await STREAMERS.getStreamerByName(streamer);
 
             if(!channel) return;
-            
+
             const { tokenEncrypt, refreshTokenEncrypt } = await refreshToken(channel.refresh_token);
 
             if(!tokenEncrypt || !refreshTokenEncrypt) {
@@ -32,7 +32,7 @@ async function refreshAllTokens() {
                     iv: null,
                     content: null
                 }
-                await channelSchema.findOneAndUpdate({name: streamer}, {twitch_user_token: nullToken, twitch_user_refresh_token: nullRefreshToken, actived: false, refreshedAt: Date.now()});
+                await channelSchema.findOneAndUpdate({name: streamer}, {twitch_user_token: nullToken, twitch_user_refresh_token: nullRefreshToken, actived: false, chat_enabled: false, refreshedAt: Date.now()});
 
                 return console.error(`Error refreshing token for ${streamer}, token is null, deactivating channel`);
             };
@@ -49,7 +49,6 @@ async function refreshAllTokens() {
                     console.error(`Error refreshing token for ${streamer} Doc Errors: ${doc.errors}`);
                 }
             }
-            
         }
         catch (error) {
             console.error(`Error refreshing token for ${streamer} Error: ${error}`);
@@ -58,12 +57,10 @@ async function refreshAllTokens() {
 
     if(count == 5) count = 0;
 
-
     console.log('Refreshing all tokens');
-    
+
     await Promise.all(promises);
     await STREAMERS.updateStreamers();
-    
 }
 
 async function refreshToken(refresh_token, independent = false, user = null) {
@@ -115,7 +112,6 @@ async function refreshToken(refresh_token, independent = false, user = null) {
             tokenEncrypt,
             refreshTokenEncrypt
         }
-        
     }
     catch (error) {
         console.error(`Error refreshing token for ${user} HTTP Request Catch: ${error}`);
@@ -167,7 +163,7 @@ async function getAppToken() {
         let token = await cache.get('domdimabot:app:token');
 
         if(token !== null) return token;
-        
+
         let doc = await appConfigSchema.findOne({name: 'domdimabot'});
 
         return decrypt(doc.access_token);

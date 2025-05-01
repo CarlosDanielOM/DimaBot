@@ -5,9 +5,9 @@ const { getIO } = require('../websocket');
 const logger = require('../../../util/logger');
 const { exec } = require('node:child_process');
 const ClipDesign = require('../../../schema/clipDesign');
+const { downloadClip, deleteOldClip } = require('../../../util/video');
 
 const HTMLPATH = `${__dirname}/public`;
-const DOWNLOADPATH = `${__dirname}/public/downloads`;
 
 let soSent = [];
 
@@ -70,11 +70,7 @@ router.post('/:channelID', async (req, res) => {
     }
 
     //Delete old clip
-    try {
-        fs.unlinkSync(`${DOWNLOADPATH}/${channelID}-clip.mp4`);
-    } catch (error) {
-        logger({error: true, message: 'Clip file to delete not found.', status: 404, type: 'error', channelID, clipUrl}, true, channelID, 'clip file to delete not found');
-    }
+    await deleteOldClip(channelID);
 
     try {
         let clip = await downloadClip(clipUrl, channelID);
@@ -87,9 +83,7 @@ router.post('/:channelID', async (req, res) => {
                 type: 'error'
             });
         }
-    
-        // logger({error: false, message: 'Clip sent', status: 200, type: 'success', channelID, clipUrl}, true, channelID, 'clip sent');
-    
+
         io.of(`/clip/${channelID}`).emit('play-clip', body);
         soSent.push(channelID);
         setTimeout(() => {
@@ -114,31 +108,3 @@ router.post('/:channelID', async (req, res) => {
 });
 
 module.exports = router;
-
-async function downloadClip(url, channelID) {
-    return new Promise((resolve, reject) => {
-        const downloadProcess = exec(`twitch-dl download -q 480p -o ${DOWNLOADPATH}/${channelID}-clip.mp4 ${url}`);
-
-        const timeout = setTimeout(() => {
-            console.log(`Timeout for ${channelID}`);
-            downloadProcess.kill();
-            reject(new Error('Download timeout'));
-        }, 10000);
-
-        downloadProcess.on('exit', (code) => {
-            clearTimeout(timeout);
-            if(code === 0) {
-                resolve(true);
-            } else {
-                logger({error: true, message: 'Clip download failed', status: 500, type: 'error', channelID, clipUrl: url}, true, channelID, 'clip download failed');
-                reject(new Error('Clip download failed'));
-            }
-        });
-
-        downloadProcess.on('error', (err) => {
-            logger({error: true, message: 'Clip download failed with error: ' + err, status: 500, type: 'error', channelID, clipUrl: url}, true, channelID, 'clip download failed');
-            clearTimeout(timeout);
-            reject(new Error('Clip download failed'));
-        });
-    });
-}

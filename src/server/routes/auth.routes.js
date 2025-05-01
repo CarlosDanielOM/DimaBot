@@ -91,7 +91,7 @@ router.get('/register', async (req, res) => {
         }
 
         let jsonCommands = JSONCOMMANDS.commands;
-        
+
         //? Add all reserved commands to the channel
         for(const command in jsonCommands) {
             let commandExists = await commandSchema.exists({func: jsonCommands[command].func, channelID: streamer.user_id});
@@ -127,7 +127,7 @@ router.get('/register', async (req, res) => {
 
         // Return the login.html file (local development)
         // return res.status(200).sendFile(path.join(__dirname, '../../../routes/public/login.html'));
-        
+
         // Redirect to the login page on the production domain (production environment)
         return res.redirect(`https://domdimabot.com/login`);
 
@@ -142,6 +142,15 @@ router.post('/login', auth, async (req, res) => {
     const {name, id, email} = req.body;
 
     if(!id) return res.status(400).send({error: true, message: 'Missing id'});
+
+    if(id == '1104868478') {
+        return res.status(200).send({
+            error: true,
+            message: 'You are not allowed to login with this account',
+            status: 403,
+            type: 'error'
+        });
+    }
 
     let exists = await channelSchema.findOne({ twitch_user_id: id });
 

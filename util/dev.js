@@ -1,13 +1,13 @@
-let production = true;
+require('dotenv').config();
+let production = process.env.PRODUCTION == 0 ? false : true;
 
 module.exports = {
     isProduction: () => {return production},
     getUrl: () => {
         let url;
         if (production) {
-            url = "https://api.domdimabot.com"
+            url = "https://api.domdimabot.com";
         } else {
-            //url = "https://api.domdimabot.com"
             url = "http://localhost:3000";
         }
         return url;

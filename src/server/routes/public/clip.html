@@ -259,6 +259,7 @@
         // Get design from URL parameter, default to design-1
         const urlParams = new URLSearchParams(window.location.search);
         const design = urlParams.get('design') || '1';
+        const timeout = urlParams.get('timeout') || 30;
         
         // If design is a custom ID, load the custom CSS
         if (design !== '1' && design !== '2' && design !== '3') {

@@ -7,6 +7,7 @@ const { exec } = require('node:child_process');
 const ClipDesign = require('../../../schema/clipDesign');
 const { downloadClip, deleteOldClip } = require('../../../util/video');
 
+const DOWNLOADPATH = `${__dirname}/../server/routes/public/downloads`;
 const HTMLPATH = `${__dirname}/public`;
 
 let soSent = [];
@@ -70,10 +71,10 @@ router.post('/:channelID', async (req, res) => {
     }
 
     //Delete old clip
-    await deleteOldClip(channelID);
+    await deleteOldClip(channelID, DOWNLOADPATH);
 
     try {
-        let clip = await downloadClip(clipUrl, channelID);
+        let clip = await downloadClip(clipUrl, channelID, DOWNLOADPATH);
         if(!clip) {
             logger({error: true, message: 'The clipUrl is invalid.', status: 400, type: 'error', channelID, clipUrl}, true, channelID, 'clip invalid');
             return res.status(400).json({

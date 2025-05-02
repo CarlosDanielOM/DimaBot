@@ -2,7 +2,7 @@ const fs = require('fs');
 const logger = require("./logger"); // Assuming your logger exists
 const { exec } = require('node:child_process');
 
-const DOWNLOADPATH = `${__dirname}/public/downloads`;
+const DOWNLOADPATH = `${__dirname}/../server/routes/public/downloads`;
 
 async function downloadClip(url, channelID) {
     return new Promise((resolve, reject) => {

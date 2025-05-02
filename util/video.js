@@ -1,4 +1,5 @@
 const fs = require('fs');
+const logger = require("./logger");
 const { exec } = require('node:child_process')
 
 const DOWNLOADPATH = `${__dirname}/public/downloads`;

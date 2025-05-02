@@ -4,12 +4,12 @@ const { exec } = require('node:child_process');
 
 const DOWNLOADPATH = `${__dirname}/../server/routes/public/downloads`;
 
-async function downloadClip(url, channelID) {
+async function downloadClip(url, channelID, downloadDir) {
     return new Promise((resolve, reject) => {
         // Note: Ensure DOWNLOADPATH exists before running this
         // Consider adding: if (!fs.existsSync(DOWNLOADPATH)) { fs.mkdirSync(DOWNLOADPATH, { recursive: true }); }
 
-        const command = `twitch-dl download -q 480p -o "${DOWNLOADPATH}/${channelID}-clip.mp4" "${url}"`; // Added quotes for safety
+        const command = `twitch-dl download -q 480p -o "${downloadDir}/${channelID}-clip.mp4" "${url}"`; // Added quotes for safety
         console.log(`Executing command: ${command}`); // Log the command being run
         const downloadProcess = exec(command);
 
@@ -79,8 +79,8 @@ async function downloadClip(url, channelID) {
 }
 
 // --- deleteOldClip remains the same ---
-async function deleteOldClip(channelID) {
-    const filePath = `${DOWNLOADPATH}/${channelID}-clip.mp4`;
+async function deleteOldClip(channelID, deleteDir) {
+    const filePath = `${deleteDir}/${channelID}-clip.mp4`;
     try {
         // Check if file exists before attempting to delete
         if (fs.existsSync(filePath)) {

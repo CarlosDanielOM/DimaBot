@@ -7,7 +7,7 @@ const { exec } = require('node:child_process');
 const ClipDesign = require('../../../schema/clipDesign');
 const { downloadClip, deleteOldClip } = require('../../../util/video');
 
-const DOWNLOADPATH = `${__dirname}/../server/routes/public/downloads`;
+const DOWNLOADPATH = `${__dirname}/public/downloads`;
 const HTMLPATH = `${__dirname}/public`;
 
 let soSent = [];

@@ -4,6 +4,7 @@ const multer = require('multer');
 const fs = require('fs');
 const {getUrl} = require('../../../util/dev');
 const {getStreamerHeaderById} = require('../../../util/header');
+const { uploadTriggerFileToS3, deleteTriggerFileFromS3 } = require('../../../util/s3');
 
 const STREAMERS = require('../../../class/streamer');
 
@@ -151,23 +152,8 @@ router.post('/:channelID/upload', async (req, res) => {
 
     const MAX_FILE_SIZE = MB * 1024 * 1024;
 
-    let folderExists = fs.existsSync(`${__dirname}/public/uploads/triggers/${streamer.name}`);
-    if(!folderExists) {
-        fs.mkdirSync(`${__dirname}/public/uploads/triggers/${streamer.name}`);
-    }
-    
-    const storage = multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, `${__dirname}/public/uploads/triggers/${streamer.name}`);
-        },
-        filename: (req, file, cb) => {
-            cb(null, `${req.body.triggerName}.${file.mimetype.split('/')[1]}`);
-        },
-        limits: {
-            fileSize: MAX_FILE_SIZE
-        }
-    });
-
+    // Use multer memory storage to avoid saving to disk
+    const storage = multer.memoryStorage();
     const fileFilter = async (req, file, cb) => {
         if(acceptableMimeTypes.includes(file.mimetype)) {
             if(await triggerFileSchema.exists({
@@ -184,10 +170,10 @@ router.post('/:channelID/upload', async (req, res) => {
             console.log(`File type ${file.mimetype} not allowed from ${streamer.name}`);
         }
     }
-    
     multer({
         storage: storage,
-        fileFilter: fileFilter
+        fileFilter: fileFilter,
+        limits: { fileSize: MAX_FILE_SIZE }
     }).single('trigger')(req, res, async err => {
         if(err) {
             console.log({
@@ -236,13 +222,32 @@ router.post('/:channelID/upload', async (req, res) => {
             });
         }
 
-        let fileNameURLEncoded = encodeURIComponent(req.file.filename);
+        // Directly upload to S3 from buffer
+        const filename = `${req.body.triggerName}.${req.file.mimetype.split('/')[1]}`;
+        const s3Key = `${channelID}/triggers/${filename}`;
+        let s3Url;
+        try {
+            s3Url = await uploadTriggerFileToS3(channelID, req.file.buffer, req.file.mimetype, s3Key);
+        } catch (s3err) {
+            console.log({
+                error: 'Internal Server Error',
+                message: 'Error uploading file to S3',
+                status: 500,
+                s3err
+            });
+            return res.status(500).send({
+                error: 'Internal Server Error',
+                message: 'Error uploading file to S3',
+                status: 500
+            });
+        }
+
         let fileData = {
             name: req.body.triggerName,
-            fileName: req.file.filename,
+            fileName: filename,
             fileSize: req.file.size,
             fileType: req.file.mimetype,
-            fileUrl: `https://api.domdimabot.com/media/${streamer.name}/${fileNameURLEncoded}`,
+            fileUrl: s3Url,
             channel: streamer.name,
             channelID: channelID
         }
@@ -269,9 +274,7 @@ router.post('/:channelID/upload', async (req, res) => {
             data: fileData,
             status: 201
         });
-        
     });
-    
 });
 
 router.delete('/:channelID/:triggerID', async (req, res) => {
@@ -438,8 +441,9 @@ router.delete('/files/:channelID/:fileID', async (req, res) => {
     }
 
     try {
-        fs.unlinkSync(`${__dirname}/public/uploads/triggers/${file.channel}/${file.fileName}`, {recursive: false, force: true, maxRetries: 5});
-
+        // Remove from S3
+        const s3Key = `${channelID}/triggers/${file.fileName}`;
+        await deleteTriggerFileFromS3(channelID, s3Key);
         await file.deleteOne();
     } catch (error) {
         console.log({

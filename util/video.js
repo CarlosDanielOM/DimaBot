@@ -9,8 +9,11 @@ async function downloadClip(url, channelID, downloadDir) {
         // Note: Ensure DOWNLOADPATH exists before running this
         // Consider adding: if (!fs.existsSync(DOWNLOADPATH)) { fs.mkdirSync(DOWNLOADPATH, { recursive: true }); }
 
+        if(!fs.existsSync(downloadDir)) {
+            fs.mkdirSync(downloadDir, { recursive: true });
+        }
+
         const command = `twitch-dl download -q 480p -o "${downloadDir}/${channelID}-clip.mp4" "${url}"`; // Added quotes for safety
-        console.log(`Executing command: ${command}`); // Log the command being run
         const downloadProcess = exec(command);
 
         let stdoutData = '';
@@ -40,7 +43,6 @@ async function downloadClip(url, channelID, downloadDir) {
 
         downloadProcess.on('exit', (code) => {
             clearTimeout(timeout); // Clear timeout if process exits normally or with error code
-            console.log(`twitch-dl process exited with code ${code} for ${url}`); // Log exit code
 
             if (code === 0) {
                 resolve(true); // Success
@@ -85,15 +87,8 @@ async function deleteOldClip(channelID, deleteDir) {
         // Check if file exists before attempting to delete
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
-            console.log(`Deleted old clip: ${filePath}`);
-        } else {
-            console.log(`Clip file to delete not found (normal if first download): ${filePath}`);
-            // Decide if you want to log this scenario via your logger or just console
-            // logger({error: false, message: 'Clip file to delete not found.', status: 404, type: 'info', channelID}, false, channelID, 'clip file to delete not found');
         }
     } catch (error) {
-        console.error(`Error deleting file ${filePath}: ${error.message}`);
-        // Log the error during deletion attempt
         logger({
             error: true,
             message: `Error deleting clip file: ${error.message}`,

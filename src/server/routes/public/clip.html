@@ -276,7 +276,10 @@
         
         socket.on('play-clip', data => {
             console.log({data});
-            const duration = Number(data.duration);
+            let duration = Number(data.duration);
+            if(duration > timeout) {
+                duration = timeout;
+            }
             let vplayer = document.getElementById('vplayer');
             if(!vplayer) {
                 vplayer = document.createElement('video');

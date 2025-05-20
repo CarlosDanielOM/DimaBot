@@ -6,6 +6,7 @@ const logger = require('../../../util/logger');
 const { exec } = require('node:child_process');
 const ClipDesign = require('../../../schema/clipDesign');
 const { downloadClip, deleteOldClip } = require('../../../util/video');
+const { getClient } = require('../../../util/database/dragonfly');
 
 const DOWNLOADPATH = `${__dirname}/public/downloads`;
 const HTMLPATH = `${__dirname}/public`;
@@ -49,18 +50,10 @@ router.get('/:channelID', async (req, res) => {
 router.post('/:channelID', async (req, res) => {
     let io = getIO();
     let channelID = req.params.channelID;
+    const cacheClient = getClient();
     const { duration, clipUrl, title, game, streamer, profileImg, streamerColor, description } = req.body;
     let body = req.body;
     
-    if(soSent.includes(channelID)) {
-        return res.status(400).json({
-            error: true,
-            message: 'The channel has already sent a clip.',
-            status: 400,
-            type: 'error'
-        });
-    }
-
     if(!clipUrl) {
         return res.status(400).json({
             error: true,
@@ -87,9 +80,6 @@ router.post('/:channelID', async (req, res) => {
 
         io.of(`/clip/${channelID}`).emit('play-clip', body);
         soSent.push(channelID);
-        setTimeout(() => {
-            soSent = soSent.filter(id => id !== channelID);
-        }, 1000 * Number(duration));
         
         res.status(200).json({
             error: false,

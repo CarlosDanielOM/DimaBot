@@ -4,11 +4,13 @@ const CHAT = require('../function/chat');
 const getChannelClips = require('../function/clip/getclips.js');
 const showClip = require('../function/clip/showclip.js');
 const { getUserByLogin } = require('../function/user/getuser.js');
+const { getClient } = require('../util/database/dragonfly.js');
 
 const cooldown = new COOLDOWN();
 
 async function shoutout(channelID, raider, color = 'purple', modID = 698614112) {
-    let raiderData = await getUserByLogin(raider);
+    const cacheClient = getClient();
+    let raiderData = await getUserByLogin(raider, true);
     if(raiderData.error) {
         return {
             error: true,
@@ -19,6 +21,7 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
         }
     }
     raiderData = raiderData.data;
+
     if(!channelID || !raiderData.id) {
         return {
             error: true,
@@ -28,7 +31,7 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
         }
     }
 
-    let raiderChannelData = await getChannelInformation(raiderData.id);
+    let raiderChannelData = await getChannelInformation(raiderData.id, true);
     if(raiderChannelData.error) {
         return {
             error: true,
@@ -38,29 +41,7 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
             where: 'shoutout getChannelInformation'
         }
     }
-
-    let clips = await getChannelClips(raiderData.id);
-    if(clips.error) {
-        return {
-            error: true,
-            message: clips.message,
-            status: clips.status,
-            type: clips.type,
-            where: 'shoutout getChannelClips'
-        }
-    }
-
-    let clip = await showClip(channelID, clips.data, raiderData, raiderChannelData);
-    if(clip.error) {
-        return {
-            error: true,
-            message: clip.message,
-            status: clip.status,
-            type: clip.type,
-            where: 'shoutout showClip'
-        }
-    }
-
+    
     let raiderChannel = {
         name: raiderChannelData.data.broadcaster_name,
         login: raiderChannelData.data.broadcaster_login,
@@ -83,6 +64,30 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
     if(!cooldown.hasCooldown(channelID)) {
         cooldown.setCooldown(channelID, 120);
         CHAT.shoutout(channelID, raiderData.id, modID)
+    }
+
+    //* Needing to implement new clip system to add a queue to the clips
+
+    let clips = await getChannelClips(raiderData.id, null, true);
+    if(clips.error) {
+        return {
+            error: true,
+            message: clips.message,
+            status: clips.status,
+            type: clips.type,
+            where: 'shoutout getChannelClips'
+        }
+    }
+
+    let clip = await showClip(channelID, clips.data, raiderData, raiderChannelData);
+    if(clip.error) {
+        return {
+            error: true,
+            message: clip.message,
+            status: clip.status,
+            type: clip.type,
+            where: 'shoutout showClip'
+        }
     }
 
     return {

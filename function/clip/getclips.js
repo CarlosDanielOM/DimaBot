@@ -1,9 +1,18 @@
 const { getBotHeader } = require("../../util/header");
 const { getTwitchHelixUrl } = require("../../util/link");
 
-async function getChannelClips(channelID, amount = null) {
-    let botHeader = await getBotHeader();
+async function getChannelClips(channelID, amount = null, saveToCache = false) {
+    const cacheClient = getClient();
 
+    let cachedClips = await cacheClient.get(`channel:clips:${channelID}`);
+    if(cachedClips) {
+        return {
+            error: false,
+            data: JSON.parse(cachedClips)
+        }
+    }
+
+    let botHeader = await getBotHeader();
     let params = new URLSearchParams();
     params.append('broadcaster_id', channelID);
     if(amount) {
@@ -23,6 +32,12 @@ async function getChannelClips(channelID, amount = null) {
             status: data.status,
             type: data.error
         }
+    }
+
+    if(saveToCache) {
+        cacheClient.set(`channel:clips:${channelID}`, JSON.stringify(data.data), {
+            EX: 60 * 60 * 3
+        });
     }
 
     return {

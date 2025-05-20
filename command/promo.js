@@ -4,43 +4,49 @@ const showClip = require("../function/clip/showclip");
 const { getUserByLogin, getUserById } = require("../function/user/getuser");
 
 async function promo(channelID, streamerName) {
-    let streamerData = await getUserByLogin(streamerName);
+    let streamerData = await getUserByLogin(streamerName, true);
     if(streamerData.error) {
         return {
             error: true,
             message: streamerData.message,
             status: streamerData.status,
-            type: streamerData.type
+            type: streamerData.type,
+            where: 'promo getUserByLogin'
         }
     }
 
-    let broadcasterData = await getUserById(channelID);
+    let broadcasterData = await getUserById(channelID, true);
     if(broadcasterData.error) {
         return {
             error: true,
             message: broadcasterData.message,
             status: broadcasterData.status,
-            type: broadcasterData.type
+            type: broadcasterData.type,
+            where: 'promo getUserById'
         }
     }
 
-    let streamerChannelData = await getChannelInformation(streamerData.data.id);
+    let streamerChannelData = await getChannelInformation(streamerData.data.id, true);
     if(streamerChannelData.error) {
         return {
             error: true,
             message: streamerChannelData.message,
             status: streamerChannelData.status,
-            type: streamerChannelData.type
+            type: streamerChannelData.type,
+            where: 'promo getChannelInformation'
         }
     }
+
+    //* Needing to implement new clip system to add a queue to the clips
     
-    let clips = await getChannelClips(streamerData.data.id);
+    let clips = await getChannelClips(streamerData.data.id, null, true);
     if(clips.error) {
         return {
             error: true,
             message: clips.message,
             status: clips.status,
-            type: clips.type
+            type: clips.type,
+            where: 'promo getChannelClips'
         }
     }
 
@@ -50,7 +56,8 @@ async function promo(channelID, streamerName) {
             error: true,
             message: clip.message,
             status: clip.status,
-            type: clip.type
+            type: clip.type,
+            where: 'promo showClip'
         }
     }
 

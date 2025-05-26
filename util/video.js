@@ -100,8 +100,14 @@ async function deleteOldClip(channelID, deleteDir) {
     }
 }
 
+async function checkIfClipExists(channelID, downloadDir) {
+    const filePath = `${downloadDir}/${channelID}-clip.mp4`;
+    return fs.existsSync(filePath);
+}
+
 
 module.exports = {
     downloadClip,
-    deleteOldClip
+    deleteOldClip,
+    checkIfClipExists
 };

@@ -36,9 +36,7 @@ async function getChannelInformation(channelID, saveToCache = false) {
     data = data.data[0]
 
     if(saveToCache) {
-        cacheClient.set(`channel:data:${channelID}`, JSON.stringify(data), {
-            EX: 60 * 60 * 3
-        });
+        cacheClient.set(`channel:data:${channelID}`, JSON.stringify(data), 'EX', 60 * 60 * 3);
     }
 
     return {

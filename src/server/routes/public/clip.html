@@ -130,7 +130,6 @@
             flex-direction: column;
             justify-content: flex-end;
             padding: 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
             transition: all 1.5s ease-in-out;
         }
 
@@ -179,21 +178,21 @@
 
         .right-container h2 {
             font-size: 1.8em;
-            color: #b9b9b9;
+            color: #ffffff;
             margin-bottom: 10px;
             font-weight: 300;
         }
 
         .right-container h3 {
             font-size: 1em;
-            color: #b9b9b9;
+            color: #ffffff;
             margin-bottom: 10px;
             font-weight: 300;
         }
 
         .right-container h4 {
             font-size: .8em;
-            color: #b9b9b9;
+            color: #ffffff;
             margin-bottom: 10px;
             font-weight: 300;
         }
@@ -221,6 +220,19 @@
             0% { transform: translateX(0px); }
             100% { transform: translateX(-400px); }
         }
+
+        .tester {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 100px;
+            height: 100px;
+            background-color: #000;
+            color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
@@ -246,6 +258,10 @@
         </div>
     </div>
 
+    <div class="tester" id="tester" style="display: none;">
+        <button id="test-button">Test</button>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
     <script>
         const container = document.getElementById('container');
@@ -260,6 +276,12 @@
         const urlParams = new URLSearchParams(window.location.search);
         const design = urlParams.get('design') || '1';
         const timeout = urlParams.get('timeout') || 30;
+        const testing = urlParams.get('testing') || false;
+
+        if(testing) {
+            const tester = document.getElementById('tester');
+            tester.style.display = 'block';
+        }
         
         // If design is a custom ID, load the custom CSS
         if (design !== '1' && design !== '2' && design !== '3') {
@@ -273,6 +295,10 @@
         
         const channelID = window.location.pathname.split('/')[2];
         const socket = io(`/clip/${channelID}`, {reconnection: true});
+
+        socket.on('start-clip', data => {
+            socket.emit('clip-ended', {channelID: channelID});
+        });
         
         socket.on('play-clip', data => {
             console.log({data});
@@ -295,11 +321,11 @@
                 profileImg.id = 'profile-img';
                 let rgb = hexToRgb(data.streamerColor);
                 if(rgb.r <= 40 && rgb.g <= 40 && rgb.b <= 40) {
-                    rightContainer.style.backgroundColor = 'rgba(204, 204, 204, 0.5)';
+                    rightContainer.style.backgroundColor = 'rgba(204, 204, 204, 0.7)';
                     rightContainer.style.backdropFilter = 'blur(10px)';
                     rightContainer.style.border = '3px solid #000';
                 } else {
-                    rightContainer.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.5)`;
+                    rightContainer.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)`;
                     rightContainer.style.backdropFilter = 'blur(10px)';
                     rightContainer.style.color = '#000'
                     rightContainer.style.border = `3px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
@@ -308,8 +334,14 @@
             }
 
             profileImg.setAttribute('src', data.profileImage);
+
+            let clipLink = null;
             
-            const clipLink = `https://api.domdimabot.com/video/clip/${channelID}?t=${Date.now()}`;
+            if(!testing) {
+                clipLink = `https://api.domdimabot.com/video/clip/${channelID}?t=${Date.now()}`;
+            } else {
+                clipLink = `http://localhost:3000/video/clip/${channelID}?t=${Date.now()}`;
+            }
 
             const videoSource = document.createElement('source');
             videoSource.setAttribute('src', clipLink);
@@ -318,6 +350,7 @@
 
             vplayer.addEventListener('canplaythrough', () => {
                 console.log('can play through');
+                console.log(timeout)
                 vplayer.play().then(() => {
                     streamerName.textContent = data.streamer;
                     streamGame.textContent = data.game;
@@ -343,6 +376,7 @@
                         profileImg.remove();
                         imgContainer.style.background = 'none';
                         console.log('clip ended');
+                        socket.emit('clip-ended', {channelID: channelID});
                     }, (1000 * duration) + (1000));
                     
                     console.log('clip started');
@@ -362,6 +396,30 @@
                 b: parseInt(result[3], 16)
             } : null;
         }
+    </script>
+    <script>
+        const testButton = document.getElementById('test-button');
+        testButton.addEventListener('click', () => {
+            let streamers = [
+                'cdom201', 'unositopolar', 'elkenozvt', 'misumik', 'ariascarletvt', 'ozbellvt'
+            ]
+
+            let channelID = window.location.pathname.split('/')[2];
+            console.log(channelID)
+            
+            fetch('http://localhost:3000/clip/test', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    channelID: channelID,
+                    streamer: streamers[Math.floor(Math.random() * streamers.length)]
+                })
+            }).then(res => res.json()).then(data => {
+                console.log(data);
+            });
+        });
     </script>
 </body>
 </html>

@@ -43,9 +43,7 @@ async function getUserById(userID, saveToCache = false) {
     }
 
     if(saveToCache) {
-        cacheClient.set(`user:data:${userID}`, JSON.stringify(data.data[0]), {
-            EX: 60 * 60 * 3
-        });
+        cacheClient.set(`user:data:${userID}`, JSON.stringify(data.data[0]), 'EX', 60 * 60 * 3);
     }
 
     return {
@@ -90,15 +88,15 @@ async function getUserByLogin(username, saveToCache = false) {
         return {
             error: true,
             message: 'User not found',
+            payload: username,
+            response: data,
             status: 404,
             type: 'User not found'
         }
     }
 
     if(saveToCache) {
-        cacheClient.set(`user:data:${username}`, JSON.stringify(data.data[0]), {
-            EX: 60 * 60 * 3
-        });
+        cacheClient.set(`user:data:${username}`, JSON.stringify(data.data[0]), 'EX', 60 * 60 * 3);
     }
 
     return {

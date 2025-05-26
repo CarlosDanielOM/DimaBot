@@ -4,6 +4,7 @@ const { getClient } = require('../../util/database/dragonfly');
 const fs = require('fs');
 
 const STREAMERS = require('../../class/streamer');
+const promo = require('../../command/promo');
 
 let io = null;
 
@@ -92,15 +93,50 @@ async function websocket(app) {
 
         let userData = await STREAMERS.getStreamerById(channelID);
 
+        await cacheClient.set(`${channelID}:clip:connected`, "true");
         console.log(`${userData.name} (${channelID}) connected to clip`);
+
+        let clipQueue = await cacheClient.lrange(`${channelID}:clips:queue`, 0, -1);
+        if(clipQueue.length > 0) {
+            let streamerName = await cacheClient.lpop(`${channelID}:clips:queue`);
+            promo(channelID, streamerName, true);
+            cacheClient.set(`${channelID}:clip:playing`, "true");
+        }
+
+        socket.on('clip-ended', async (data) => {
+            //? If the queue is empty, stop the clip
+            let exists = await cacheClient.exists(`${channelID}:clips:queue`);
+            if(!exists) {
+                cacheClient.del(`${channelID}:clip:playing`);
+            }
+            
+            let nextStreamer = await cacheClient.lpop(`${channelID}:clips:queue`);
+            let duplicateExists = await cacheClient.exists(`${channelID}:clips:queue:first`);
+            if(duplicateExists) {
+                if(nextStreamer == await cacheClient.get(`${channelID}:clips:queue:first`)) {
+                    nextStreamer = await cacheClient.lpop(`${channelID}:clips:queue`);
+                    cacheClient.del(`${channelID}:clips:queue:first`);
+                }
+            }
+
+            if(!nextStreamer) {
+                cacheClient.del(`${channelID}:clip:playing`);
+                cacheClient.del(`${channelID}:clips:queue:first`);
+            }
+            
+            //? Waits 0.5 seconds before sending the next clip
+            setTimeout(async () => {
+                if(nextStreamer) {
+                    promo(channelID, nextStreamer, true);
+                }
+            }, 500);
+        });
 
         socket.on('disconnect', () => {
             console.log(`${userData.name} (${channelID}) disconnected from clip`);
+            cacheClient.del(`${channelID}:clip:connected`);
         });
 
-        socket.on('clip-ended', async (data) => {
-            
-        });
     });
     
     //? Sumimetro

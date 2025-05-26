@@ -30,7 +30,7 @@ async function eventsubHandler(subscriptionData, eventData) {
         streamer = await STREAMERS.getStreamerById(eventData.to_broadcaster_user_id);
         if(!streamer) return;
     }
-    if(streamer.chat_enabled == false) chatEnabled = false;
+    if(streamer.chat_enabled == "false") chatEnabled = false;
     
     const {type, version, status, cost, id} = subscriptionData;
     let eventsubData = await eventsubSchema.findOne({type, channelID: streamer.user_id})

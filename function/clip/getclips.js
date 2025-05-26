@@ -1,3 +1,4 @@
+const { getClient } = require("../../util/database/dragonfly");
 const { getBotHeader } = require("../../util/header");
 const { getTwitchHelixUrl } = require("../../util/link");
 
@@ -35,9 +36,7 @@ async function getChannelClips(channelID, amount = null, saveToCache = false) {
     }
 
     if(saveToCache) {
-        cacheClient.set(`channel:clips:${channelID}`, JSON.stringify(data.data), {
-            EX: 60 * 60 * 3
-        });
+        cacheClient.set(`channel:clips:${channelID}`, JSON.stringify(data.data), 'EX', 60 * 60 * 3);
     }
 
     return {

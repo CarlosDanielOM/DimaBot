@@ -5,7 +5,7 @@ const { getIO } = require('../websocket');
 const logger = require('../../../util/logger');
 const { exec } = require('node:child_process');
 const ClipDesign = require('../../../schema/clipDesign');
-const { downloadClip, deleteOldClip } = require('../../../util/video');
+const { downloadClip, deleteOldClip, checkIfClipExists } = require('../../../util/video');
 const { getClient } = require('../../../util/database/dragonfly');
 
 const DOWNLOADPATH = `${__dirname}/public/downloads`;
@@ -47,6 +47,29 @@ router.get('/:channelID', async (req, res) => {
     }
 });
 
+router.post('/test', async (req, res) => {
+    let promoCommand = require('../../../command/promo');
+    // let shoutoutCommand = require('../../../command/shoutout');
+
+    let channelID = req.body.channelID;
+    let streamer = req.body.streamer;
+
+    if(!channelID || !streamer) {
+        return res.status(400).json({
+            error: true,
+            message: 'The channelID and streamer are required.',
+            status: 400
+        });
+    }
+
+    let promo = await promoCommand(channelID, streamer);
+    if(promo.error) {
+        return res.status(promo.status).json(promo);
+    }
+
+    res.status(200).json(promo);
+});
+
 router.post('/:channelID', async (req, res) => {
     let io = getIO();
     let channelID = req.params.channelID;
@@ -65,6 +88,16 @@ router.post('/:channelID', async (req, res) => {
 
     //Delete old clip
     await deleteOldClip(channelID, DOWNLOADPATH);
+
+    //Check if clip exists
+    let clipExists = await checkIfClipExists(channelID, DOWNLOADPATH);
+
+    if(clipExists) {
+        await deleteOldClip(channelID, DOWNLOADPATH);
+
+        //? make a half a second delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
 
     try {
         let clip = await downloadClip(clipUrl, channelID, DOWNLOADPATH);

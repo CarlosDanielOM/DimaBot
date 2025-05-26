@@ -5,11 +5,28 @@ const getChannelClips = require('../function/clip/getclips.js');
 const showClip = require('../function/clip/showclip.js');
 const { getUserByLogin } = require('../function/user/getuser.js');
 const { getClient } = require('../util/database/dragonfly.js');
+const promo = require('./promo.js');
 
 const cooldown = new COOLDOWN();
 
 async function shoutout(channelID, raider, color = 'purple', modID = 698614112) {
     const cacheClient = getClient();
+
+    let clipConnected = await cacheClient.get(`${channelID}:clip:connected`);
+    if(clipConnected) {
+        let queueExists = await cacheClient.exists(`${channelID}:clips:queue`);
+        await cacheClient.rpush(`${channelID}:clips:queue`, raider);
+        if(!queueExists) {
+            const playing = await cacheClient.exists(`${channelID}:clip:playing`);
+            if(!playing) {
+                await cacheClient.set(`${channelID}:clip:playing`, "true");
+                await cacheClient.set(`${channelID}:clips:queue:first`, raider);
+                //! Start the clip process for this user
+                await promo(channelID, raider, true);
+            }
+        }
+    }
+    
     let raiderData = await getUserByLogin(raider, true);
     if(raiderData.error) {
         return {
@@ -68,13 +85,14 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
 
     //* Needing to implement new clip system to add a queue to the clips
 
-    let clips = await getChannelClips(raiderData.id, null, true);
-    if(clips.error) {
-        return {
-            error: true,
-            message: clips.message,
-            status: clips.status,
-            type: clips.type,
+    if(false) {
+        let clips = await getChannelClips(raiderData.id, null, true);
+        if(clips.error) {
+            return {
+                error: true,
+                message: clips.message,
+                status: clips.status,
+                type: clips.type,
             where: 'shoutout getChannelClips'
         }
     }
@@ -82,11 +100,12 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
     let clip = await showClip(channelID, clips.data, raiderData, raiderChannelData);
     if(clip.error) {
         return {
-            error: true,
-            message: clip.message,
-            status: clip.status,
-            type: clip.type,
-            where: 'shoutout showClip'
+                error: true,
+                message: clip.message,
+                status: clip.status,
+                type: clip.type,
+                where: 'shoutout showClip'
+            }
         }
     }
 

@@ -100,6 +100,12 @@
         }
 
         /* Design 2 */
+        .design-2 .left-container {
+            width: 400px;
+            height: 225px;
+            left: 0;
+        }
+        
         .design-2 #vplayer {
             width: 100%;
             height: 100%;
@@ -108,6 +114,7 @@
         }
 
         .design-2 .img {
+            display: none;
             width: 80px;
             height: 80px;
             border-radius: 50%;
@@ -121,12 +128,12 @@
         }
 
         .design-2 .right-container {
+            display: none;
             width: 100%;
             height: 100%;
             position: absolute;
             top: 0;
             left: 0;
-            display: flex;
             flex-direction: column;
             justify-content: flex-end;
             padding: 20px;
@@ -312,28 +319,30 @@
                 vplayer.setAttribute('width', '400px');
                 vplayer.setAttribute('height', '300px');
                 vplayer.id = 'vplayer';
-                container.appendChild(vplayer);
+                leftContainer.appendChild(vplayer);
             }
 
-            let profileImg = document.getElementById('profile-img');
-            if(!profileImg) {
-                profileImg = document.createElement('img');
-                profileImg.id = 'profile-img';
-                let rgb = hexToRgb(data.streamerColor);
-                if(rgb.r <= 40 && rgb.g <= 40 && rgb.b <= 40) {
-                    rightContainer.style.backgroundColor = 'rgba(204, 204, 204, 0.7)';
-                    rightContainer.style.backdropFilter = 'blur(10px)';
-                    rightContainer.style.border = '3px solid #000';
-                } else {
-                    rightContainer.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)`;
-                    rightContainer.style.backdropFilter = 'blur(10px)';
-                    rightContainer.style.color = '#000'
-                    rightContainer.style.border = `3px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
+            if(design == 1) {
+                let profileImg = document.getElementById('profile-img');
+                if(!profileImg) {
+                    profileImg = document.createElement('img');
+                    profileImg.id = 'profile-img';
+                    let rgb = hexToRgb(data.streamerColor);
+                    if(rgb.r <= 40 && rgb.g <= 40 && rgb.b <= 40) {
+                        rightContainer.style.backgroundColor = 'rgba(204, 204, 204, 0.7)';
+                        rightContainer.style.backdropFilter = 'blur(10px)';
+                        rightContainer.style.border = '3px solid #000';
+                    } else {
+                        rightContainer.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 0.7)`;
+                        rightContainer.style.backdropFilter = 'blur(10px)';
+                        rightContainer.style.color = '#000'
+                        rightContainer.style.border = `3px solid rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, 1)`;
+                    }
+                    imgContainer.appendChild(profileImg);
                 }
-                imgContainer.appendChild(profileImg);
-            }
 
-            profileImg.setAttribute('src', data.profileImage);
+                profileImg.setAttribute('src', data.profileImage);
+            }
 
             let clipLink = null;
             
@@ -373,7 +382,7 @@
                     setTimeout(() => {
                         videoSource.remove();
                         vplayer.remove();
-                        profileImg.remove();
+                        if(design == 1) profileImg.remove();
                         imgContainer.style.background = 'none';
                         console.log('clip ended');
                         socket.emit('clip-ended', {channelID: channelID});

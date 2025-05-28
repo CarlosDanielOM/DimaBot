@@ -85,9 +85,9 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
 
     //* Needing to implement new clip system to add a queue to the clips
 
-    let clips = null;
+    let clip = null;
     if(false) {
-        clips = await getChannelClips(raiderData.id, null, true);
+        let clips = await getChannelClips(raiderData.id, null, true);
         if(clips.error) {
             return {
                 error: true,
@@ -98,7 +98,7 @@ async function shoutout(channelID, raider, color = 'purple', modID = 698614112) 
         }
     }
 
-    let clip = await showClip(channelID, clips.data, raiderData, raiderChannelData);
+    clip = await showClip(channelID, clips.data, raiderData, raiderChannelData);
     if(clip.error) {
         return {
                 error: true,

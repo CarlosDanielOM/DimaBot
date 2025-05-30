@@ -106,7 +106,7 @@ async function websocket(app) {
         socket.on('clip-ended', async (data) => {
             //? If the queue is empty, stop the clip
             let exists = await cacheClient.exists(`${channelID}:clips:queue`);
-            if(!exists) {
+            if(true) {
                 cacheClient.del(`${channelID}:clip:playing`);
             }
             

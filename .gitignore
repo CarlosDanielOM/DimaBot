@@ -131,3 +131,6 @@ dist
 
 # REST API Route Test
 rest/
+src/server/routes/public/downloads
+src/server/routes/public/speach
+src/server/routes/public/uploads

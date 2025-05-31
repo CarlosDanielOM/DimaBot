@@ -322,8 +322,9 @@
                 leftContainer.appendChild(vplayer);
             }
 
+            let profileImg = null;
             if(design == 1) {
-                let profileImg = document.getElementById('profile-img');
+                profileImg = document.getElementById('profile-img');
                 if(!profileImg) {
                     profileImg = document.createElement('img');
                     profileImg.id = 'profile-img';

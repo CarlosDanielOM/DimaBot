@@ -91,6 +91,13 @@ async function websocket(app) {
         const channelID = socket.nsp.name.split('/')[2];
         const cacheClient = getClient();
 
+        try {
+            await cacheClient.del(`${channelID}:clip:playing`);
+            await cacheClient.del(`${channelID}:clip:connected`);
+        } catch (error) {
+            console.error(`Error deleting clip cache data: ${error}`);
+        }
+
         let userData = await STREAMERS.getStreamerById(channelID);
 
         await cacheClient.set(`${channelID}:clip:connected`, "true");

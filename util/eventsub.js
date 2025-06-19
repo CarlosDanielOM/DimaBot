@@ -53,21 +53,21 @@ const subcriptionsTypes = [
     },
     {
         type: 'channel.hype_train.begin',
-        version: '1',
+        version: '2',
         condition: {
             broadcaster_user_id: '698614112'
         }
     },
     {
         type: 'channel.hype_train.progress',
-        version: '1',
+        version: '2',
         condition: {
             broadcaster_user_id: '698614112'
         }
     },
     {
         type: 'channel.hype_train.end',
-        version: '1',
+        version: '2',
         condition: {
             broadcaster_user_id: '698614112'
         }
@@ -85,8 +85,64 @@ const subcriptionsTypes = [
         version: '1',
         condition: {
             broadcaster_user_id: '698614112'
-        }
-    }
+        },
+    },
+    {
+        type: 'user.update',
+        version: '1',
+        condition: {
+            user_id: '698614112'
+        },
+    },
+    {
+        type: 'channel.cheer',
+        version: '1',
+        condition: {
+            broadcaster_user_id: '698614112'
+        },
+    },
+    {
+        type: 'channel.subscribe',
+        version: '1',
+        condition: {
+            broadcaster_user_id: '698614112'
+        },
+    },
+    {
+        type: 'channel.subscription.gift',
+        version: '1',
+        condition: {
+            broadcaster_user_id: '698614112'
+        },
+    },
+    {
+        type: 'channel.subscription.message',
+        version: '1',
+        condition: {
+            broadcaster_user_id: '698614112'
+        },
+    },
+    {
+        type: 'channel.update',
+        version: '1',
+        condition: {
+            broadcaster_user_id: '698614112'
+        },
+    },
+    {
+        type: 'channel.bits.use',
+        version: '1',
+        condition: {
+            broadcaster_user_id: '698614112'
+        },
+    },
+    {
+        type: 'automod.message.hold',
+        version: '1',
+        condition: {
+            broadcaster_user_id: '698614112'
+        },
+    },
 ];
 
 async function subscribeTwitchEvent(channelID, type, version, condition) {

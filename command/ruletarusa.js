@@ -80,8 +80,8 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         }
     }
 
-    if(timeoutTime > 1209600) {
-        timeoutTime = null;
+    if(timeoutTime > 60) {
+        timeoutTime = 60;
     }
     
     if(!isMod) {

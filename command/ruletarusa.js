@@ -3,8 +3,6 @@ const ban = require("../function/moderation/ban");
 const { getUserByLogin } = require("../function/user/getuser");
 const { getClient } = require("../util/database/dragonfly");
 
-let timeoutTime = 10;
-
 async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
     let cacheClient = getClient();
 
@@ -64,24 +62,16 @@ async function ruletarusa(channelID, user, isMod = false, modID = 698614112) {
         }
     }
 
-    let timeIncrease = await cacheClient.get(`${channelID}:roulette:${userData.id}:died`);
-    timeIncrease = Number(timeIncrease);
-    if(!timeIncrease) {
-        timeIncrease = 1;
-    } else {
-        timeIncrease++;
-    }
+    const BASE_TIMEOUT = 10;
+    let previousDiedCount = await cacheClient.get(`${channelID}:roulette:${userData.id}:died`);
+    previousDiedCount = Number(previousDiedCount) || 0;
 
-    timeoutTime = timeoutTime * timeIncrease;
+    let timeoutTime = BASE_TIMEOUT * (previousDiedCount + 1);
 
     if(channelID == 81308976) {
         if(timeoutTime < 300) {
             timeoutTime = 300;
         }
-    }
-
-    if(timeoutTime > 60) {
-        timeoutTime = 60;
     }
     
     if(!isMod) {

@@ -112,6 +112,7 @@ router.post('/:channelID', async (req, res) => {
         }
 
         io.of(`/clip/${channelID}`).emit('play-clip', body);
+        logger({message: "Emitting play-clip event", channelID, body}, false, channelID, 'clip play-clip emitted');
         soSent.push(channelID);
         
         res.status(200).json({

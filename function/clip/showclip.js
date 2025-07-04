@@ -77,6 +77,8 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
         })
     })
 
+    logger({message: "Clip data sent to /clip/:channelID", data: {duration, clipUrl, title: streamerChannelData.title, game: clipGame.data.name, streamer: streamerData.display_name, profileImage: streamerData.profile_image_url, description: streamerData.description, streamerColor: streamerColor}}, false, channelID, 'showClip data sent');
+
     let data = await clipResponse.json();
 
     if(data.error) {

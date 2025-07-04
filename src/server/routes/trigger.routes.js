@@ -129,6 +129,12 @@ router.post('/:channelID/send', async (req, res) => {
     const body = req.body;
 
     io.of(`/overlays/triggers/${channelID}`).emit('trigger', body);
+
+    res.status(200).send({
+        error: false,
+        message: 'Trigger sent',
+        status: 200
+    });
 });
 
 router.post('/:channelID/upload', async (req, res) => {

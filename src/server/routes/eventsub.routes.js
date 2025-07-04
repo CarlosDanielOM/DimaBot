@@ -55,7 +55,19 @@ router.post('/:channelID', async (req, res) => {
     let channelID = req.params.channelID;
     let body = req.body;
 
-    let eventsub = await subscribeTwitchEvent(channelID, body.type, body.version, body.condition);
+    let type = body.type;
+    let version = body.version;
+    let condition = body.condition;
+
+    if(!type || !version || !condition) {
+        return res.status(400).send({
+            error: 'Bad Request',
+            message: 'Missing type, version or condition',
+            status: 400
+        });
+    }
+
+    let eventsub = await subscribeTwitchEvent(channelID, type, version, condition);
 
     if (!eventsub) {
         return res.status(400).send({

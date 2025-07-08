@@ -3,6 +3,7 @@ const router = express.Router();
 const auth = require('../../../middleware/auth');
 const { getClient } = require('../../../util/database/dragonfly');
 const Event = require('../../../schema/event');
+const mongoose = require('mongoose');
 
 router.use(auth);
 
@@ -131,6 +132,46 @@ router.get('/events/:type', async (req, res) => {
             error: error.message
         });
     }
+});
+
+router.patch('/events/:id', async (req, res) => {
+    let event;
+    try {
+        if(!mongoose.isValidObjectId(req.params.id)) {
+            return res.status(400).send({
+                error: 'Invalid ID',
+                message: 'ID is not a valid ObjectID',
+                status: 400
+            });
+        }
+        event = await Event.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if(!event) {
+            return res.status(404).send({
+                error: 'Event not found',
+                message: 'Event not found',
+                status: 404
+            });
+        }
+    } catch (error) {
+        console.error('Error updating event:', error);
+        if(error.name === 'CastError') {
+        res.status(500).json({
+                success: false,
+                message: 'Invalid ID',
+                error: 'ID is not a valid ObjectID',
+                status: 400
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+    }
+    res.status(200).json({
+        success: true,
+        message: 'Event updated successfully',
+        data: event
+    });
 });
 
 module.exports = router;

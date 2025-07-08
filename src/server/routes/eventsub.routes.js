@@ -126,6 +126,16 @@ router.patch('/:channelID/:id', async (req, res) => {
         });
     }
 
+    if(id) {
+        if(!mongoose.isValidObjectId(id)) {
+            return res.status(400).send({
+                error: 'Invalid ID',
+                message: 'ID is not a valid ObjectID',
+                status: 400
+            });
+        }
+    }
+
     let update = await eventsubSchema.updateOne({_id: id}, req.body, {new: true});
     if(!update) {
         return res.status(400).send({

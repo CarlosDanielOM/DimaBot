@@ -117,17 +117,13 @@ router.delete('/:channelID/:id', async (req, res) => {
 router.patch('/:channelID/:id', async (req, res) => {
     const {channelID, id} = req.params;
 
-    let eventsub = await eventsubSchema.findOne({channelID: channelID, _id: id});
-
-    if(!eventsub) {
-        return res.status(404).send({
-            error: 'Not Found',
-            message: 'Eventsub not found',
-            status: 404
+    if(!id) {
+        return res.status(400).send({
+            error: 'Bad Request',
+            message: 'ID is required',
+            status: 400
         });
-    }
-
-    if(id) {
+    } else {
         if(!mongoose.isValidObjectId(id)) {
             return res.status(400).send({
                 error: 'Invalid ID',
@@ -135,6 +131,16 @@ router.patch('/:channelID/:id', async (req, res) => {
                 status: 400
             });
         }
+    } 
+
+    let eventsub = await eventsubSchema.findOne({_id: id});
+
+    if(!eventsub) {
+        return res.status(404).send({
+            error: 'Not Found',
+            message: 'Eventsub not found',
+            status: 404
+        });
     }
 
     let update = await eventsubSchema.updateOne({_id: id}, req.body, {new: true});

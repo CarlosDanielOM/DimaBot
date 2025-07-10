@@ -14,6 +14,9 @@ const subcriptionsTypes = [
         condition: {
             broadcaster_user_id: '698614112',
             moderator_user_id: modID
+        },
+        config: {
+            message: '$(user) has followed, Welcome to the stream!'
         }
     },
     {
@@ -21,6 +24,9 @@ const subcriptionsTypes = [
         version: '1',
         condition: {
             broadcaster_user_id: '698614112'
+        },
+        config: {
+            message: '$(twitch channel) is now live! Playing $(twitch game)'
         }
     },
     {
@@ -28,6 +34,9 @@ const subcriptionsTypes = [
         version: '1',
         condition: {
             broadcaster_user_id: '698614112'
+        },
+        config: {
+            message: '$(twitch channel) is now offline!'
         }
     },
     {
@@ -36,6 +45,10 @@ const subcriptionsTypes = [
         condition: {
             to_broadcaster_user_id: '698614112'
         },
+        config: {
+            message: '$(raid channel) is raiding with $(raid viewers) viewers!',
+            clipEnabled: true
+        }
     },
     {
         type: 'channel.poll.progress',
@@ -56,6 +69,9 @@ const subcriptionsTypes = [
         version: '2',
         condition: {
             broadcaster_user_id: '698614112'
+        },
+        config: {
+            message: 'Hype train has started! It started at $(hypetrain progress) and will end at $(hypetrain end)'
         }
     },
     {
@@ -63,6 +79,9 @@ const subcriptionsTypes = [
         version: '2',
         condition: {
             broadcaster_user_id: '698614112'
+        },
+        config: {
+            message: 'Hype train has progressed to level $(hypetrain level)!'
         }
     },
     {
@@ -70,6 +89,9 @@ const subcriptionsTypes = [
         version: '2',
         condition: {
             broadcaster_user_id: '698614112'
+        },
+        config: {
+            message: 'Hype train has ended! It ended at level $(hypetrain level) with $(hypetrain progress)% progress!'
         }
     },
     {
@@ -78,6 +100,9 @@ const subcriptionsTypes = [
         condition: {
             broadcaster_user_id: '698614112',
             moderator_user_id: modID
+        },
+        config: {
+            message: '$(shoutout channel) has sent a shoutout to $(twitch channel)!'
         }
     },
     {
@@ -86,6 +111,11 @@ const subcriptionsTypes = [
         condition: {
             broadcaster_user_id: '698614112'
         },
+        config: {
+            message: '$(ad duration) seconds of ad break has begun!',
+            endMessage: 'Ad break has ended!',
+            endEnabled: true
+        }
     },
     {
         type: 'user.update',
@@ -100,6 +130,9 @@ const subcriptionsTypes = [
         condition: {
             broadcaster_user_id: '698614112'
         },
+        config: {
+            message: '$(user) cheered $(cheer amount) bits!'
+        }
     },
     {
         type: 'channel.subscribe',
@@ -107,6 +140,9 @@ const subcriptionsTypes = [
         condition: {
             broadcaster_user_id: '698614112'
         },
+        config: {
+            message: '$(user) subscribed with $(sub tier) for the first time!'
+        }
     },
     {
         type: 'channel.subscription.gift',
@@ -114,6 +150,9 @@ const subcriptionsTypes = [
         condition: {
             broadcaster_user_id: '698614112'
         },
+        config: {
+            message: '$(user) gifted a $(sub tier) subscription to $(gifted user)!'
+        }
     },
     {
         type: 'channel.subscription.message',
@@ -121,6 +160,9 @@ const subcriptionsTypes = [
         condition: {
             broadcaster_user_id: '698614112'
         },
+        config: {
+            message: '$(user) resubscribed with $(sub tier) for $(sub months) months on a row!'
+        }
     },
     {
         type: 'channel.update',
@@ -145,7 +187,7 @@ const subcriptionsTypes = [
     },
 ];
 
-async function subscribeTwitchEvent(channelID, type, version, condition) {
+async function subscribeTwitchEvent(channelID, type, version, condition, config = null) {
     let streamer = await STREAMERS.getStreamerById(channelID);
     let streamerHeaders = await getStreamerHeaderById(channelID);
     let appAccessToken = await getAppToken();
@@ -197,6 +239,12 @@ async function subscribeTwitchEvent(channelID, type, version, condition) {
         channel: streamer.name,
         channelID: channelID
     });
+
+    if(config) {
+        for(let key in config) {
+            newEventSub[key] = config[key];
+        }
+    }
 
     await newEventSub.save();
 

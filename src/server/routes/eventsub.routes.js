@@ -58,6 +58,7 @@ router.post('/:channelID', async (req, res) => {
     let type = body.type;
     let version = body.version;
     let condition = body.condition;
+    let config = body.config ?? null;
 
     if(!type || !version || !condition) {
         return res.status(400).send({
@@ -67,7 +68,7 @@ router.post('/:channelID', async (req, res) => {
         });
     }
 
-    let eventsub = await subscribeTwitchEvent(channelID, type, version, condition);
+    let eventsub = await subscribeTwitchEvent(channelID, type, version, condition, config);
 
     if (!eventsub) {
         return res.status(400).send({

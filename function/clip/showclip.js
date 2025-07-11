@@ -2,8 +2,11 @@ const CHAT = require('../chat');
 const { searchGameById } = require('../search/game');
 const { getUrl } = require('../../util/dev');
 const logger = require('../../util/logger');
+const { getClient } = require('../../util/redis');
+const promo = require('../../command/promo');
 
 async function showClip(channelID, clipData, streamerData, streamerChannelData) {
+    const cacheClient = getClient();
     if(!clipData || !streamerData || !streamerChannelData) {
         logger({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID}, true, channelID, 'showClip missing_parameters');
         return {
@@ -27,6 +30,8 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
 
     if(!randomClip) {
         logger({error: true, message: "Clip not found", status: 404, type: "clip_not_found", channelID}, true, channelID, 'showClip clip_not_found');
+        retryClip(channelID);
+
         return {
             error: true,
             message: "Clip not found",
@@ -40,6 +45,8 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
 
     if (!duration || !clipUrl) {
         logger({error: true, message: "Missing parameters", status: 400, type: "missing_parameters", channelID}, true, channelID, 'showClip missing_parameters');
+        retryClip(channelID);
+
         return {
             error: true,
             message: "Missing parameters",
@@ -52,6 +59,8 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
 
     if(clipGame.error) {
         logger({error: true, message: "Game not found", status: 404, type: "game_not_found", channelID}, true, channelID, 'showClip game_not_found');
+        retryClip(channelID);
+
         return {
             error: true,
             message: "Game not found",
@@ -77,12 +86,12 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
         })
     })
 
-    logger({message: "Clip data sent to /clip/:channelID", data: {duration, clipUrl, title: streamerChannelData.title, game: clipGame.data.name, streamer: streamerData.display_name, profileImage: streamerData.profile_image_url, description: streamerData.description, streamerColor: streamerColor}}, false, channelID, 'showClip data sent');
-
     let data = await clipResponse.json();
 
     if(data.error) {
         logger(data, true, channelID, 'showClip');
+        retryClip(channelID);
+
         return data;
     }
 
@@ -91,3 +100,24 @@ async function showClip(channelID, clipData, streamerData, streamerChannelData) 
 }
 
 module.exports = showClip;
+
+async function retryClip(channelID) {
+    const cacheClient = getClient();
+    cacheClient.lpop(`${channelID}:clips:queue`);
+    cacheClient.del(`${channelID}:clips:queue:first`);
+    cacheClient.del(`${channelID}:clip:playing`);
+
+    if(cacheClient.exists(`${channelID}:clips:queue`)) {
+        let nextStreamer = await cacheClient.lpop(`${channelID}:clips:queue`);
+        if(nextStreamer) {
+            promo(channelID, nextStreamer, true);
+        } else {
+            cacheClient.del(`${channelID}:clip:playing`);
+        }
+    }
+
+    return {
+        error: false,
+        message: "Clip retried",
+    }
+}

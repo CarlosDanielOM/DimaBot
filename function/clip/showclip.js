@@ -2,7 +2,7 @@ const CHAT = require('../chat');
 const { searchGameById } = require('../search/game');
 const { getUrl } = require('../../util/dev');
 const logger = require('../../util/logger');
-const { getClient } = require('../../util/redis');
+const { getClient } = require('../../util/database/dragonfly');
 const promo = require('../../command/promo');
 
 async function showClip(channelID, clipData, streamerData, streamerChannelData) {

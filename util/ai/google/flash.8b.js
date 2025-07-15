@@ -284,6 +284,7 @@ For example:
         if (part.text) {
             textResponse += part.text;
         } else if (part.functionCall) {
+            console.log({part: part.functionCall})
             if (part.functionCall.name === 'userChatFlagging') {
                 try {
                     const { username: userToFlag, duration, reason } = part.functionCall.args;

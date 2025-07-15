@@ -271,7 +271,7 @@ For example:
         config: generationConfig
     })
 
-    console.log({response, candidate: response.candidates[0], candidateParts: response.candidates[0].parts, promptTokens: response.usageMetadata.promptTokensDetails})
+    console.log({response, candidate: response.candidates[0], candidateParts: response.candidates[0].content.parts, promptTokens: response.usageMetadata.promptTokensDetails})
     
     if(response.toolResults) {
         const toolResult = response.toolResults[0];

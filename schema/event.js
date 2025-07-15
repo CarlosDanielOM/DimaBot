@@ -95,6 +95,23 @@ const eventSchema = new mongoose.Schema({
         canDisable: {
             type: Boolean,
             default: false
+        },
+        showIf: {
+            type: new mongoose.Schema({
+                controlId: { type: String, required: true },
+                is: { type: mongoose.Schema.Types.Mixed, required: true }
+            }, { _id: false }),
+            required: false,
+            validate: {
+                validator: function(value) {
+                    // If showIf is provided, it must have both controlId and is defined
+                    if (value !== undefined && value !== null) {
+                        return value.controlId !== undefined && value.is !== undefined;
+                    }
+                    return true; // Allow undefined/null
+                },
+                message: 'If showIf is provided, both controlId and is must be defined'
+            }
         }
     }],
     tierLimits: {

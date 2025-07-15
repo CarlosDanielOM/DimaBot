@@ -1,4 +1,4 @@
-const { GoogleGenAI, HarmCategory, HarmBlockThreshold } = require("@google/genai")
+const { GoogleGenAI, HarmCategory, HarmBlockThreshold, Type } = require("@google/genai")
 const Channel = require('../../../schema/channel')
 const ChannelAIPersonality = require('../../../schema/channelAIPersonality')
 const COMMANDS = require('../../../command')
@@ -8,12 +8,33 @@ const {getUserByLogin} = require('../../../function/user/getuser')
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY })
 
+const functionTools = [
+    {
+        functionDeclarations: [
+            {
+                name: 'userChatFlagging',
+                description: 'Flag a user for moderation',
+                parameters: {
+                    type: Type.OBJECT,
+                    required: ['username'],
+                    properties: {
+                        username: {type: Type.STRING, description: 'The username of the user to flag'},
+                        duration: {type: Type.NUMBER, description: 'The duration of the timeout in seconds, unless the offense is severe this should be null to make it a permanent timeout'},
+                        reason: {type: Type.STRING, description: 'The reason for the timeout'}
+                    }
+                }
+            }
+        ]
+    }
+]
+
 const generationConfig = {
     temperature: 1,
     topP: 0.95,
     topK: 40,
-    masOutputTokens: 600,
+    maxOutputTokens: 600,
     responseMimeType: 'text/plain',
+    tools: functionTools,
     safetySettings: [
         {
             category: HarmCategory.HARM_CATEGORY_CIVIC_INTEGRITY,
@@ -183,147 +204,6 @@ async function getUserLevel(channelID, username, tags) {
     return userLevel;
 }
 
-async function handleCommand(channelID, command, argument, username, tags) {
-    // Get user's level
-    const userLevel = await getUserLevel(channelID, username, tags);
-    
-    // Check if user has required level (7 for mod commands)
-    if (userLevel < 7) {
-        return {
-            error: true,
-            message: 'You do not have permission to use this command. Only moderators and above can use it.',
-            status: 403,
-            type: 'insufficient_permissions'
-        };
-    }
-
-    let commandResult;
-
-    switch(command) {
-        case 'title':
-            commandResult = await COMMANDS.title(channelID, argument, userLevel);
-            break;
-        case 'game':
-            commandResult = await COMMANDS.game(channelID, argument, userLevel);
-            break;
-        case 'timeout':
-            // Parse timeout duration and reason
-            const [targetUser, duration, ...reasonParts] = argument.split(' ');
-            const reason = reasonParts.join(' ');
-            
-            if (!targetUser || !duration) {
-                return {
-                    error: true,
-                    message: 'Usage: !timeout <username> <duration> [reason]',
-                    status: 400,
-                    type: 'invalid_arguments'
-                };
-            }
-
-            // Convert duration to seconds (e.g., "5m" -> 300 seconds)
-            let timeoutSeconds = 0;
-            const durationMatch = duration.match(/^(\d+)([smhd])$/);
-            if (durationMatch) {
-                const [, amount, unit] = durationMatch;
-                switch (unit) {
-                    case 's': timeoutSeconds = parseInt(amount); break;
-                    case 'm': timeoutSeconds = parseInt(amount) * 60; break;
-                    case 'h': timeoutSeconds = parseInt(amount) * 3600; break;
-                    case 'd': timeoutSeconds = parseInt(amount) * 86400; break;
-                }
-            } else {
-                timeoutSeconds = parseInt(duration);
-            }
-
-            if (isNaN(timeoutSeconds) || timeoutSeconds <= 0) {
-                return {
-                    error: true,
-                    message: 'Invalid duration format. Use number followed by s/m/h/d (e.g., 5m, 1h)',
-                    status: 400,
-                    type: 'invalid_duration'
-                };
-            }
-
-            // Get target user's ID
-            const targetUserData = await getUserByLogin(targetUser);
-            if (targetUserData.error) {
-                return {
-                    error: true,
-                    message: `User ${targetUser} not found`,
-                    status: 404,
-                    type: 'user_not_found'
-                };
-            }
-
-            // Check if target is a moderator or higher
-            const targetUserLevel = await getUserLevel(channelID, targetUser, { username: targetUser });
-            if (targetUserLevel >= 7) {
-                return {
-                    error: true,
-                    message: 'Cannot timeout moderators or higher',
-                    status: 403,
-                    type: 'cannot_timeout_mod'
-                };
-            }
-
-            // Execute timeout
-            commandResult = await ban(channelID, targetUserData.data.id, tags['user-id'], timeoutSeconds, reason || 'Timeout by AI moderator');
-            break;
-        default:
-            return {
-                error: true,
-                message: 'Command not recognized',
-                status: 404,
-                type: 'command_not_found'
-            };
-    }
-
-    return commandResult;
-}
-
-async function handleAITimeout(channelID, username, message, personality) {
-    // Get user's level
-    const userLevel = await getUserLevel(channelID, username, { username });
-    
-    // Don't timeout moderators or higher
-    if (userLevel >= 7) {
-        return null;
-    }
-
-    // Get user's ID
-    const userData = await getUserByLogin(username);
-    if (userData.error) {
-        return null;
-    }
-
-    // Check for violations with more specific patterns
-    let timeoutSeconds = 0;
-    let reason = '';
-
-    // Severe violations (1 hour)
-    if (message.match(/\b(hate speech|harassment|threats|spam)\b/i)) {
-        timeoutSeconds = 3600;
-        reason = 'Severe rule violation';
-    }
-    // Moderate violations (15 minutes)
-    else if (message.match(/\b(excessive caps|repeated emotes|offensive language)\b/i)) {
-        timeoutSeconds = 900;
-        reason = 'Moderate rule violation';
-    }
-    // Minor violations (5 minutes)
-    else if (message.match(/\b(excessive punctuation|single emote spam)\b/i)) {
-        timeoutSeconds = 300;
-        reason = 'Minor rule violation';
-    }
-
-    // Only execute timeout if we found a violation
-    if (timeoutSeconds > 0) {
-        return await ban(channelID, userData.data.id, '698614112', timeoutSeconds, reason || 'AI timeout');
-    }
-
-    return null;
-}
-
 async function flash8b(input, channelID, recentMessages = [], username, tags) {
     const personality = await getChannelPersonality(channelID)
     
@@ -337,21 +217,6 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
     const knownUsersContext = personality.knownUsers
         .map(user => `${user.username} is ${user.description} and has a ${user.relationship} relationship with the bot`)
         .join('\n')
-
-    // Check if the input contains a command request
-    const commandMatch = input.match(/!(\w+)\s*(.*)/);
-    let commandResult = null;
-    
-    if (commandMatch) {
-        const [_, command, argument] = commandMatch;
-        commandResult = await handleCommand(channelID, command, argument, username, tags);
-    } else {
-        // Only check for violations if the message is not a command
-        const timeoutResult = await handleAITimeout(channelID, username, input, personality);
-        if (timeoutResult) {
-            commandResult = timeoutResult;
-        }
-    }
 
     // Build system instructions with personality, rules, and command awareness
     const systemInstructions = `
@@ -402,9 +267,18 @@ For example:
 
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-lite-preview-06-17',
-        contents: `${systemInstructions}\n\nThe following user message is: ${input}${commandResult ? `\n\nCommand result: ${commandResult.message}` : ''}`,
+        contents: `${systemInstructions}\n\nThe following user message is: ${input}`,
         config: generationConfig
     })
+
+    console.log(response)
+    
+    if(response.toolResults) {
+        const toolResult = response.toolResults[0];
+        if(toolResult.name === 'userChatFlagging') {
+            console.log(toolResult)
+        }
+    }
 
     return response.text
 }

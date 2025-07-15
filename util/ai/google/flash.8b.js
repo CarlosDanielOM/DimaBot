@@ -271,18 +271,38 @@ For example:
         config: generationConfig
     })
 
-    for(const part of response.candidates[0].content.parts) {
-        console.log({part})
+    const { content } = response.candidates[0];
+
+    if (!content || !content.parts) {
+        // No response from AI, return empty string
+        return '';
     }
 
-    if(response.toolResults) {
-        const toolResult = response.candidates[0].content.parts.functionCall;
-        if(toolResult.name === 'userChatFlagging') {
-            console.log({toolResult})
+    let textResponse = '';
+
+    for (const part of content.parts) {
+        if (part.text) {
+            textResponse += part.text;
+        } else if (part.functionCall) {
+            if (part.functionCall.name === 'userChatFlagging') {
+                try {
+                    const { username: userToFlag, duration, reason } = part.functionCall.args;
+                    const user = await getUserByLogin(userToFlag);
+
+                    if (!user.error && user.data) {
+                        const botModeratorID = 698614112;
+                        await ban(channelID, user.data.id, botModeratorID, duration, reason);
+                    } else {
+                        console.log(`AI tried to flag user "${userToFlag}" but the user was not found.`);
+                    }
+                } catch (e) {
+                    console.error('Error executing userChatFlagging:', e);
+                }
+            }
         }
     }
 
-    return response.text
+    return textResponse.trim();
 }
 
 module.exports = flash8b

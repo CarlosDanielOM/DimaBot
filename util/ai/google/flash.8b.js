@@ -271,10 +271,10 @@ For example:
         config: generationConfig
     })
 
-    console.log({response, candidate: response.candidates[0], candidateParts: response.candidates[0].content.parts, promptTokens: response.usageMetadata.promptTokensDetails})
+    console.log({response, candidate: response.candidates[0], candidateParts: response.candidates[0].content.parts[0], promptTokens: response.usageMetadata.promptTokensDetails})
     
     if(response.toolResults) {
-        const toolResult = response.toolResults[0];
+        const toolResult = response.candidates[0].content.parts[0].functionCall;
         if(toolResult.name === 'userChatFlagging') {
             console.log({toolResult})
         }

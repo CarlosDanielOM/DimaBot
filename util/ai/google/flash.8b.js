@@ -284,17 +284,21 @@ For example:
         if (part.text) {
             textResponse += part.text;
         } else if (part.functionCall) {
-            console.log({part: part.functionCall})
             if (part.functionCall.name === 'userChatFlagging') {
                 try {
-                    const { username: userToFlag, duration, reason } = part.functionCall.args;
+                    const { username: userToFlag, duration = null, reason } = part.functionCall.args;
                     const user = await getUserByLogin(userToFlag);
 
                     if (!user.error && user.data) {
                         const botModeratorID = 698614112;
-                        await ban(channelID, user.data.id, botModeratorID, duration, reason);
+                        let banResult = await ban(channelID, user.data.id, botModeratorID, duration, reason);
+                        if(banResult.error) {
+                            console.error('Error executing userChatFlagging:', banResult.message);
+                            textResponse += `Sorry, there was an error flagging ${userToFlag} for ${reason}.`;
+                        }
                     } else {
                         console.log(`AI tried to flag user "${userToFlag}" but the user was not found.`);
+                        textResponse += `Sorry, the user "${userToFlag}" was not found.`;
                     }
                 } catch (e) {
                     console.error('Error executing userChatFlagging:', e);

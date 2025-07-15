@@ -271,12 +271,12 @@ For example:
         config: generationConfig
     })
 
-    console.log(response)
+    console.log({response, candidate: response.candidates[0]})
     
     if(response.toolResults) {
         const toolResult = response.toolResults[0];
         if(toolResult.name === 'userChatFlagging') {
-            console.log(toolResult)
+            console.log({toolResult})
         }
     }
 

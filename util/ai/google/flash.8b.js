@@ -210,7 +210,7 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
     // Build context from recent messages
     const contextWindow = personality.contextWindow
     const recentContext = recentMessages.slice(-contextWindow)
-        .map(msg => `${msg.username}: ${msg.message}`)
+        .map(msg => `{"username": "${msg.username}", "message": "${msg.message}"}`)
         .join('\n')
 
     // Build known users context
@@ -227,13 +227,6 @@ ${personality.rules.join('\n')}
 
 Known Users:
 ${knownUsersContext}
-
-Available Commands:
-- !title [new title] - Change the stream title (Moderator+ only)
-- !game [game name] - Change the current game category (Moderator+ only)
-- !timeout [username] [duration] [reason] - Timeout a user (Moderator+ only)
-  Duration format: number followed by s/m/h/d (e.g., 5m, 1h)
-  Example: !timeout user123 5m Spam in chat
 
 Recent Chat Context:
 ${recentContext}
@@ -267,7 +260,7 @@ For example:
 
     const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash-lite-preview-06-17',
-        contents: `${systemInstructions}\n\nThe following user message is: ${input}`,
+        contents: `${systemInstructions}\n\nThe following user message is: {"username": "${username}", "message": "${input}"}`,
         config: generationConfig
     })
 

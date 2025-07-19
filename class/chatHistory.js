@@ -3,7 +3,7 @@ const { getClient } = require('../util/database/dragonfly');
 class ChatHistory {
     constructor() {
         this.cacheClient = null;
-        this.maxHistorySize = 15; // Maximum history size for premium plus channels
+        this.maxHistorySize = 100; // Maximum history size for premium plus channels
     }
 
     async init() {

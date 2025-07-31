@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const STREAMERS = require('../../../class/streamer');
 
 const commandSchema = require('../../../schema/command');
 
@@ -58,6 +57,7 @@ router.get('/:channelID', async (req, res) => {
 });
 
 router.post('/:channelID', async (req, res) => {
+    const cacheClient = getClient();
     const { channelID } = req.params;
     let body = req.body;
 
@@ -102,6 +102,9 @@ router.post('/:channelID', async (req, res) => {
     
     try {
         await newCommand.save();
+        await cacheClient.del(`${channelID}:commands:${body.cmd}`);
+        await cacheClient.del(`${channelID}:commands:${body.name}`);
+
         res.send({
             message: 'Command created',
             command: newCommand,

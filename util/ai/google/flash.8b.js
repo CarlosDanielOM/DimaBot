@@ -8,25 +8,27 @@ const {getUserByLogin} = require('../../../function/user/getuser')
 
 const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY })
 
-const functionTools = [
-    {
-        functionDeclarations: [
-            {
-                name: 'userChatFlagging',
-                description: 'Flag a user for moderation',
-                parameters: {
-                    type: Type.OBJECT,
-                    required: ['username'],
-                    properties: {
-                        username: {type: Type.STRING, description: 'The username of the user to flag'},
-                        duration: {type: Type.NUMBER, description: 'The duration of the timeout in seconds, unless the offense is severe this should be null to make it a permanent timeout'},
-                        reason: {type: Type.STRING, description: 'The reason for the timeout'}
-                    }
-                }
-            }
-        ]
-    }
-]
+// const functionTools = [
+//     {
+//         functionDeclarations: [
+//             {
+//                 name: 'userChatFlagging',
+//                 description: 'Flag a user for moderation',
+//                 parameters: {
+//                     type: Type.OBJECT,
+//                     required: ['username'],
+//                     properties: {
+//                         username: {type: Type.STRING, description: 'The username of the user to flag'},
+//                         duration: {type: Type.NUMBER, description: 'The duration of the timeout in seconds, unless the offense is severe this should be null to make it a permanent timeout'},
+//                         reason: {type: Type.STRING, description: 'The reason for the timeout'}
+//                     }
+//                 }
+//             }
+//         ]
+//     }
+// ]
+
+const functionTools = [];
 
 const generationConfig = {
     temperature: 1,

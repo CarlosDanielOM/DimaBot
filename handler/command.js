@@ -68,8 +68,7 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                     }
                     break;
                 case 'vip':
-                    let user = special[3] || argument;
-                    console.log({user, argument, special});
+                    let user = special[2] || special[3];
                     let vipAction = await addVIPCommand(channelID, user, tags);
                     if(vipAction.error) {
                         cmdFunc = cmdFunc.replace(special[0], vipAction.message);

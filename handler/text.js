@@ -180,6 +180,8 @@ async function textConvertor(channelID, eventData, message, rewardData = {}) {
                         break;
                 }
                 break;
+            case 'vip':
+                break;
         }
     }
     return message;

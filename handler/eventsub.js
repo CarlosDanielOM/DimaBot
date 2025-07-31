@@ -20,6 +20,8 @@ const logger = require('../util/logger')
 const clearSpeachFiles = require('../handler_function/clearspeachfiles')
 const addCommandsToCache = require('../handler_function/addcommandstocache')
 const chatHistory = require('../class/chatHistory')
+const eventsub = require('../schema/eventsub')
+const cheerHandler = require('./cheerhandler')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -52,19 +54,14 @@ async function eventsubHandler(subscriptionData, eventData) {
             }
             followDayCount++;
             await cacheClient.set(`${eventData.broadcaster_user_id}:follows:count`, followDayCount);
-            
-            if(eventsubData.message == '' || eventsubData.message == null) {
-                eventsubData.message = `$(user) has followed the channel! Welcome!`;
-            };
 
-            eventsubData.message = eventsubData.message + ` (Follow #${followDayCount})`;
-            
+            if(eventsubData.todayFollows && (eventsubData.message != '' && eventsubData.message != null)) {
+                eventsubData.message = eventsubData.message + ` (Follow #${followDayCount})`;
+            }
+
             defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             break;
         case 'stream.online':
-            if(eventsubData.message == '' || eventsubData.message == null) {
-                eventsubData.message = `Hey! $(twitch channel) is live! $(twitch title) playing $(twitch game)!`;
-            };
             defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             await getEditors(eventData.broadcaster_user_id, true);
             await addCommandsToCache(eventData.broadcaster_user_id);
@@ -73,9 +70,6 @@ async function eventsubHandler(subscriptionData, eventData) {
             await startTimerCommands(client, eventData);
             break;
         case 'stream.offline':
-            if(eventsubData.message == '' || eventsubData.message == null) {
-                eventsubData.message = `Hey! $(twitch channel) has gone offline!`;
-            };
             defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             //! SEPARATOR FOR FUNCTIONS
             resetRedemptionPrice(client, eventData.broadcaster_user_id);
@@ -92,42 +86,29 @@ async function eventsubHandler(subscriptionData, eventData) {
             }
             break;
         case 'channel.channel_points_custom_reward_redemption.add':
-            logger({data: eventData, type: 'channel.channel_points_custom_reward_redemption.add'}, true, eventData.broadcaster_user_id, 'eventsub_redeem');
             redeemHandler(client, eventData);
             break;
         case 'channel.ad_break.begin':
-            if(eventsubData.message == '' || eventsubData.message == null) {
-                eventsubData.message = `Hey! $(twitch channel) is having a $(ad time) seconds ad-break!`;
-            };
             defaultMessages(client, eventData, eventsubData.message, chatEnabled);
             if(!eventsubData.endEnabled) return;
             setTimeout(() => {
-                if(eventsubData.endMessage == '' || eventsubData.endMessage == null) {
-                    eventsubData.endMessage = `Hey! the ad-break has ended!`;
-                };
                 defaultMessages(client, eventData, eventsubData.endMessage, chatEnabled);
             }, eventData.duration_seconds * 1000);
             break;
         case 'channel.raid':
-            if(!eventsubData.message || eventsubData.message == '' || eventsubData.message == null) {
-                eventsubData.message = `Hey! $(twitch channel) is being raided by $(raid channel) with $(raid viewers) viewers!`
-            }
             let clipEnabled = false;
             if(eventsubData.clipEnabled) clipEnabled = true;
             await raidHandler(client, eventData, eventsubData, clipEnabled);
             break;
         case 'channel.ban':
             if(!eventData.is_permanent) {
-                if(eventsubData.temporalBanMessage == '' || eventsubData.temporalBanMessage == null) {
-                    eventsubData.temporalBanMessage = `$(user) has been banned for $(ban time) seconds from the channel! by $(ban mod) for $(ban reason)`
-                }
                 defaultMessages(client, eventData, eventsubData.temporalBanMessage, chatEnabled)
             } else {
-                if(eventsubData.message == '' || eventsubData.message == null) {
-                    eventsubData.message = `$(user) has been banned for from the channel! by $(ban mod) for $(ban reason)`
-                }
                 defaultMessages(client, eventData, eventsubData.message, chatEnabled)
             }
+            break;
+        case 'channel.cheer':
+            cheerHandler(client, eventData, eventsubData);
             break;
     }
 }

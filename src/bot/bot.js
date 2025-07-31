@@ -63,11 +63,6 @@ async function init() {
         if(self) return;
         await messageHandler(client, channel.replace('#', ''), tags, message);
     })
-
-    client.on('cheer', (channel, tags, message) => {
-        if(channel == '#ozbellvt') return;
-        client.say(channel, `Gracias por los ${tags.bits} bits ${tags['display-name']}!`)
-    });
 }
 
 module.exports = init;

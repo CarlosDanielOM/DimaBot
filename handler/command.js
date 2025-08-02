@@ -130,7 +130,7 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                             }
                             cmdFunc = cmdFunc.replace(special[0], viewers.chatters.length);
                             break;
-                        case 'followers':
+                        case 'follows':
                             let followers = await CHANNEL.getFollowers(channelID);
                             if(followers.error) {
                                 cmdFunc = cmdFunc.replace(special[0], followers.message);

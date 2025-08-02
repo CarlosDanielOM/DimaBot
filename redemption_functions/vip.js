@@ -1,5 +1,6 @@
 const CHANNEL = require('../function/channel')
 const rewardSchema = require('../schema/redemptionreward');
+const STREAMERS = require('../class/streamer');
 const vipSchema = require('../schema/vip');
 const { getUrl } = require('../util/dev');
 

@@ -1,14 +1,14 @@
 const { getStreamerHeaderById } = require("../../util/header");
-const { getTwitchOAuthURL } = require("../../util/link");
+const { getTwitchHelixUrl } = require("../../util/link");
 
 async function getTwitchFollowers(channelID, userId = null) {
     let streamerHeader = await getStreamerHeaderById(channelID);
     
-    let params = {
-        broadcaster_id: channelID,
-    }
+    let params = new URLSearchParams({
+        broadcaster_id: channelID
+    })
 
-    let response = await fetch(getTwitchOAuthURL('channels/followers', params), {
+    let response = await fetch(getTwitchHelixUrl('channels/followers', params), {
         method: 'GET',
         headers: streamerHeader
     })

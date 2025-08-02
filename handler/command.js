@@ -122,6 +122,22 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                         case 'channel':
                             cmdFunc = cmdFunc.replace(special[0], streamer.name);
                             break;
+                        case 'viewers':
+                            let viewers = await CHAT.getChatters(channelID, channelID);
+                            if(viewers.error) {
+                                cmdFunc = cmdFunc.replace(special[0], viewers.message);
+                                break;
+                            }
+                            cmdFunc = cmdFunc.replace(special[0], viewers.chatters.length);
+                            break;
+                        case 'followers':
+                            let followers = await CHANNEL.getFollowers(channelID);
+                            if(followers.error) {
+                                cmdFunc = cmdFunc.replace(special[0], followers.message);
+                                break;
+                            }
+                            cmdFunc = cmdFunc.replace(special[0], followers.total);
+                            break;
                     }
                     break;
                 case 'set':

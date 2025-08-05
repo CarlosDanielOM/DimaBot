@@ -112,7 +112,7 @@ const subcriptionsTypes = [
             broadcaster_user_id: '698614112'
         },
         config: {
-            message: '$(ad duration) seconds of ad break has begun!',
+            message: '$(ad time) seconds of ad break has begun!',
             endMessage: 'Ad break has ended!',
             endEnabled: true
         }

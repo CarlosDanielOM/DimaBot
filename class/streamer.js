@@ -18,8 +18,12 @@ class STREAMERS {
         try {
             this.cache = getClient();
             const result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
+            this.cache.del('streamers:by:name');
+            this.cache.del('streamers:by:id');
 
             for(let i = 0; i < result.length; i++) {
+                await this.cache.del(`${result[i].name}:streamer:data`);
+                await this.cache.del(`${result[i].twitch_user_id}:streamer:data`);
                 let data = {
                     name: result[i].name,
                     user_id: result[i].twitch_user_id,

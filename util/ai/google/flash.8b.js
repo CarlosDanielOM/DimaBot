@@ -222,42 +222,23 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
 
     // Build system instructions with personality, rules, and command awareness
     const systemInstructions = `
-${personality.personality}
+<system-instructions>
+    <persona>
+        ${personality.personality}
+    </persona>
 
-Channel Rules:
-${personality.rules.join('\n')}
+    <channel-rules>
+        ${personality.rules.join('\n')}
+    </channel-rules>
 
-Known Users:
-${knownUsersContext}
+    <known-users>
+        ${knownUsersContext}
+    </known-users>
 
-Recent Chat Context:
-${recentContext}
-
-You are able to understand and execute Twitch commands. When a moderator asks to change the title, game, or timeout a user, you should use the appropriate command. For example:
-- If asked to change title: Use !title command
-- If asked to change game: Use !game command
-- If asked to timeout a user: Use !timeout command with appropriate duration based on severity
-
-You also have the ability to autonomously detect and act on rule violations. When you detect a violation:
-1. Assess the severity of the violation
-2. Apply appropriate timeout duration:
-   - Minor violations: 5 minutes
-   - Moderate violations: 15 minutes
-   - Severe violations: 1 hour
-3. Do not timeout moderators or higher-level users
-4. Respond with a friendly but firm message explaining the action
-
-When a command is executed, you should respond with a friendly message in Spanish that:
-1. Acknowledges the action taken
-2. Uses the command's result message
-3. Maintains your personality and tone
-4. Is concise and engaging
-
-For example:
-- If title change succeeds: "¡Listo! [command result message]"
-- If game change succeeds: "¡Listo! [command result message]"
-- If timeout succeeds: "¡Listo! [command result message]"
-- If command fails: "Lo siento, [command error message]"
+    <recent-chat-context>
+        ${recentContext}
+    </recent-chat-context>
+</system-instructions>
 `
 
     const response = await ai.models.generateContent({

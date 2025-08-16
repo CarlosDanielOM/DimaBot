@@ -28,7 +28,25 @@ const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_GEMINI_API_KEY })
 //     }
 // ]
 
-const functionTools = [];
+const functionTools = [
+    {
+        functionDeclarations: [
+            {
+                name: 'userChatFlagging',
+                description: 'Flag a user for moderation (timeout or ban) when behavior violates chat rules or when an authorized user requests it',
+                parameters: {
+                    type: Type.OBJECT,
+                    required: ['username'],
+                    properties: {
+                        username: { type: Type.STRING, description: 'The username (login) of the user to moderate' },
+                        duration: { type: Type.NUMBER, description: 'Timeout duration in seconds. Omit or null for permanent ban' },
+                        reason: { type: Type.STRING, description: 'Explanation of why the action is taken' }
+                    }
+                }
+            }
+        ]
+    }
+]
 
 const generationConfig = {
     temperature: 1,
@@ -203,6 +221,14 @@ async function getUserLevel(channelID, username, tags) {
         userLevel = 9;
     }
 
+    // Broadcaster level 10
+    try {
+        const channelDoc = await Channel.findOne({ twitch_user_id: channelID });
+        if (channelDoc && channelDoc.name === username) {
+            userLevel = 10;
+        }
+    } catch (e) {}
+
     return userLevel;
 }
 
@@ -219,6 +245,9 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
     const knownUsersContext = personality.knownUsers
         .map(user => `${user.username} is ${user.description} and has a ${user.relationship} relationship with the bot`)
         .join('\n')
+
+    // Requesting user's moderation level
+    const requestingUserLevel = await getUserLevel(channelID, username, tags)
 
     // Build system instructions with personality, rules, and command awareness
     const systemInstructions = `
@@ -238,6 +267,15 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
     <recent-chat-context>
         ${recentContext}
     </recent-chat-context>
+
+    <moderation-policy>
+        - User levels: 7=mod, 8=editor, 9=admin, 10=broadcaster.
+        - The requesting user is ${username} (level ${requestingUserLevel}).
+        - If you detect severe non-desired behavior (harassment, hate speech, threats, doxxing, sexual content towards minors, extreme toxicity, or repeated spam), call userChatFlagging with the offending user's username.
+        - If a user asks you to timeout or ban someone, only call userChatFlagging if the requester level is 7 or higher (mod, editor, admin, or broadcaster). Otherwise, respond that you cannot.
+        - Timeout guidance: 60s for mild offenses, 600s for repeated or targeted harassment; omit duration for permanent bans in severe cases.
+        - Keep responses brief.
+    </moderation-policy>
 </system-instructions>
 `
 
@@ -262,7 +300,19 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
         } else if (part.functionCall) {
             if (part.functionCall.name === 'userChatFlagging') {
                 try {
-                    const { username: userToFlag, duration = null, reason } = part.functionCall.args;
+                    const args = part.functionCall.args || {};
+                    const userToFlag = args.username;
+                    const duration = args.duration ?? null;
+                    const reason = args.reason ?? null;
+
+                    const requestorLevel = await getUserLevel(channelID, username, tags);
+                    const isSelfFlag = userToFlag && userToFlag.toLowerCase() === username.toLowerCase();
+
+                    if (!isSelfFlag && requestorLevel < 7) {
+                        textResponse += `No tienes permisos para moderar a otros usuarios.`;
+                        continue;
+                    }
+
                     const user = await getUserByLogin(userToFlag);
 
                     if (!user.error && user.data) {
@@ -270,11 +320,13 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
                         let banResult = await ban(channelID, user.data.id, botModeratorID, duration, reason);
                         if(banResult.error) {
                             console.error('Error executing userChatFlagging:', banResult.message);
-                            textResponse += `Sorry, there was an error flagging ${userToFlag} for ${reason}.`;
+                            textResponse += `Lo siento, hubo un error al moderar a ${userToFlag}${reason ? ` por "${reason}"` : ''}.`;
+                        } else {
+                            textResponse += `${duration ? `He silenciado a ${userToFlag} por ${duration}s` : `He baneado a ${userToFlag}`} ${reason ? `por "${reason}"` : ''}.`;
                         }
                     } else {
                         console.log(`AI tried to flag user "${userToFlag}" but the user was not found.`);
-                        textResponse += `Sorry, the user "${userToFlag}" was not found.`;
+                        textResponse += `Lo siento, el usuario "${userToFlag}" no fue encontrado.`;
                     }
                 } catch (e) {
                     console.error('Error executing userChatFlagging:', e);

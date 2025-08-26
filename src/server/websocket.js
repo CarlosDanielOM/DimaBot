@@ -175,6 +175,23 @@ async function websocket(app) {
         });
     });
 
+    //? Site Global Data Analytics
+    io.of(/^\/site\/analytics\/\w+$/).on('connection', async (socket) => {
+        const type = socket.nsp.name.split('/')[3];
+
+        console.log(`${type} connected to site analytics`);
+
+        if(type == 'live-channels') {
+            // let liveChannels = await cacheClient.lrange('live-channels', 0, -1);
+            // socket.emit('live-channels', liveChannels);
+            socket.emit('live-channels', {live: 15});
+        }
+
+        socket.on('disconnect', () => {
+            console.log(`${type} disconnected from site analytics`);
+        });
+    });
+
     io.on('error', (error) => {
         console.error('Websocket error:', error);
     });

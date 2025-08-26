@@ -119,6 +119,7 @@ async function message(client, channel, tags, message) {
     }
     
     if(!commandUserLevel) {
+        console.log(`Command ${command} user level was not found for ${channel} `);
         commandUserLevel = 7;
     }
 

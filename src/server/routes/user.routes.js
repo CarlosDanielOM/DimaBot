@@ -4,7 +4,11 @@ const channelSchema = require('../../../schema/channel');
 const STREAMERS = require('../../../class/streamer');
 const { getClient } = require('../../../util/database/dragonfly');
 
-const { getUserByLogin } = require('../../../function/user/getuser')
+const { getUserByLogin } = require('../../../function/user/getuser');
+const { connectChannel, disconnectChannel } = require('../../../util/client');
+
+const auth = require('../../../middleware/auth');
+const logger = require('../../../util/logger');
 
 router.get('/', async (req, res) => {
     const cacheClient = getClient();
@@ -85,6 +89,32 @@ router.get('/active/:channel', async (req, res) => {
     res.status(200).json({ message: 'Channel is not active', active: false, error: false });
   }
 });
+
+router.put('/active/:channelID', auth, async (req, res) => {
+  const { channelID } = req.params;
+  const { active } = req.body;
+  const streamer = await STREAMERS.getStreamerById(channelID);
+
+  if (typeof active !== 'boolean') {
+    return res.status(400).json({ message: 'Active parameter must be a boolean', error: true });
+  }
+
+  await channelSchema.findOneAndUpdate({ twitch_user_id: channelID }, { actived: active });
+
+  try {
+    await fetch('http://localhost:3355/user/active', {
+      method: 'PUT',
+      body: JSON.stringify({
+        channelID,
+        active
+      })
+    })
+  } catch (e) {
+    logger({error: true, message: "Error on the localhost http request", channelID, e}, true, channelID, `user-${channelID}-active`);
+  }
+
+  return res.status(200).json({ message: 'Channel active status updated', error: false });
+})
 
 router.post('/chat/:channelID', async (req, res) => {
   const { channelID } = req.params;

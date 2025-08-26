@@ -286,4 +286,4 @@ async function flash8b(input, channelID, recentMessages = [], username, tags) {
     return textResponse.trim();
 }
 
-module.exports = flash8b
+module.exports = flash8b;

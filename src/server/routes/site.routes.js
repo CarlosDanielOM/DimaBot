@@ -11,6 +11,8 @@ router.get('/', (req, res) => {
     let cacheClient = getClient();
 });
 
+
+
 // POST endpoint to create a new event
 router.post('/events', async (req, res) => {
     try {

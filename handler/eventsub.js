@@ -108,7 +108,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             }
             break;
         case 'channel.cheer':
-            cheerHandler(client, eventData, eventsubData);
+            cheerHandler(client, eventData, eventsubData, chatEnabled);
             break;
     }
 }

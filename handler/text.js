@@ -182,6 +182,19 @@ async function textConvertor(channelID, eventData, message, rewardData = {}) {
                 break;
             case 'vip':
                 break;
+            case 'cheer':
+                if(!cmdSpecial[2]) break;
+                switch(cmdSpecial[2]) {
+                    case 'amount':
+                        let amount = eventData.bits;
+                        message = message.replace(cmdSpecial[0], amount);
+                        break;
+                    case 'message':
+                        let userMessage = eventData.message;
+                        message = message.replace(cmdSpecial[0], userMessage);
+                        break;
+                }
+                break;
         }
     }
     return message;

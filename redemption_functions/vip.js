@@ -7,7 +7,7 @@ const { getUrl } = require('../util/dev');
 async function vipRedemptionFun(eventData, rewardData) {
     const { broadcaster_user_id, broadcaster_user_login, user_id } = eventData;
 
-    let vipReward = await rewardSchema.findOne({ channelID: broadcaster_user_id, rewardID: rewardData.id, rewardType: 'vip' });
+    let vipReward = await rewardSchema.findOne({ channelID: broadcaster_user_id, rewardID: rewardData.id, type: 'vip' });
 
     if (!vipReward) {
         return {
@@ -18,11 +18,11 @@ async function vipRedemptionFun(eventData, rewardData) {
         }
     }
 
-    if(vipReward.rewardCostChange > 0) {
-        let newCost = vipReward.rewardCost + vipReward.rewardCostChange;
+    if(vipReward.costChange > 0) {
+        let newCost = vipReward.cost + vipReward.costChange;
         let data = {
-            title: vipReward.rewardTitle,
-            prompt: vipReward.rewardPrompt,
+            title: vipReward.title,
+            prompt: vipReward.prompt,
             cost: newCost,
         }
 
@@ -55,9 +55,9 @@ async function vipRedemptionFun(eventData, rewardData) {
         
     }
 
-    if(vipReward.rewardDuration > 0) {
+    if(vipReward.duration > 0) {
         let date = new Date();
-        date.setDate(date.getDate() + vipReward.rewardDuration);
+        date.setDate(date.getDate() + vipReward.duration);
         let expireDate = {
             day: date.getDate(),
             month: date.getMonth(),
@@ -70,7 +70,7 @@ async function vipRedemptionFun(eventData, rewardData) {
             channel: broadcaster_user_login,
             channelID: broadcaster_user_id,
             vip: true,
-            duration: vipReward.rewardDuration,
+            duration: vipReward.duration,
             expireDate,
         }
 
@@ -96,7 +96,7 @@ async function vipRedemptionFun(eventData, rewardData) {
     return {
         error: false,
         message: 'VIP added',
-        rewardMessage: vipReward.rewardMessage,
+        rewardMessage: vipReward.message,
     }
     
 }

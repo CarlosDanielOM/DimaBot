@@ -24,15 +24,15 @@ async function redeem(client, eventData) {
     if (vipMatch) {
         let result = await vipRedemtionFun(eventData, reward);
         if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
-        let message = await textConvertor(broadcaster_user_id, eventData,result.rewardMessage, reward )
+        let message = await textConvertor(broadcaster_user_id, eventData,result.message, reward )
         client.say(broadcaster_user_login, `${message}`);
         return { error: false, message: 'VIP set' };
     }
 
-    if(rewardData.rewardType == 'song') {
+    if(rewardData.type == 'song') {
         let result = await songRequestFun(eventData, reward);
         if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
-        let message = await textConvertor(broadcaster_user_id, eventData, result.rewardMessage, reward)
+        let message = await textConvertor(broadcaster_user_id, eventData, result.message, reward)
         client.say(broadcaster_user_login, `${message}`);
         return { error: false, message: 'Song Requested' };
     }
@@ -42,7 +42,7 @@ async function redeem(client, eventData) {
     if (!trigger) {
         let result = await customRedemptionFun(eventData, reward);
         if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
-        let message = await textConvertor(broadcaster_user_id, eventData, result.rewardMessage, reward)
+        let message = await textConvertor(broadcaster_user_id, eventData, result.message, reward)
         client.say(broadcaster_user_login, `${message}`);
         return { error: false, message: 'Reward Redeemed' };
     };
@@ -62,9 +62,9 @@ async function redeem(client, eventData) {
     }
 
     if (customReward.rewardCostChange > 0) {
-        let newCost = customReward.rewardCost + customReward.rewardCostChange;
+        let newCost = customReward.cost + customReward.costChange;
         let data = {
-            title: customReward.rewardTitle,
+            title: customReward.title,
             prompt: customReward.rewardPrompt,
             cost: newCost,
         }

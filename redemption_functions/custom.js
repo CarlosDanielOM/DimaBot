@@ -6,15 +6,15 @@ const STREAMERS = require('../class/streamer');
 async function customRedemptionReward(eventData, rewardData) {
     const { broadcaster_user_id, broadcaster_user_login} = eventData;
 
-    let reward = await rewardSchema.findOne({channelID: broadcaster_user_id, rewardID: rewardData.id, rewardType: 'custom'});
+    let reward = await rewardSchema.findOne({channelID: broadcaster_user_id, rewardID: rewardData.id, type: 'custom'});
     if(!reward) return { error: true, message: 'Reward not found', status: 404, type: 'reward_not_found' };
 
-    if(reward.rewardCostChange > 0) {
-        let newCost = reward.rewardCost + reward.rewardCostChange;
+    if(reward.costChange > 0) {
+        let newCost = reward.cost + reward.costChange;
         if(newCost < 1) newCost = 1;
         let data = {
-            title: reward.rewardTitle,
-            prompt: reward.rewardPrompt,
+            title: reward.title,
+            prompt: reward.prompt,
             cost: newCost,
         }
 

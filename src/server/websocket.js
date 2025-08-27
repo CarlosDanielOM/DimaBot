@@ -179,13 +179,12 @@ async function websocket(app) {
     io.of(/^\/site\/analytics\/[\w-]+$/).on('connection', async (socket) => {
         const type = socket.nsp.name.split('/')[3];
 
-        console.log(`${type} connected to site analytics`);
-
         if(type == 'live-channels') {
-            // let liveChannels = await cacheClient.lrange('live-channels', 0, -1);
-            // socket.emit('live-channels', liveChannels);
-            socket.emit('live-channels', {live: 15});
         }
+
+        if(type == 'active-channels') {}
+
+        if(type == 'registered-channels') {}
 
         socket.on('disconnect', () => {
             console.log(`${type} disconnected from site analytics`);

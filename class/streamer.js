@@ -128,7 +128,9 @@ class STREAMERS {
     }
 
     async getStreamerByName(name) {
-        return this.cache.hgetall(`${name}:streamer:data`);
+        let streamer = await this.cache.hgetall(`${name}:streamer:data`);
+        if(!streamer) return null;
+        let streamerData = streamer;
     }
 
     async getStreamerById(id) {
@@ -179,6 +181,10 @@ class STREAMERS {
 
     async getStreamerNames() {
         return await this.cache.smembers('streamers:by:name');
+    }
+
+    async getStreamerIds() {
+        return await this.cache.smembers('streamers:by:id');
     }
     
     async updateStreamers() {

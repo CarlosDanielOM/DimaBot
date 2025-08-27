@@ -14,9 +14,9 @@ async function resetRedemptionCost(client, channelID) {
 
     for(let i = 0; i < rewards.length; i++) {
         let data = {
-            title: rewards[i].rewardTitle,
-            prompt: rewards[i].rewardPrompt,
-            cost: rewards[i].rewardOriginalCost,
+            title: rewards[i].title,
+            prompt: rewards[i].prompt,
+            cost: rewards[i].originalCost,
         }
 
         let streamerToken = await STREAMERS.getStreamerTokenById(channelID);

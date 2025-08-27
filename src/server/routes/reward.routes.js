@@ -34,7 +34,7 @@ router.get('/:channelID', async (req, res) => {
         });
     }
     else if (type) {
-        const rewards = await rewardSchema.find({channelID: channelID, rewardType: type});
+        const rewards = await rewardSchema.find({channelID: channelID, type: type});
         return res.status(200).send({
             data: rewards,
             total: rewards.length
@@ -100,7 +100,7 @@ router.post('/:channelID', async (req, res) => {
     }
     
     const priceIncrease = body.priceIncrease || 0;
-    const rewardMessage = body.rewardMessage || '';
+    const rewardMessage = body.message || '';
     const returnToOriginalCost = body.returnToOriginalCost || false;
 
     let newReward = new rewardSchema({
@@ -108,22 +108,22 @@ router.post('/:channelID', async (req, res) => {
         channelID: channelID,
         channel: streamer.name,
         rewardID: rewardData.id,
-        rewardTitle: rewardData.title,
-        rewardPrompt: rewardData.prompt,
-        rewardCost: rewardData.cost,
-        rewardOriginalCost: rewardData.cost,
-        rewardIsEnabled: rewardData.is_enabled,
-        rewardCostChange: priceIncrease,
-        rewardMessage: rewardMessage,
-        rewardReturnToOriginalCost: returnToOriginalCost,
+        title: rewardData.title,
+        prompt: rewardData.prompt,
+        cost: rewardData.cost,
+        originalCost: rewardData.cost,
+        isEnabled: rewardData.is_enabled,
+        costChange: priceIncrease,
+        message: rewardMessage,
+        returnToOriginalCost: returnToOriginalCost,
         cooldown: body.cooldown || 0,
     });
 
-    if(body.rewardType) {
-        newReward.rewardType = body.rewardType;
+    if(body.type) {
+        newReward.type = body.type;
     }
-    if(body.rewardDuration) {
-        newReward.rewardDuration = body.rewardDuration;
+    if(body.duration) {
+        newReward.duration = body.duration;
     }
 
     try {
@@ -226,12 +226,10 @@ router.patch('/:channelID/:id', async (req, res) => {
         });
     }
 
-    let parsedBody = parseDBBody(body);
-
     let updatedRewardDB = null;
     
     try {
-        updatedRewardDB = await rewardSchema.updateOne({channelID: channelID, rewardID: id}, parsedBody, {new: true});
+        updatedRewardDB = await rewardSchema.updateOne({channelID: channelID, rewardID: id}, body, {new: true});
     } catch (error) {
         console.error('Error updating reward: ', error);
         return res.status(500).send({

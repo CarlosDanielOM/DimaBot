@@ -176,7 +176,7 @@ async function websocket(app) {
     });
 
     //? Site Global Data Analytics
-    io.of(/^\/site\/analytics\/\w+$/).on('connection', async (socket) => {
+    io.of(/^\/site\/analytics\/[\w-]+$/).on('connection', async (socket) => {
         const type = socket.nsp.name.split('/')[3];
 
         console.log(`${type} connected to site analytics`);

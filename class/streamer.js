@@ -131,10 +131,14 @@ class STREAMERS {
         let streamer = await this.cache.hgetall(`${name}:streamer:data`);
         if(!streamer) return null;
         let streamerData = streamer;
+        return streamerData;
     }
 
     async getStreamerById(id) {
-        return this.cache.hgetall(`${id}:streamer:data`);
+        let streamer = await this.cache.hgetall(`${id}:streamer:data`);
+        if(!streamer) return null;
+        let streamerData = streamer;
+        return streamerData;
     }
 
     async setStreamer(streamer) {

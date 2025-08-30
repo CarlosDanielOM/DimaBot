@@ -74,8 +74,8 @@ router.get('/twitch/:channelID', async (req, res) => {
 
     return res.status(200).send({
         error: false,
-        data: data,
-        total: data.length
+        data: data.data,
+        total: data.total
     });
 });
 

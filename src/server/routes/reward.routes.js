@@ -47,7 +47,36 @@ router.get('/:channelID', async (req, res) => {
             total: rewards.length
         });
     }
-    
+});
+
+router.get('/twitch/:channelID', async (req, res) => {
+    const {channelID} = req.params;
+
+    let params = new URLSearchParams();
+    params.append('broadcaster_id', channelID);
+
+    let headers = await getStreamerHeaderById(channelID);
+
+    let response = await fetch(getTwitchHelixUrl('channel_points/custom_rewards', params), {
+        headers: headers
+    });
+
+    let data = await response.json();
+
+    if(data.error) {
+
+        return res.status(400).send({
+            error: 'Bad Request',
+            message: data.error,
+            status: 400
+        });
+    }
+
+    return res.status(200).send({
+        error: false,
+        data: data,
+        total: data.length
+    });
 });
 
 router.post('/:channelID', async (req, res) => {

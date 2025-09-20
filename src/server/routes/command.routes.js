@@ -94,6 +94,7 @@ router.post('/:channelID', async (req, res) => {
         reserved: body.reserved ?? false,
         description: body.description ?? '',
         cooldown: body.cooldown ?? 10,
+        enabled: body.enabled ?? true,
         userLevelName: body.userLevelName ?? 'everyone',
         userLevel: body.userLevel ?? 1,
         channelID: channelID,

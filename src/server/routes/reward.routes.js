@@ -255,10 +255,13 @@ router.patch('/:channelID/:id', async (req, res) => {
         });
     }
 
-    let updatedRewardDB = null;
-    
     try {
-        updatedRewardDB = await rewardSchema.updateOne({channelID: channelID, rewardID: id}, body, {new: true});
+        let updatedRewardDB = await rewardSchema.updateOne({channelID: channelID, rewardID: id}, body, {new: true});
+
+        return res.status(200).send({
+            error: false,
+            data: updatedRewardDB
+        });
     } catch (error) {
         console.error('Error updating reward: ', error);
         return res.status(500).send({
@@ -267,12 +270,6 @@ router.patch('/:channelID/:id', async (req, res) => {
             status: 500
         });
     }
-
-    return res.status(200).send({
-        error: false,
-        data: updatedRewardDB
-    });
-
 });
 
 module.exports = router;

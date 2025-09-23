@@ -3,12 +3,14 @@ const STREAMERS = require('../class/streamer')
 const CHANNEL = require('../function/channel')
 const CHAT = require('../function/chat')
 const COMMANDS = require('../command');
+const banUser = require('../function/moderation/ban');
 
 const categories = require('../function/search/categories');
 const { getUserByLogin } = require('../function/user/getuser');
 const addVIPCommand = require('../command/addvip');
 
 let specialCommandsFunc = (/\$\(([a-z]+)\s?([a-z0-9]+)?\s?([a-zA-Z0-9?;\/\s]+)?\)/g);
+const modID = '698614112';
 
 async function commandHandler(channelID, tags, command, argument) {
     let cmd = await COMMAND.getCommandFromDB(channelID, command);
@@ -76,6 +78,38 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                         break;
                     }
                     cmdFunc = cmdFunc.replace(special[0], vipAction.message);
+                    break;
+                case 'ban':
+                    try {
+                        let rawArgs = (special[3] || special[2] || argument || '').trim();
+                        if(!rawArgs) {
+                            cmdFunc = cmdFunc.replace(special[0], '');
+                            break;
+                        }
+                        let [rawUser, rawSeconds] = rawArgs.split(/[;\s]+/);
+                        if(!rawUser) {
+                            cmdFunc = cmdFunc.replace(special[0], '');
+                            break;
+                        }
+                        let login = rawUser.replace(/^@/, '').toLowerCase();
+                        let userData = await getUserByLogin(login);
+                        if(userData.error) {
+                            cmdFunc = cmdFunc.replace(special[0], userData.message);
+                            break;
+                        }
+                        let duration = null;
+                        if(rawSeconds && /^\d+$/.test(rawSeconds)) {
+                            duration = parseInt(rawSeconds, 10);
+                        }
+                        let banRes = await banUser(channelID, userData.data.id, modID, duration);
+                        if(banRes.error) {
+                            cmdFunc = cmdFunc.replace(special[0], banRes.message);
+                            break;
+                        }
+                        cmdFunc = cmdFunc.replace(special[0], '');
+                    } catch (error) {
+                        cmdFunc = cmdFunc.replace(special[0], '');
+                    }
                     break;
                 case 'random':
                     let maxNumber = special[2] || 100;

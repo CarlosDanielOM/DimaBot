@@ -26,8 +26,10 @@ let isAndoni = false;
 
 //? Test imports
 const flash8b = require('../util/ai/google/flash.8b');
+const messageLogger = require('./messagelogger');
 
 async function message(client, channel, tags, message) {
+    
     if(channel == 'andonide') {
         if(message == 'a' && !isAndoni) {
             isAndoni = true;
@@ -42,6 +44,7 @@ async function message(client, channel, tags, message) {
     let streamer = await STREAMERS.getStreamerByName(channel);
     let channelID = streamer.user_id;
     let userLevel = await giveUserLevel(channel, tags, channelID);
+    messageLogger(channelID, tags, message);
 
     // Add message to chat history
     await chatHistory.addMessage(channelID, tags.username, message);

@@ -146,6 +146,8 @@ router.post('/:channelID', async (req, res) => {
         message: rewardMessage,
         returnToOriginalCost: returnToOriginalCost,
         cooldown: body.cooldown || 0,
+        createdFrom: body.createdFrom || 'domdimabot',
+        createdFor: body.createdFor || 'twitch'
     });
 
     if(body.type) {

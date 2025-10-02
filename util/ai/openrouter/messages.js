@@ -88,6 +88,12 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
         messages: messages
     }
 
+    if(options.length > 0) {
+        for(let [key, value] of Object.entries(options[0])) {
+            body[key] = value;
+        }
+    }
+
     let response = await fetch(`https://openrouter.ai/api/v1/chat/completions`, {
         method: 'POST',
         headers: headers,

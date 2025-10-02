@@ -162,7 +162,15 @@ async function getChannelPersonality(channelID) {
                 channel: channel.name,
                 contextWindow: channel.premium_plus ? 15 : 3,
                 personality: `You are a friendly and playful Twitch chat moderator for ${channel.name} channel. You speak in Spanish by default but can adapt to other languages. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary.`,
-                rules: ["Be respectful and friendly with users"]
+                rules: ["Be respectful and friendly with users"],
+                knownUsers: [
+                    {
+                        username: 'cdom201',
+                        description: 'Creator, Owner and Developer of you, the bot',
+                        relationship: 'professional',
+                        lastInteraction: new Date()
+                    }
+                ],
             })
         }
     }

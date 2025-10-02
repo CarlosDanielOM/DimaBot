@@ -59,7 +59,8 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
         content_type: 'application/json',
         authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'HTTP-Referer': 'https://domdimabot.com',
-        'X-Title': 'DomDimaBot'
+        'X-Title': 'DomDimaBot',
+        'X-Description': 'DomDimaBot is a twitch chat bot that helps with maken the stream more engaging and fun in one place, with more platforms to come soon.'
     }
 
     let messages = [
@@ -89,8 +90,14 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
     }
 
     if(options.length > 0) {
-        for(let [key, value] of Object.entries(options[0])) {
-            body[key] = value;
+        for(let [key, value] of Object.entries(options)) {
+            if(typeof value === 'object') {
+                for(let [key2, value2] of Object.entries(value)) {
+                    body[key2] = value2;
+                }
+            } else {
+                body[key] = value;
+            }
         }
     }
 

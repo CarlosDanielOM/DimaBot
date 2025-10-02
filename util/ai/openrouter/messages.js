@@ -5,6 +5,7 @@ const { getClient } = require('../../database/dragonfly');
 
 async function getChannelPersonality(channelID) {
     const cacheClient = getClient();
+    let streamer = await STREAMERS.getStreamerById(channelID);
     let personality = await cacheClient.get(`${channelID}:chatbot:personality`);
     if(personality) {
         return JSON.parse(personality);
@@ -13,6 +14,22 @@ async function getChannelPersonality(channelID) {
     if(personality) {
         await cacheClient.set(`${channelID}:chatbot:personality`, JSON.stringify(personality));
         return personality;
+    } else {
+        personality = await AIPersonality.create({
+            channelID,
+            channel: streamer.name,
+            contextWindow: streamer.premium_plus ? 15 : 3,
+            personality: `You are a friendly and playful Twitch chat moderator for ${streamer.name} channel. You speak in Spanish by default but can adapt to other languages. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary.`,
+            rules: ["Be respectful and friendly with users"],
+            knownUsers: [
+                {
+                    username: 'cdom201',
+                    description: 'Creator, Owner and Developer of you, the bot',
+                    relationship: 'professional',
+                    lastInteraction: new Date()
+                }
+            ],
+        })
     }
     return null;
 }

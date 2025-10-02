@@ -77,7 +77,7 @@ async function message(client, channel, tags, message) {
             // Get recent messages based on channel tier
             const recentMessages = await chatHistory.getRecentMessages(channelID, streamer.premium_plus ? 15 : 7);
             client.say(channel, `${await AiResponse(channelID, aiInput, 'google/gemini-2.5-flash-lite', recentMessages, tags, [
-                {reasoning: {'effort': 'medium'}}, {'usage': true}, {'user': `${channelID}`}
+                {reasoning: {'effort': 'medium'}}, {usage: {'include': true}}, {'user': `${channelID}`}
             ])}`)
         }
         return;

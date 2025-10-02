@@ -107,11 +107,7 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
         body: JSON.stringify(body)
     })
 
-    console.log({response, when: 'response'});
-
     let data = await response.json();
-
-    console.log({data, when: 'data'});
 
     if(data.error) {
         return {

@@ -182,17 +182,17 @@ async function websocket(app) {
 
         if(type == 'live-channels') {
             let liveChannels = await getSiteAnalytics('live');
-            socket.emit('live-channels', { liveChannels });
+            socket.emit('live-channels', liveChannels);
         }
 
         if(type == 'active-channels') {
             let activeChannels = await getSiteAnalytics('active');
-            socket.emit('active-channels', { activeChannels });
+            socket.emit('active-channels', activeChannels);
         }
 
         if(type == 'registered-channels') {
             let registeredChannels = await getSiteAnalytics('channels');
-            socket.emit('registered-channels', { registeredChannels });
+            socket.emit('registered-channels', registeredChannels);
         }
 
         socket.on('disconnect', () => {

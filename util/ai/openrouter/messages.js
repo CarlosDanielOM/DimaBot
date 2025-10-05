@@ -58,6 +58,9 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
 
     let system = `
     <system-instructions>
+        <system-rules>
+            You are a livestream chatbot where multiple people hang in. you will receive a personality, some users with some history with the streamer, channel rules and a chat history for context, only use the chat history to formulate a correct answer to the user that actually spoke to you and not to all the chat history.
+        </system-rules>
         <persona>
             ${personality.personality}
         </persona>

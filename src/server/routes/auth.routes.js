@@ -13,6 +13,7 @@ const { encrypt, decrypt } = require('../../../util/crypto');
 const {connectChannel} = require('../../../util/client');
 const {subcriptionsTypes, subscribeTwitchEvent} = require('../../../util/eventsub')
 const JSONCOMMANDS = require('../../../config/reservedcommands.json')
+const { incrementSiteAnalytics } = require('../../../util/siteanalytics');
 
 const auth = require("../../../middleware/auth");
 
@@ -125,6 +126,9 @@ router.get('/register', async (req, res) => {
 
         await connectChannel(streamer.name);
 
+        // Increment active channels count when account is activated
+        await incrementSiteAnalytics('active', 1);
+
         // Return the login.html file (local development)
         // return res.status(200).sendFile(path.join(__dirname, '../../../routes/public/login.html'));
 
@@ -188,6 +192,8 @@ router.post('/login', auth, async (req, res) => {
 
         try {
             await newChannel.save();
+            // Increment registered channels count
+            await incrementSiteAnalytics('registered', 1);
         } catch (error) {
             logger(error, true, id, 'auth_channel');
             return res.status(500).send('Internal server error');

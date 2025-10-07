@@ -198,6 +198,8 @@ async function websocket(app) {
         });
     });
 
+    //? PubSub
+
     io.on('error', (error) => {
         console.error('Websocket error:', error);
     });

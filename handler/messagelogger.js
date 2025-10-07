@@ -1,3 +1,4 @@
+const PUBSUB = require("../class/pubsub");
 const { getClient } = require("../util/database/dragonfly");
 
 async function messageLogger(channelID, tags, message) {
@@ -9,7 +10,9 @@ async function messageLogger(channelID, tags, message) {
         await cacheClient.expire(`${channelID}:weekly:messages`, generateTimeLeftToNextWeekInSeconds());
     }
 
-    await cacheClient.incr(`${channelID}:weekly:messages`);
+    const newCount = await cacheClient.incr(`${channelID}:weekly:messages`);
+
+    await PUBSUB.publishWeeklyMessageUpdate(channelID, newCount);
 }
 
 module.exports = messageLogger;

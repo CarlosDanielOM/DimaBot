@@ -9,6 +9,7 @@ const { connectChannel, disconnectChannel } = require('../../../util/client');
 
 const auth = require('../../../middleware/auth');
 const logger = require('../../../util/logger');
+const { incrementSiteAnalytics, decrementSiteAnalytics } = require('../../../util/siteanalytics');
 
 router.get('/', async (req, res) => {
     const cacheClient = getClient();
@@ -100,6 +101,13 @@ router.put('/active/:channelID', auth, async (req, res) => {
   }
 
   await channelSchema.findOneAndUpdate({ twitch_user_id: channelID }, { actived: active });
+
+  // Update analytics based on activation status
+  if (active) {
+    await incrementSiteAnalytics('active', 1);
+  } else {
+    await decrementSiteAnalytics('active', 1);
+  }
 
   try {
     await fetch('http://localhost:3355/user/active', {

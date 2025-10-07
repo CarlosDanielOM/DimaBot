@@ -22,6 +22,7 @@ const addCommandsToCache = require('../handler_function/addcommandstocache')
 const chatHistory = require('../class/chatHistory')
 const eventsub = require('../schema/eventsub')
 const cheerHandler = require('./cheerhandler')
+const { incrementSiteAnalytics, decrementSiteAnalytics } = require('../util/siteanalytics')
 
 async function eventsubHandler(subscriptionData, eventData) {
     const client = CLIENT.getClient();
@@ -68,6 +69,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             //! SEPARATOR FOR FUNCTIONS
             unVIPExpiredUser(client, eventData);
             await startTimerCommands(client, eventData);
+            await incrementSiteAnalytics('live', 1);
             break;
         case 'stream.offline':
             defaultMessages(client, eventData, eventsubData.message, chatEnabled);
@@ -84,6 +86,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             } catch (error) {
                 console.log({error: 'Error deleting editors from cache', message: error});
             }
+            await decrementSiteAnalytics('live', 1);
             break;
         case 'channel.channel_points_custom_reward_redemption.add':
             redeemHandler(client, eventData);

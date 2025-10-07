@@ -1,3 +1,4 @@
+const { liveChannels } = require("../function/channel/islive");
 const Channel = require("../schema/channel");
 const { getClient } = require("./database/dragonfly");
 
@@ -20,9 +21,17 @@ async function startSiteAnalytics() {
             }
             channelsCount++;
         }
+
+        let onlineChannels = await liveChannels();
+        if(onlineChannels.error) {
+            console.error('Error getting online channels: ', onlineChannels.message);
+            liveChannelsCount = 0;
+        } else {
+            liveChannelsCount = onlineChannels.data.length;
+        }
         
-        await cacheClient.hset('site:analytics:channels', 'channels', channelsCount);
-        await cacheClient.hset('site:analytics:channels', 'live', 0);
+        await cacheClient.hset('site:analytics:channels', 'registered', channelsCount);
+        await cacheClient.hset('site:analytics:channels', 'live', liveChannelsCount);
         await cacheClient.hset('site:analytics:channels', 'active', activeChannelsCount);
         
         await cacheClient.set('site:analytics:start', 1);

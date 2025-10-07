@@ -179,7 +179,6 @@ async function websocket(app) {
     //? Site Global Data Analytics
     io.of(/^\/site\/analytics\/[\w-]+$/).on('connection', async (socket) => {
         const type = socket.nsp.name.split('/')[3];
-
         if(type == 'live-channels') {
             let liveChannels = await getSiteAnalytics('live');
             socket.emit('live-channels', liveChannels);
@@ -191,12 +190,11 @@ async function websocket(app) {
         }
 
         if(type == 'registered-channels') {
-            let registeredChannels = await getSiteAnalytics('channels');
+            let registeredChannels = await getSiteAnalytics('registered');
             socket.emit('registered-channels', registeredChannels);
         }
 
         socket.on('disconnect', () => {
-            console.log(`${type} disconnected from site analytics`);
         });
     });
 

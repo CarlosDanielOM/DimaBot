@@ -257,6 +257,13 @@ router.patch('/:channelID/:id', async (req, res) => {
         });
     }
 
+    if(body.background_color && Object.keys(body).length === 1) {
+        return res.status(200).send({
+            error: false,
+            data: updatedReward
+        });
+    }
+
     try {
         let updatedRewardDB = await rewardSchema.updateOne({channelID: channelID, rewardID: id}, body, {new: true});
 
@@ -306,16 +313,16 @@ async function CreateTwitchReward(channelID, body) {
 async function PatchTwitchReward(channelID, body, rewardID) {
     let streamerHeader = await getStreamerHeaderById(channelID);
 
-    body = TwitchBodyParser(body);
+    let newBody = TwitchBodyParser(body);
 
-    let params = new URLSearchParams(body);
+    let params = new URLSearchParams(newBody);
     params.append('broadcaster_id', channelID);
     params.append('id', rewardID);
 
     let response = await fetch(getTwitchHelixUrl('channel_points/custom_rewards', params), {
         method: 'PATCH',
         headers: streamerHeader,
-        body: JSON.stringify(body)
+        body: JSON.stringify(newBody)
     });
 
     let result = await response.json();
@@ -331,54 +338,25 @@ async function PatchTwitchReward(channelID, body, rewardID) {
 }
 
 function TwitchBodyParser(body) {
+    if('isEnabled' in body) {
+        body.is_enabled = body.isEnabled;
+    }
+    
     if(body.skipQueue) {
         body.should_redemptions_skip_request_queue = true;
-        delete body.skipQueue;
     }
 
-    if(body.cooldown && body.cooldown > 0) {
+    if(body.cooldown && body.cooldown > 0 && body.cooldown !== 0) {
         body.is_global_cooldown_enabled = true;
         body.global_cooldown_seconds = body.cooldown;
-        delete body.cooldown;
-    } else {
+    } else if(body.cooldown && body.cooldown === 0) {
         body.is_global_cooldown_enabled = false;
         body.global_cooldown_seconds = 0;
-        delete body.cooldown;
     }
 
     if(body.userInput) {
         body.is_user_input_required = body.userInput;
-        delete body.userInput;
     }
     
-    return body;
-}
-
-function parseDBBody(body) {
-    if(body.title) {
-        body.rewardTitle = body.title;
-        delete body.title;
-    }
-    if(body.prompt) {
-        body.rewardPrompt = body.prompt;
-        delete body.prompt;
-    }
-    if(body.cost) {
-        body.rewardCost = body.cost;
-        delete body.cost;
-    }
-    if(body.priceIncrease) {
-        body.rewardCostChange = body.priceIncrease;
-        delete body.priceIncrease;
-    }
-    if(body.message) {
-        body.rewardMessage = body.message;
-        delete body.message;
-    }
-    if(body.isEnabled) {
-        body.rewardIsEnabled = body.isEnabled;
-        delete body.isEnabled;
-    }
-
     return body;
 }

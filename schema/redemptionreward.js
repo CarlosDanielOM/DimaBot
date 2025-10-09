@@ -18,6 +18,7 @@ const redemptionRewardSchema = new schema({
     returnToOriginalCost: { type: Boolean, defualt: false },
     duration: { type: Number, defualt: 0 },
     cooldown: { type: Number, defualt: 0 },
+    backgroundColor: { type: String },
     createdFrom: { type: String, defualt: 'domdimabot' },
     createdFor: { type: String, defualt: 'twitch' },
 });

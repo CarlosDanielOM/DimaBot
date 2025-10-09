@@ -48,7 +48,7 @@ async function customRedemptionReward(eventData, rewardData) {
     }
     
 
-    return { error: false, message: 'Reward updated', rewardMessage: reward.rewardMessage };
+    return { error: false, message: 'Reward updated', rewardMessage: reward.message };
     
 }
 

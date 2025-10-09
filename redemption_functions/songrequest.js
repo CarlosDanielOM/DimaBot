@@ -36,7 +36,7 @@ async function spotifySongRequest(eventData, reward) {
 
     if (data.error) return { error: true, message: data.message };
 
-    let rewardMessage = rewardData.rewardMessage;
+    let rewardMessage = rewardData.message;
 
     return { error: false, message: 'Song queued', rewardMessage };
 

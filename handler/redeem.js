@@ -24,7 +24,7 @@ async function redeem(client, eventData) {
     if (vipMatch) {
         let result = await vipRedemtionFun(eventData, reward);
         if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
-        let message = await textConvertor(broadcaster_user_id, eventData,result.message, reward )
+        let message = await textConvertor(broadcaster_user_id, eventData,result.rewardMessage, reward )
         client.say(broadcaster_user_login, `${message}`);
         return { error: false, message: 'VIP set' };
     }
@@ -32,7 +32,7 @@ async function redeem(client, eventData) {
     if(rewardData.type == 'song') {
         let result = await songRequestFun(eventData, reward);
         if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
-        let message = await textConvertor(broadcaster_user_id, eventData, result.message, reward)
+        let message = await textConvertor(broadcaster_user_id, eventData, result.rewardMessage, reward)
         client.say(broadcaster_user_login, `${message}`);
         return { error: false, message: 'Song Requested' };
     }
@@ -42,7 +42,7 @@ async function redeem(client, eventData) {
     if (!trigger) {
         let result = await customRedemptionFun(eventData, reward);
         if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
-        let message = await textConvertor(broadcaster_user_id, eventData, result.message, reward)
+        let message = await textConvertor(broadcaster_user_id, eventData, result.rewardMessage, reward)
         client.say(broadcaster_user_login, `${message}`);
         return { error: false, message: 'Reward Redeemed' };
     };

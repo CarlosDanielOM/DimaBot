@@ -15,8 +15,8 @@ async function refreshAllTokens() {
     await STREAMERS.updateStreamers();
     const streamers = await STREAMERS.getStreamerNames();
 
+    const promises = streamers.map(async streamer => {
     try {
-        const promises = streamers.map(async streamer => {
             let channel = await STREAMERS.getStreamerByName(streamer);
 
             if(!channel) return;
@@ -60,18 +60,18 @@ async function refreshAllTokens() {
                     console.error(`Error refreshing token for ${streamer} Doc Errors: ${doc.errors}`);
                 }
             }
-            
-            if(count == 5) count = 0;
-        
-            console.log('Refreshing all tokens');
-        
-            await Promise.all(promises);
-            await STREAMERS.updateStreamers();
-        });
     }
     catch (error) {
         console.error(`Error refreshing token for ${streamer} Error: ${error}`);
     }
+    
+    if(count == 5) count = 0;
+
+    });
+
+    console.log('Refreshing all tokens');
+    await Promise.all(promises);
+    await STREAMERS.updateStreamers();
 }
 
 async function refreshToken(refresh_token, independent = false, user = null) {
@@ -82,7 +82,6 @@ async function refreshToken(refresh_token, independent = false, user = null) {
         refreshTokenEncrypt: null
     }}
     try {
-        console.log('Refreshing token for ', {refresh_token, independent, user});
         let cache = getClient();
         let params = new URLSearchParams({
             client_id: process.env.CLIENT_ID,

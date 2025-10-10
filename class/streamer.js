@@ -15,9 +15,10 @@ class STREAMERS {
     }
 
     async getStreamersFromDB() {
+        let result = [];
         try {
             this.cache = getClient();
-            const result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
+            result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
             this.cache.del('streamers:by:name');
             this.cache.del('streamers:by:id');
 
@@ -27,14 +28,14 @@ class STREAMERS {
                 let data = {
                     name: result[i].name,
                     user_id: result[i].twitch_user_id,
-                    token: decrypt(result[i].twitch_user_token),
-                    refresh_token: decrypt(result[i].twitch_user_refresh_token),
+                    token: result[i].twitch_user_token ? decrypt(result[i].twitch_user_token) : null,
+                    refresh_token: result[i].twitch_user_refresh_token ? decrypt(result[i].twitch_user_refresh_token) : null,
                     actived: result[i].actived ? 'true' : 'false',
                     premium: result[i].premium ? 'true' : 'false',
                     premium_plus: result[i].premium_plus ? 'true' : 'false',
                     chat_enabled: result[i].chat_enabled ? 'true' : 'false'
                 }
-                
+
                 // Store the data with both name and ID as keys
                 await this.cache.hset(`${result[i].name}:streamer:data`, data);
                 await this.cache.hset(`${result[i].twitch_user_id}:streamer:data`, data);
@@ -58,8 +59,8 @@ class STREAMERS {
                 let data = {
                     name: streamer.name,
                     user_id: streamer.twitch_user_id,
-                    token: decrypt(streamer.twitch_user_token),
-                    refresh_token: decrypt(streamer.twitch_user_refresh_token),
+                    token: streamer.twitch_user_token ? decrypt(streamer.twitch_user_token) : null,
+                    refresh_token: streamer.twitch_user_refresh_token ? decrypt(streamer.twitch_user_refresh_token) : null,
                     actived: streamer.actived ? 'true' : 'false',
                     premium: streamer.premium ? 'true' : 'false',
                     premium_plus: streamer.premium_plus ? 'true' : 'false',
@@ -88,8 +89,8 @@ class STREAMERS {
                 let data = {
                     name: streamer.name,
                     user_id: streamer.twitch_user_id,
-                    token: decrypt(streamer.twitch_user_token),
-                    refresh_token: decrypt(streamer.twitch_user_refresh_token),
+                    token: streamer.twitch_user_token ? decrypt(streamer.twitch_user_token) : null,
+                    refresh_token: streamer.twitch_user_refresh_token ? decrypt(streamer.twitch_user_refresh_token) : null,
                     actived: streamer.actived ? 'true' : 'false',
                     premium: streamer.premium ? 'true' : 'false',
                     premium_plus: streamer.premium_plus ? 'true' : 'false',
@@ -220,22 +221,22 @@ class STREAMERS {
     
     async getStreamerTokenByName(name) {
         const streamer = await this.getStreamerByName(name);
-        return streamer.token;
+        return streamer.token ? streamer.token : null;
     }
 
     async getStreamerTokenById(id) {
         const streamer = await this.getStreamerById(id);
-        return streamer.token;
+        return streamer.token ? streamer.token : null;
     }
 
     async getStreamerRefreshTokenByName(name) {
         const streamer = await this.getStreamerByName(name);
-        return streamer.refresh_token;
+        return streamer.refresh_token ? streamer.refresh_token : null;
     }
 
     async getStreamerRefreshTokenById(id) {
         const streamer = await this.getStreamerById(id);
-        return streamer.refresh_token;
+        return streamer.refresh_token ? streamer.refresh_token : null;
     }
     
 }

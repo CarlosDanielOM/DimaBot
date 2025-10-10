@@ -18,6 +18,8 @@ function encrypt(text) {
 }
 
 function decrypt(hash) {
+    if(!hash || !hash.iv || !hash.content) return null;
+    
     const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(hash.iv, 'hex'));
     const decrypted = Buffer.concat([decipher.update(Buffer.from(hash.content, 'hex')), decipher.final()]);
     return decrypted.toString();

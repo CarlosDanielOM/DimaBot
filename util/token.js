@@ -5,6 +5,7 @@ const appConfigSchema = require('../schema/appconfig');
 const { decrypt, encrypt } = require('./crypto');
 const CLIENT = require('./client');
 const { getClient } = require('./database/dragonfly');
+const { decrementSiteAnalytics } = require('./siteanalytics');
 
 let count = 0;
 
@@ -14,12 +15,16 @@ async function refreshAllTokens() {
     await STREAMERS.updateStreamers();
     const streamers = await STREAMERS.getStreamerNames();
 
-    const promises = streamers.map(async streamer => {
-        try {
+    try {
+        const promises = streamers.map(async streamer => {
             let channel = await STREAMERS.getStreamerByName(streamer);
 
             if(!channel) return;
 
+            if(!channel.refresh_token) {
+                console.log('Refresh token is null for ', {streamer});
+            };
+            
             const { tokenEncrypt, refreshTokenEncrypt } = await refreshToken(channel.refresh_token);
 
             if(!tokenEncrypt || !refreshTokenEncrypt) {
@@ -33,6 +38,12 @@ async function refreshAllTokens() {
                     content: null
                 }
                 await channelSchema.findOneAndUpdate({name: streamer}, {twitch_user_token: nullToken, twitch_user_refresh_token: nullRefreshToken, actived: false, chat_enabled: false, refreshedAt: Date.now()});
+
+                decrementSiteAnalytics('active', 1);
+
+                await cache.del(`${streamer}:streamer:data`);
+                await cache.srem('streamers:by:name', streamer);
+                await cache.srem('streamers:by:id', channel.user_id);
 
                 return console.error(`Error refreshing token for ${streamer}, token is null, deactivating channel`);
             };
@@ -49,22 +60,29 @@ async function refreshAllTokens() {
                     console.error(`Error refreshing token for ${streamer} Doc Errors: ${doc.errors}`);
                 }
             }
-        }
-        catch (error) {
-            console.error(`Error refreshing token for ${streamer} Error: ${error}`);
-        }
-    });
-
-    if(count == 5) count = 0;
-
-    console.log('Refreshing all tokens');
-
-    await Promise.all(promises);
-    await STREAMERS.updateStreamers();
+            
+            if(count == 5) count = 0;
+        
+            console.log('Refreshing all tokens');
+        
+            await Promise.all(promises);
+            await STREAMERS.updateStreamers();
+        });
+    }
+    catch (error) {
+        console.error(`Error refreshing token for ${streamer} Error: ${error}`);
+    }
 }
 
 async function refreshToken(refresh_token, independent = false, user = null) {
+    if(!user && independent) {
+        console.log({refresh_token, independent, user});
+        return {
+        tokenEncrypt: null,
+        refreshTokenEncrypt: null
+    }}
     try {
+        console.log('Refreshing token for ', {refresh_token, independent, user});
         let cache = getClient();
         let params = new URLSearchParams({
             client_id: process.env.CLIENT_ID,

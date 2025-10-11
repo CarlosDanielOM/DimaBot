@@ -1,7 +1,7 @@
 const { liveChannels } = require("../function/channel/islive");
 const Channel = require("../schema/channel");
 const { getClient } = require("./database/dragonfly");
-const { getIO } = require("../src/server/websocket");
+//const { getIO } = require("../src/server/websocket");
 
 async function startSiteAnalytics() {
     const cacheClient = getClient();
@@ -57,7 +57,7 @@ async function incrementSiteAnalytics(filter, value = 1) {
     
     console.log(`Incrementing ${filter} by ${value}`);
     // Emit websocket message with updated analytics data
-    const io = getIO();
+    const io = null;
     if (io) {
         const updatedValue = await cacheClient.hget('site:analytics:channels', filter);
         // Map filter names to websocket namespace names
@@ -77,7 +77,7 @@ async function decrementSiteAnalytics(filter, value = 1) {
 
     console.log(`Decrementing ${filter} by ${value}`);
     // Emit websocket message with updated analytics data
-    const io = getIO();
+    const io = null;
     if (io) {
         const updatedValue = await cacheClient.hget('site:analytics:channels', filter);
         // Map filter names to websocket namespace names

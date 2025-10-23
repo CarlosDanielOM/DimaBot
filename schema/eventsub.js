@@ -19,6 +19,7 @@ const eventsubSchema = new Schema({
     minViewers: { type: Number, default: 2 },
     temporalBanMessage: { type: String, default: '' },
     clipEnabled: { type: Boolean, default: false },
+    delay: { type: Number, default: 0 },
     cheerTiers: { type: Array, default: [] },
 });
 

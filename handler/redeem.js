@@ -86,7 +86,15 @@ async function redeem(client, eventData) {
         };
     }
 
-    sendTrigger(broadcaster_user_id, triggerData);
+    let delay = trigger.delay ?? 0;
+
+    if(delay > 0) {
+        setTimeout(() => {
+            sendTrigger(broadcaster_user_id, triggerData);
+        }, delay * 1000);
+    } else {
+        sendTrigger(broadcaster_user_id, triggerData);
+    }
 
 }
 
@@ -110,7 +118,6 @@ async function sendTrigger(channelID, triggerData) {
     };
 
     const responseData = await res.json();
-    console.log({ responseData, body: responseData.body, where: 'sendTrigger', for: 'triggerData' })
 
     return { error: false, message: 'Trigger sent' }
 }

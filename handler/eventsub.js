@@ -43,6 +43,7 @@ async function eventsubHandler(subscriptionData, eventData) {
         }
         eventsubData.message = ''
         console.log({error: 'No data found', type, condition: subscriptionData.condition});
+        logger({channelID: eventData.broadcaster_user_id, channel: eventData.broadcaster_user_login, error: 'No data found', type, condition: subscriptionData.condition}, true, eventData.broadcaster_user_id, 'eventsub not found');
     }
 
     if(!eventsubData.enabled) return;
@@ -99,6 +100,8 @@ async function eventsubHandler(subscriptionData, eventData) {
             }, eventData.duration_seconds * 1000);
             break;
         case 'channel.raid':
+            let delay = eventsubData.delay ?? 0;
+            
             let clipEnabled = false;
             if(eventsubData.clipEnabled) clipEnabled = true;
             await raidHandler(client, eventData, eventsubData, clipEnabled);

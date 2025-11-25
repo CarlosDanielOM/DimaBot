@@ -80,36 +80,27 @@ async function specialCommands(channelID, tags, argument, cmdFunc, count = 0) {
                     cmdFunc = cmdFunc.replace(special[0], vipAction.message);
                     break;
                 case 'ban':
-                    try {
-                        let rawArgs = (special[3] || special[2] || argument || '').trim();
-                        if(!rawArgs) {
-                            cmdFunc = cmdFunc.replace(special[0], '');
-                            break;
-                        }
-                        let [rawUser, rawSeconds] = rawArgs.split(/[;\s]+/);
-                        if(!rawUser) {
-                            cmdFunc = cmdFunc.replace(special[0], '');
-                            break;
-                        }
-                        let login = rawUser.replace(/^@/, '').toLowerCase();
-                        let userData = await getUserByLogin(login);
-                        if(userData.error) {
-                            cmdFunc = cmdFunc.replace(special[0], userData.message);
-                            break;
-                        }
-                        let duration = null;
-                        if(rawSeconds && /^\d+$/.test(rawSeconds)) {
-                            duration = parseInt(rawSeconds, 10);
-                        }
-                        let banRes = await banUser(channelID, userData.data.id, modID, duration);
-                        if(banRes.error) {
-                            cmdFunc = cmdFunc.replace(special[0], banRes.message);
-                            break;
-                        }
+                    let banUserArg = special[2] || argument;
+                    if(!banUserArg) {
                         cmdFunc = cmdFunc.replace(special[0], '');
-                    } catch (error) {
-                        cmdFunc = cmdFunc.replace(special[0], '');
+                        break;
                     }
+                    let banLogin = banUserArg.replace(/^@/, '').toLowerCase();
+                    let banUserData = await getUserByLogin(banLogin);
+                    if(banUserData.error) {
+                        cmdFunc = cmdFunc.replace(special[0], banUserData.message);
+                        break;
+                    }
+                    let banDuration = null;
+                    if(special[3] && /^\d+$/.test(special[3])) {
+                        banDuration = parseInt(special[3], 10);
+                    }
+                    let banRes = await banUser(channelID, banUserData.data.id, modID, banDuration);
+                    if(banRes.error) {
+                        cmdFunc = cmdFunc.replace(special[0], banRes.message);
+                        break;
+                    }
+                    cmdFunc = cmdFunc.replace(special[0], '');
                     break;
                 case 'random':
                     let maxNumber = special[2] || 100;

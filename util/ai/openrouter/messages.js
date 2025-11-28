@@ -37,6 +37,7 @@ async function getChannelPersonality(channelID) {
     
 async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-lite', context = [], tags = {}, options = [], toolContext = []) {
 
+    let streamer = await STREAMERS.getStreamerById(channelID);
     let personality = await getChannelPersonality(channelID);
     if(!personality) {
         personality = {
@@ -69,7 +70,7 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
     let system = `
     <system-instructions>
         <system-rules>
-            You are a livestream chatbot where multiple people hang in. you will receive a personality, some users with some history with the streamer, channel rules and a chat history for context, only use the chat history to formulate a correct answer to the user that actually spoke to you and not to all the chat history.
+            You are a livestream chatbot where multiple people hang in. you will receive a personality, some users with some history with the streamer, channel rules and a chat history for context, only use the chat history to formulate a correct answer to the user that actually spoke to you and not to all the chat history. Personality was given to you by the streamer of the channel you are in which is ${streamer.name}.
         </system-rules>
         <persona>
             ${personality.personality}

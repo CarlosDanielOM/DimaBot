@@ -79,7 +79,11 @@ async function message(client, channel, tags, message) {
             let aiInput = message.replace('@domdimabot', '');
             // Get recent messages based on channel tier
             const recentMessages = await chatHistory.getRecentMessages(channelID, streamer.premium_plus ? 15 : 7);
-            client.say(channel, `${await AiResponse(channelID, aiInput, 'moonshotai/kimi-k2-thinking', recentMessages, tags, [
+            let model = 'openai/gpt-oss-20b';
+            if(streamer.premium || streamer.premium_plus) {
+                model = 'moonshotai/kimi-k2-thinking';
+            }
+            client.say(channel, `${await AiResponse(channelID, aiInput, model, recentMessages, tags, [
                 {reasoning: {'effort': 'medium'}}, {usage: {'include': true}}, {'user': `${channelID}`}
             ])}`)
         }

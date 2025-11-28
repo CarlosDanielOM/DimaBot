@@ -29,6 +29,7 @@ const flash8b = require('../util/ai/google/flash.8b');
 const messageLogger = require('./messagelogger');
 const { AiResponse } = require('../util/ai/openrouter/messages');
 const formatBadges = require('../util/badges');
+const router = require('../util/ai/openrouter/router');
 
 async function message(client, channel, tags, message) {
     
@@ -75,17 +76,15 @@ async function message(client, channel, tags, message) {
     const [raw, command, argument] = message.match(commandsRegex) || [];
 
     if(!command) {
-        if(message.startsWith('@domdimabot') || message.startsWith('@DomDimaBot')) {
+        if(message.startsWith('@domdimabot') || message.startsWith('@DomDimaBot') || message.includes('@domdimabot') || message.includes('@DomDimaBot')) {
             let aiInput = message.replace('@domdimabot', '');
+
             // Get recent messages based on channel tier
             const recentMessages = await chatHistory.getRecentMessages(channelID, streamer.premium_plus ? 15 : 7);
-            let model = 'openai/gpt-oss-20b';
-            if(streamer.premium || streamer.premium_plus) {
-                model = 'moonshotai/kimi-k2-thinking';
-            }
-            client.say(channel, `${await AiResponse(channelID, aiInput, model, recentMessages, tags, [
-                {reasoning: {'effort': 'medium'}}, {usage: {'include': true}}, {'user': `${channelID}`}
-            ])}`)
+
+            let aiResponse = await router(channelID, aiInput, '@preset/router', recentMessages, tags, [{reasoning: {'effort': 'medium'}}, {usage: {'include': true}}, {'user': `${channelID}`}], streamer);
+
+            client.say(channel, aiResponse.message);
         }
         return;
     };

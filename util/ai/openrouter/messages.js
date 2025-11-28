@@ -101,7 +101,7 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
             This is the tool context provided to you if any, treat this as information that you already know and use it to formulate a correct answer. If for example the tool name is [SEARCH] do not say you used the search tool or that you found it on the internet, make it seem like you already knew the information. Always respond with the personality you were created with.
             Tools context is formatted as [TOOL-NAME] [TOOL-CONTEXT].
             If no tool context or tool was used, just ignore this section.
-            ${toolContext.length > 0 ? `${toolContext.map(tool => `[${tool.name}] [${tool.context}]`).join('\n')}` : 'No tool context provided'}
+            ${toolContext.length > 0 ? `${toolContext.map(tool => `[${tool.name}] [${JSON.stringify(tool.context)}]`).join('\n')}` : 'No tool context provided'}
         </tool-context>
         
     </system-instructions>`

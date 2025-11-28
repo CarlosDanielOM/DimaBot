@@ -85,7 +85,7 @@ async function router(channelID, message, preset = '@preset/router', history = [
     }
 
     let model = 'openai/gpt-oss-20b';
-    if(streamer.premium || streamer.premium_plus) {
+    if(streamer.premium == "true" || streamer.premium_plus == "true") {
         model = 'moonshotai/kimi-k2-thinking';
     }
 

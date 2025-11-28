@@ -18,7 +18,7 @@ class ChatHistory {
         }
     }
 
-    async addMessage(channelID, username, message) {
+    async addMessage(channelID, username, message, formattedBadges) {
         try {
             if (!this.cacheClient) {
                 await this.init();
@@ -30,7 +30,7 @@ class ChatHistory {
             }
 
             const key = `${channelID}:chat:history`;
-            const messageData = JSON.stringify({ username, message, timestamp: Date.now() });
+            const messageData = JSON.stringify({ username, message:message, timestamp: Date.now(), badges: formattedBadges });
             
             // Add new message
             await this.cacheClient.lpush(key, messageData);

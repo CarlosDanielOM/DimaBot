@@ -1,6 +1,7 @@
 require('dotenv').config();
 const STREAMERS = require('../../../class/streamer');
 const AIPersonality = require('../../../schema/channelAIPersonality');
+const formatBadges = require('../../badges');
 const { getClient } = require('../../database/dragonfly');
 
 async function getChannelPersonality(channelID) {
@@ -34,7 +35,7 @@ async function getChannelPersonality(channelID) {
     return null;
 }
     
-async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-lite', context = [], tags = {}, options = [] ) {
+async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-lite', context = [], tags = {}, options = [], toolContext = []) {
 
     let personality = await getChannelPersonality(channelID);
     if(!personality) {
@@ -56,6 +57,15 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
         .map(user => `${user.username} is ${user.description} and has a ${user.relationship} relationship with the channel`)
         .join('\n')
 
+    let chatHistoryContext = "No previous chat history";
+    if(context.length > 0) {
+        chatHistoryContext = context.map(msg => {
+            let msgTimestamp = new Date(msg.timestamp);
+            let timeInHours = `${msgTimestamp.getHours()}:${msgTimestamp.getMinutes()}`;
+            return `[${timeInHours}] ${msg.badges} ${msg.username}: ${msg.message}`
+        }).join('\n')
+    }
+
     let system = `
     <system-instructions>
         <system-rules>
@@ -72,6 +82,28 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
         <known-users>
             ${knownUsersContext}
         </known-users>
+
+        <chat-history>
+            This is the chat history of the channel, only use the chat history to formulate a correct answer to the user that actually spoke to you and not to all the chat history. You can use the chat history to get a better understanding of the context of the conversation and the users, how they interact with each other and the streamer and their jokes.
+            ${chatHistoryContext}
+        </chat-history>
+
+        <critical-rules>
+            1. Only reply to the user with the [CURRENT] timestamp and not to all the chat history unless the user asks you to do so.
+            2. Chat history and current message is formatted as [TIME] [BADGES] [USERNAME]: [MESSAGE]
+            3. Notice the user badges and adjust your response to the user's level and status based on your personality and the channel rules.
+            4. Keep your responses short and concise, avoid long paragraphs and keep it simple and easy to understand unless you feel like you need to elaborate more or is a complex topic.
+            5. Do not respond with any [TIME] [BADGES] [USERNAME]: [MESSAGE] format, only respond with the message.
+            6. If you are speaking directly to the user, do not forget to tag them with @username.
+        </critical-rules>
+        
+        <tool-context>
+            This is the tool context provided to you if any, treat this as information that you already know and use it to formulate a correct answer. If for example the tool name is [SEARCH] do not say you used the search tool or that you found it on the internet, make it seem like you already knew the information. Always respond with the personality you were created with.
+            Tools context is formatted as [TOOL-NAME] [TOOL-CONTEXT].
+            If no tool context or tool was used, just ignore this section.
+            ${toolContext.length > 0 ? `${toolContext.map(tool => `[${tool.name}] [${tool.context}]`).join('\n')}` : 'No tool context provided'}
+        </tool-context>
+        
     </system-instructions>`
     
     const cacheClient = getClient();
@@ -90,18 +122,11 @@ async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-l
         }
     ]
 
-    if(context.length > 0) {
-        for(let i = 0; i < context.length; i++) {
-            messages.push({
-                role: 'user',
-                content: `{"username": "${context[i].username}", "message": "${context[i].message}"}`
-            })
-        }
-    }
+    let userBadges = formatBadges(tags);
 
     messages.push({
         role: 'user',
-        content: `{"username": "${tags.username}", "message": "${message}"}`
+        content: `[CURRENT] ${userBadges} ${tags.username}: ${message}`
     })
 
     let body = {

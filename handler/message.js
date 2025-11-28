@@ -28,6 +28,7 @@ let isAndoni = false;
 const flash8b = require('../util/ai/google/flash.8b');
 const messageLogger = require('./messagelogger');
 const { AiResponse } = require('../util/ai/openrouter/messages');
+const formatBadges = require('../util/badges');
 
 async function message(client, channel, tags, message) {
     
@@ -47,8 +48,10 @@ async function message(client, channel, tags, message) {
     let userLevel = await giveUserLevel(channel, tags, channelID);
     messageLogger(channelID, tags, message);
 
+    let formattedBadges = formatBadges(tags);
+
     // Add message to chat history
-    await chatHistory.addMessage(channelID, tags.username, message);
+    await chatHistory.addMessage(channelID, tags.username, message, formattedBadges);
 
     // Deletes links from chat if user is not a mod or streamer for certain channels
     let haslink = message.match(linkRegex);

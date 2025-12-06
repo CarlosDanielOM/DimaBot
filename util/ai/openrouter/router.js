@@ -86,7 +86,7 @@ async function router(channelID, message, preset = '@preset/router', history = [
 
     let model = 'openai/gpt-oss-20b';
     if(streamer.premium == "true" || streamer.premium_plus == "true") {
-        model = 'moonshotai/kimi-k2-thinking';
+        model = 'moonshotai/kimi-k2-thinking:nitro';
     }
 
     let AiAnswer = await AiResponse(channelID, message, model, history, tags, options, toolContext);

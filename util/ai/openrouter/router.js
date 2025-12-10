@@ -84,7 +84,7 @@ async function router(channelID, message, preset = '@preset/router', history = [
         // logger({channelID, message, toolContext, aiDecision}, true, channelID, 'router');
     }
 
-    let model = 'openai/gpt-oss-20b';
+    let model = 'sao10k/l3-lunaris-8b';
     if(streamer.premium == "true" || streamer.premium_plus == "true") {
         model = 'moonshotai/kimi-k2-thinking:nitro';
     }

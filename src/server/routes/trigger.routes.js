@@ -129,8 +129,6 @@ router.post('/:channelID/send', async (req, res) => {
     const {channelID} = req.params;
     const body = req.body;
 
-    logger({data: body, where: 'sendTrigger', for: 'triggerData', channelID}, true, channelID, 'trigger sent');
-
     if (!io) {
         return res.status(500).send({
             error: true,

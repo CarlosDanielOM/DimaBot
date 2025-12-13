@@ -131,7 +131,26 @@ router.post('/:channelID/send', async (req, res) => {
 
     logger({data: body, where: 'sendTrigger', for: 'triggerData', channelID}, true, channelID, 'trigger sent');
 
-    io.of(`/overlays/triggers/${channelID}`).emit('trigger', body);
+    if (!io) {
+        return res.status(500).send({
+            error: true,
+            message: 'Websocket not initialized',
+            status: 500
+        });
+    }
+
+    const namespacePath = `/overlays/triggers/${channelID}`;
+    const namespace = io.of(namespacePath);
+
+    try {
+        namespace.emit('trigger', body);
+    } catch (error) {
+        return res.status(500).send({
+            error: true,
+            message: 'Error emitting trigger',
+            status: 500
+        });
+    }
 
     res.status(200).send({
         error: false,
@@ -149,6 +168,18 @@ router.post('/:channelID/upload', async (req, res) => {
             message: 'Streamer not found',
             status: 404
         });
+    }
+
+    // Validate triggerName - only allow a-z, A-Z, 0-9, spaces, and underscores
+    if(req.body.triggerName) {
+        const validNameRegex = /^[a-zA-Z0-9 ]+$/;
+        if(!validNameRegex.test(req.body.triggerName)) {
+            return res.status(400).send({
+                error: 'Bad Request',
+                message: 'Filename can only contain letters (a-z, A-Z), numbers (0-9), and spaces',
+                status: 400
+            });
+        }
     }
 
     let MB = 5;
@@ -232,8 +263,11 @@ router.post('/:channelID/upload', async (req, res) => {
         }
 
         // Directly upload to S3 from buffer
+        // Keep original filename with spaces for database storage
         const filename = `${req.body.triggerName}.${req.file.mimetype.split('/')[1]}`;
-        const s3Key = `${channelID}/triggers/${filename}`;
+        // Replace spaces with underscores for URL-friendly S3 key
+        const s3SafeFilename = filename.replace(/\s+/g, '_');
+        const s3Key = `${channelID}/triggers/${s3SafeFilename}`;
         let s3Url;
         try {
             s3Url = await uploadTriggerFileToS3(channelID, req.file.buffer, req.file.mimetype, s3Key);
@@ -450,8 +484,9 @@ router.delete('/files/:channelID/:fileID', async (req, res) => {
     }
 
     try {
-        // Remove from S3
-        const s3Key = `${channelID}/triggers/${file.fileName}`;
+        // Remove from S3 - replace spaces with underscores to match S3 key format
+        const s3SafeFilename = file.fileName.replace(/\s+/g, '_');
+        const s3Key = `${channelID}/triggers/${s3SafeFilename}`;
         await deleteTriggerFileFromS3(channelID, s3Key);
         await file.deleteOne();
     } catch (error) {

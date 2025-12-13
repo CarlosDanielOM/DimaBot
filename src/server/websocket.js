@@ -64,7 +64,14 @@ async function websocket(app) {
     //? Overlay triggers
     io.of(/^\/overlays\/triggers\/\w+$/).on('connection', async (socket) => {
         const channelID = socket.nsp.name.split('/')[3];
-        console.log(`${channelID} connected to triggers`);
+
+        let userData = await STREAMERS.getStreamerById(channelID);
+        
+        console.log(`${userData.name} (${channelID}) connected to triggers`);
+        
+        socket.on('disconnect', () => {
+            console.log(`${userData.name} (${channelID}) disconnected from triggers`);
+        });
     });
 
     //? Overlay Furry

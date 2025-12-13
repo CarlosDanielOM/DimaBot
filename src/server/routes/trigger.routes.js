@@ -12,6 +12,7 @@ const triggerSchema = require('../../../schema/trigger');
 const triggerFileSchema = require('../../../schema/triggerfile');
 const auth = require('../../../middleware/auth');
 const { getIO } = require('../websocket');
+const logger = require('../../../util/logger');
 
 const acceptableMimeTypes = ['video/mp4', 'video/mov', 'video/avi', 'video/flv', 'video/wmv', 'video/webm', 'video/mkv', 'image/gif', 'image/jpg', 'image/jpeg', 'image/png', 'image/bmp', 'image/tiff', 'image/svg', 'image/webp', 'audio/mp3', 'audio/flac', 'audio/wav', 'audio/ogg', 'audio/aac', 'audio/wma', 'audio/m4a'];
 
@@ -127,6 +128,8 @@ router.post('/:channelID/send', async (req, res) => {
     const io = getIO();
     const {channelID} = req.params;
     const body = req.body;
+
+    logger({data: body, where: 'sendTrigger', for: 'triggerData', channelID}, true, channelID, 'trigger sent');
 
     io.of(`/overlays/triggers/${channelID}`).emit('trigger', body);
 

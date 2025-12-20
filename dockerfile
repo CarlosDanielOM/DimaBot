@@ -19,7 +19,7 @@ COPY handler_function/ ./handler_function/
 COPY middleware/ ./middleware/
 COPY redemption_functions/ ./redemption_functions/
 COPY schema/ ./schema/
-COPY services/ ./services/
+# COPY services/ ./services/
 COPY timer_functions/ ./timer_functions/
 COPY util/ ./util/
 

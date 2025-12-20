@@ -1,0 +1,41 @@
+services:
+  # =========================================
+  # SERVICE 1: API SERVER (Dashboard Backend)
+  # =========================================
+  api-server:
+    build:
+      context: .
+      args:
+        - SERVICE_NAME=server  # <--- Tells Dockerfile to copy src/server
+    image: dimabot/api-server:latest # Unique Image Name
+    container_name: twitch-api
+    command: node src/server/index.js
+    restart: always
+    env_file: .env
+    networks:
+      - web-proxy  # Exposed to the internet via Nginx
+      - databases
+
+  # =========================================
+  # SERVICE 2: CHAT BOT (Twitch Connection)
+  # =========================================
+  chat-bot:
+    build:
+      context: .
+      args:
+        - SERVICE_NAME=bot     # <--- Tells Dockerfile to copy src/bot
+    image: dimabot/chat-bot:latest   # Unique Image Name
+    container_name: dima-bot
+    command: node src/bot/index.js
+    restart: always
+    env_file: .env
+    networks:
+      - web-proxy
+      - databases
+      # Note: Bot is NOT in web-proxy because nobody connects to it directly.
+
+networks:
+  web-proxy:
+    external: true
+  databases:
+    external: true

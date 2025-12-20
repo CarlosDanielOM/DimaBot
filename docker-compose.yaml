@@ -28,7 +28,7 @@ services:
     container_name: dima-bot
     command: node src/bot/index.js
     restart: always
-    env_file: .env
+    env_file: .env-bot
     networks:
       - web-proxy
       - databases

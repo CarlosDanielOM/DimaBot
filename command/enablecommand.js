@@ -28,7 +28,7 @@ async function enableCommand (channelID, argument) {
     let exists = await cacheClient.exists(`${channelID}:commands:${argument}`);
     
     if(exists) {
-        await cacheClient.hset(`${channelID}:commands:${argument}`, 'enabled', 1);
+        await cacheClient.hset(`${channelID}:commands:${argument}`, 'enabled', 'true');
     }
 
     await command.save();

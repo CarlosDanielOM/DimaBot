@@ -102,33 +102,40 @@ async function message(client, channel, tags, message) {
                 func: 'none',
                 level: 0,
                 cooldown: 0,
-                enabled: 0
+                enabled: 'false'
             }
             // Saves non existing command to cache as disabled
             await cacheClient.hset(`${channelID}:commands:${command}`, cacheCommandData);
             commandFunc = 'none';
             commandUserLevel = 0;
             commandCD = 0;
-            commandEnabled = 0;
+            commandEnabled = 'false';
         } else {
             let cacheCommandData = {
                 func: commandData.func,
                 level: commandData.userLevel,
                 cooldown: commandData.cooldown,
-                enabled: commandData.enabled ? 1 : 0
+                enabled: commandData.enabled ? 'true' : 'false'
             }
             // Saves command to cache
             await cacheClient.hset(`${channelID}:commands:${command}`, cacheCommandData);
             commandFunc = commandData.func;
             commandUserLevel = commandData.userLevel;
             commandCD = commandData.cooldown;
-            commandEnabled = commandData.enabled ? 1 : 0;
+            commandEnabled = commandData.enabled ? 'true' : 'false';
         }
     }
 
-    // Convert commandEnabled to number and check if disabled (handles string "0", "1", null, undefined)
-    commandEnabled = commandEnabled === null || commandEnabled === undefined ? 0 : parseInt(commandEnabled, 10);
-    if(commandEnabled === 0 || isNaN(commandEnabled)) {
+    // Check if command is enabled (handles string "true"/"false", "0"/"1", boolean, null, undefined)
+    if(commandEnabled === null || commandEnabled === undefined) {
+        return;
+    }
+    
+    // Convert to string for comparison (handles both string and number values from cache)
+    const enabledStr = String(commandEnabled).toLowerCase().trim();
+    
+    // Only proceed if enabled is "true" or "1", otherwise return early
+    if(enabledStr !== 'true' && enabledStr !== '1') {
         return;
     }
     

@@ -126,7 +126,9 @@ async function message(client, channel, tags, message) {
         }
     }
 
-    if(commandEnabled == 0) {
+    // Convert commandEnabled to number and check if disabled (handles string "0", "1", null, undefined)
+    commandEnabled = commandEnabled === null || commandEnabled === undefined ? 0 : parseInt(commandEnabled, 10);
+    if(commandEnabled === 0 || isNaN(commandEnabled)) {
         return;
     }
     

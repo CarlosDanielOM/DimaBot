@@ -17,7 +17,7 @@ async function addCommandsToCache(channelID) {
             func: commands[i].func,
             level: commands[i].userLevel,
             cooldown: commands[i].cooldown,
-            enabled: commands[i].enabled,
+            enabled: commands[i].enabled ? 'true' : 'false',
         }
 
         try {

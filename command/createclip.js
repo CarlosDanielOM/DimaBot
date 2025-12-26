@@ -17,7 +17,7 @@ async function createChannelClip(channelID) {
         return {
             error: true,
             message: 'There was an internal Twitch server error that we cannot resolve.',
-            status: clipData.status,
+            status: createClipFun.status,
             type: 'Clip creation error'
         };
     }
@@ -31,18 +31,22 @@ async function createChannelClip(channelID) {
     if(clipData.status === 404) {
         return {
             error: true,
-            message: 'There was an error finding the clip, it may have been created.',
+            message: 'There was an error finding the clip, it may have been created but is taking too long to process. Please check your clips later.',
             status: 404,
             type: 'Clip not found'
         }
     }
     
+    if(clipData.error) {
+        return clipData;
+    }
+
     if(!clipData.data) {
         return {
             error: true,
-            message: 'There was an error creating the clip.',
-            status: 404,
-            type: 'Clip not found'
+            message: 'There was an unexpected error retrieving the clip data.',
+            status: 500,
+            type: 'Clip data missing'
         }
     }
 
@@ -62,7 +66,7 @@ async function checkClipStatus(channelID, clipID, retries = 0) {
     let getClipFun = await getClip(channelID, clipID);
 
     if(getClipFun.error) {
-        if(getClipFun.status === 404 && retries < 8) {
+        if(getClipFun.status === 404 && retries < 15) { // Increased retries to 15 (total ~30s)
             await new Promise(resolve => setTimeout(resolve, 2000)); // Wait 2 seconds
             return checkClipStatus(channelID, clipID, retries + 1); // Retry
         }

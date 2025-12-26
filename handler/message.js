@@ -285,7 +285,7 @@ async function message(client, channel, tags, message) {
             res = await COMMANDS.vanish(channelID, tags);
             break;
         case 'duel':
-            res = await COMMANDS.duel(channelID, channel, tags['username'], tags.mod, argument);
+            res = await COMMANDS.duel(client, channelID, channel, tags['username'], tags.mod, argument);
             break;
         case 'pechos':
             res = await COMMANDS.pechos(channelID, tags);

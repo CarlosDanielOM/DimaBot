@@ -33,6 +33,15 @@ async function createClip(channelID) {
 
     response = await response.json();
 
+    if(!response.data || response.data.length === 0) {
+        return {
+            error: true,
+            message: 'Twitch accepted the clip request but did not return a clip ID.',
+            status: 500,
+            type: 'Clip ID missing'
+        }
+    }
+
     return {
         error: false,
         message: 'Clip created',

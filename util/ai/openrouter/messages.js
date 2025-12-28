@@ -1,194 +1,293 @@
+/**
+ * AI Chat Response Handler
+ * 
+ * This module handles chat-based AI interactions (@bot conversations).
+ * Uses the shared prompts.js utility for consistent personality construction.
+ * Preserves chat history context and tool integration.
+ */
+
 require('dotenv').config();
 const STREAMERS = require('../../../class/streamer');
 const AIPersonality = require('../../../schema/channelAIPersonality');
 const formatBadges = require('../../badges');
 const { getClient } = require('../../database/dragonfly');
+const { constructChatSystemMessages } = require('../prompts');
 
+// ============================================================================
+// MODEL CONFIGURATION - Tiered Nitro Models (Same as command.js)
+// ============================================================================
+
+/**
+ * Model tiers for different subscription levels.
+ * All use :nitro suffix for faster inference.
+ */
+const MODELS = {
+    free: 'sao10k/l3-lunaris-8b:nitro',
+    premium: 'nousresearch/hermes-4-70b:nitro',
+    pro: 'moonshotai/kimi-k2-thinking:nitro'
+};
+
+/**
+ * Token limits based on model type.
+ * Kimi (Pro) needs more tokens to allow for "thinking" process.
+ */
+const TOKEN_LIMITS = {
+    default: 500,
+    'moonshotai/kimi-k2-thinking:nitro': 5000
+};
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+
+/**
+ * Retrieves or creates the channel's AI personality configuration.
+ * Uses cache for performance, falls back to DB.
+ * 
+ * @param {string} channelID - The channel's Twitch user ID
+ * @returns {Promise<object>} - The personality configuration
+ */
 async function getChannelPersonality(channelID) {
     const cacheClient = getClient();
-    let streamer = await STREAMERS.getStreamerById(channelID);
+    const streamer = await STREAMERS.getStreamerById(channelID);
+    
+    // Try cache first
     let personality = await cacheClient.get(`${channelID}:chatbot:personality`);
-    if(personality) {
+    if (personality) {
         return JSON.parse(personality);
     }
+    
+    // Try database
     personality = await AIPersonality.findOne({ channelID: channelID });
-    if(personality) {
+    if (personality) {
         await cacheClient.set(`${channelID}:chatbot:personality`, JSON.stringify(personality));
         return personality;
-    } else {
-        personality = await AIPersonality.create({
-            channelID,
-            channel: streamer.name,
-            contextWindow: streamer.premium_plus ? 15 : 3,
-            personality: `You are a friendly and playful Twitch chat moderator for ${streamer.name} channel. You speak in Spanish by default but can adapt to other languages. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary.`,
-            rules: ["Be respectful and friendly with users"],
-            knownUsers: [
-                {
-                    username: 'cdom201',
-                    description: 'Creator, Owner and Developer of you, the bot',
-                    relationship: 'professional',
-                    lastInteraction: new Date()
-                }
-            ],
-        })
     }
-    return null;
-}
     
-async function AiResponse(channelID, message, model = 'google/gemini-2.5-flash-lite', context = [], tags = {}, options = [], toolContext = []) {
-
-    let streamer = await STREAMERS.getStreamerById(channelID);
-    let personality = await getChannelPersonality(channelID);
-    if(!personality) {
-        personality = {
-            personality: `You are a friendly and playful Twitch chat moderator for this channel. You speak in Spanish by default but can adapt to other languages. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary.`,
-                rules: ["Be respectful and friendly with users"],
-                knownUsers: [
-                    {
-                        username: 'cdom201',
-                        description: 'Creator, Owner and Developer of you, the bot',
-                        relationship: 'professional',
-                        lastInteraction: new Date()
-                    }
-                ]
-        }
-    }
-
-    let knownUsersContext = personality.knownUsers
-        .map(user => `${user.username} is ${user.description} and has a ${user.relationship} relationship with the channel`)
-        .join('\n')
-
-    let chatHistoryContext = "No previous chat history";
-    if(context.length > 0) {
-        chatHistoryContext = context.map(msg => {
-            let msgTimestamp = new Date(msg.timestamp);
-            let timeInHours = `${msgTimestamp.getHours()}:${msgTimestamp.getMinutes()}`;
-            return `[${timeInHours}] ${msg.badges} ${msg.username}: ${msg.message}`
-        }).join('\n')
-    }
-
-    let system = `
-    <system-instructions>
-        <system-rules>
-            You are a livestream chatbot where multiple people hang in. you will receive a personality, some users with some history with the streamer, channel rules and a chat history for context, only use the chat history to formulate a correct answer to the user that actually spoke to you and not to all the chat history. Personality was given to you by the streamer of the channel you are in which is ${streamer.name}.
-        </system-rules>
-        <persona>
-            ${personality.personality}
-        </persona>
-
-        <channel-rules>
-            ${personality.rules.join('\n')}
-        </channel-rules>
-
-        <known-users>
-            ${knownUsersContext}
-        </known-users>
-
-        <chat-history>
-            This is the chat history of the channel, only use the chat history to formulate a correct answer to the user that actually spoke to you and not to all the chat history. You can use the chat history to get a better understanding of the context of the conversation and the users, how they interact with each other and the streamer and their jokes.
-            ${chatHistoryContext}
-        </chat-history>
-
-        <critical-rules>
-            1. Only reply to the user with the [CURRENT] timestamp and not to all the chat history unless the user asks you to do so.
-            2. Chat history and current message is formatted as [TIME] [BADGES] [USERNAME]: [MESSAGE]
-            3. Notice the user badges and adjust your response to the user's level and status based on your personality and the channel rules.
-            4. Keep your responses short and concise, avoid long paragraphs and keep it simple and easy to understand unless you feel like you need to elaborate more or is a complex topic.
-            5. Do not respond with any [TIME] [BADGES] [USERNAME]: [MESSAGE] format, only respond with the message.
-            6. If you are speaking directly to the user, do not forget to tag them with @username.
-        </critical-rules>
-        
-        <tool-context>
-            This is the tool context provided to you if any, treat this as information that you already know and use it to formulate a correct answer. If for example the tool name is [SEARCH] do not say you used the search tool or that you found it on the internet, make it seem like you already knew the information. Always respond with the personality you were created with.
-            Tools context is formatted as [TOOL-NAME] [TOOL-CONTEXT].
-            If no tool context or tool was used, just ignore this section.
-            ${toolContext.length > 0 ? `${toolContext.map(tool => `[${tool.name}] [${JSON.stringify(tool.context)}]`).join('\n')}` : 'No tool context provided'}
-        </tool-context>
-        
-    </system-instructions>`
-    
-    const cacheClient = getClient();
-    let headers = {
-        content_type: 'application/json',
-        authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'HTTP-Referer': 'https://domdimabot.com',
-        'X-Title': 'DomDimaBot',
-        'X-Description': 'DomDimaBot is a twitch chat bot that helps with maken the stream more engaging and fun in one place, with more platforms to come soon.'
-    }
-
-    let messages = [
-        {
-            role: 'system',
-            content: system
-        }
-    ]
-
-    let userBadges = formatBadges(tags);
-
-    messages.push({
-        role: 'user',
-        content: `[CURRENT] ${userBadges} ${tags.username}: ${message}`
-    })
-
-    let body = {
-        model: model,
-        messages: messages
-    }
-
-    if(options.length > 0) {
-        for(let [key, value] of Object.entries(options)) {
-            if(typeof value === 'object') {
-                for(let [key2, value2] of Object.entries(value)) {
-                    body[key2] = value2;
-                }
-            } else {
-                body[key] = value;
+    // Create default personality for new channels
+    personality = await AIPersonality.create({
+        channelID,
+        channel: streamer?.name || 'Unknown',
+        contextWindow: streamer?.premium_plus === 'true' ? 15 : (streamer?.premium === 'true' ? 7 : 3),
+        personality: `You are a friendly and playful Twitch chat moderator for ${streamer?.name || 'this channel'}. You speak in Spanish by default but can adapt to other languages. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary.`,
+        rules: ["Be respectful and friendly with users"],
+        knownUsers: [
+            {
+                username: 'cdom201',
+                description: 'Creator, Owner and Developer of you, the bot',
+                relationship: 'professional',
+                lastInteraction: new Date()
             }
-        }
-    }
-
-    let response = await fetch(`https://openrouter.ai/api/v1/chat/completions`, {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify(body)
-    })
-
-    let data = await response.json();
-
-    if(data.error) {
-        return {
-            error: true,
-            message: data.message,
-            status: data.status,
-            type: data.error
-        }
-    }
-
-    let messageData = data.choices[0].message;
-    let usageData = data.usage ?? {};
-
-    cacheClient.set(`${channelID}:chatbot:response:last`, JSON.stringify({messageData, usageData}));
+        ],
+    });
     
-    if(usageData) {
-        await cacheClient.hincrby(`${channelID}:chatbot:usage`, 'total_tokens', usageData.total_tokens);
-        await cacheClient.hincrby(`${channelID}:chatbot:usage`, 'prompt_tokens', usageData.prompt_tokens);
-        await cacheClient.hincrby(`${channelID}:chatbot:usage`, 'completion_tokens', usageData.completion_tokens);
-        await cacheClient.expire(`${channelID}:chatbot:usage`, generateTimeLeftToNextMonthInSeconds());
+    if (personality) {
+        await cacheClient.set(`${channelID}:chatbot:personality`, JSON.stringify(personality));
     }
-
-    return messageData.content;
+    
+    return personality;
 }
 
-module.exports = {
-    AiResponse
+/**
+ * Determines the appropriate model based on streamer's subscription tier.
+ * 
+ * @param {object} streamer - Streamer object from cache
+ * @returns {string} - Model identifier for OpenRouter
+ */
+function selectModel(streamer) {
+    if (streamer?.premium_plus === 'true' || streamer?.premium_plus === true) {
+        return MODELS.pro;
+    }
+    if (streamer?.premium === 'true' || streamer?.premium === true) {
+        return MODELS.premium;
+    }
+    return MODELS.free;
 }
 
+/**
+ * Gets the appropriate max_tokens limit for a model.
+ * 
+ * @param {string} model - Model identifier
+ * @returns {number} - Maximum tokens for completion
+ */
+function getTokenLimit(model) {
+    return TOKEN_LIMITS[model] || TOKEN_LIMITS.default;
+}
+
+/**
+ * Calculates seconds until the next month for cache expiration.
+ * 
+ * @returns {number} - Seconds until next month
+ */
 function generateTimeLeftToNextMonthInSeconds() {
     const now = new Date();
     const dayOfMonth = now.getDate();
     const timeLeft = 30 - dayOfMonth;
 
-    const timeLeftInSeconds = timeLeft * 24 * 3600 - now.getHours() * 3600 - now.getMinutes() * 60 - now.getSeconds() - now.getMilliseconds();
+    const timeLeftInSeconds = timeLeft * 24 * 3600 - 
+        now.getHours() * 3600 - 
+        now.getMinutes() * 60 - 
+        now.getSeconds() - 
+        now.getMilliseconds();
 
-    return timeLeftInSeconds;
+    return Math.max(timeLeftInSeconds, 3600); // Minimum 1 hour
 }
+
+// ============================================================================
+// MAIN CHAT HANDLER
+// ============================================================================
+
+/**
+ * Generates an AI response for chat-based interactions.
+ * Uses the shared prompts utility for system message construction.
+ * 
+ * @param {string} channelID - The channel's Twitch user ID
+ * @param {string} message - The user's message
+ * @param {string} model - Optional model override (defaults to tier-based selection)
+ * @param {Array} context - Chat history for context
+ * @param {object} tags - Twitch IRC tags for the user
+ * @param {Array} options - Additional API options
+ * @param {Array} toolContext - Tool context (e.g., search results)
+ * @returns {Promise<string|object>} - AI response or error object
+ */
+async function AiResponse(channelID, message, model = null, context = [], tags = {}, options = [], toolContext = []) {
+    const cacheClient = getClient();
+    
+    // Get streamer and personality data
+    const streamer = await STREAMERS.getStreamerById(channelID);
+    const personality = await getChannelPersonality(channelID);
+    
+    // Handle missing personality (fallback)
+    const effectivePersonality = personality || {
+        personality: `You are a friendly and playful Twitch chat moderator for this channel. You speak in Spanish by default but can adapt to other languages. You have a good sense of humor and enjoy interacting with chat users. You maintain a fun and engaging atmosphere while still being able to moderate when necessary.`,
+        rules: ["Be respectful and friendly with users"],
+        knownUsers: [
+            {
+                username: 'cdom201',
+                description: 'Creator, Owner and Developer of you, the bot',
+                relationship: 'professional',
+                lastInteraction: new Date()
+            }
+        ]
+    };
+    
+    // Select model based on streamer tier if not explicitly provided
+    const selectedModel = model || selectModel(streamer);
+    const maxTokens = getTokenLimit(selectedModel);
+    
+    // Build user context from Twitch tags
+    const userBadges = formatBadges(tags);
+    const userContext = {
+        username: tags.username || tags['display-name'] || 'Anonymous',
+        badges: userBadges
+    };
+    
+    // Build chat history context
+    const chatHistory = context.map(msg => ({
+        timestamp: msg.timestamp,
+        badges: msg.badges || '',
+        username: msg.username,
+        message: msg.message
+    }));
+    
+    // Use shared utility to construct messages
+    const messages = constructChatSystemMessages(
+        streamer,
+        effectivePersonality,
+        userContext,
+        message,
+        chatHistory,
+        toolContext
+    );
+    
+    // API headers - consistent with DomDimaBot branding
+    const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        'HTTP-Referer': 'https://domdimabot.com',
+        'X-Title': 'DomDimaBot',
+        'X-Description': 'DomDimaBot is a Twitch chat bot that helps make streams more engaging and fun.'
+    };
+    
+    // Build request body
+    const body = {
+        model: selectedModel,
+        messages: messages,
+        max_tokens: maxTokens
+    };
+    
+    // Apply additional options if provided
+    if (options && options.length > 0) {
+        for (const option of options) {
+            if (typeof option === 'object') {
+                for (const [key, value] of Object.entries(option)) {
+                    body[key] = value;
+                }
+            }
+        }
+    }
+    
+    try {
+        const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify(body)
+        });
+        
+        const data = await response.json();
+        
+        // Handle API errors
+        if (data.error) {
+            return {
+                error: true,
+                message: data.message || 'API error occurred',
+                status: data.status,
+                type: data.error
+            };
+        }
+        
+        const messageData = data.choices?.[0]?.message;
+        const usageData = data.usage || {};
+        
+        // Store last response for debugging
+        if (channelID) {
+            await cacheClient.set(`${channelID}:chatbot:response:last`, JSON.stringify({
+                messageData,
+                usageData,
+                model: selectedModel,
+                timestamp: new Date().toISOString()
+            }));
+        }
+        
+        // Track usage statistics
+        if (usageData && channelID) {
+            try {
+                await cacheClient.hincrby(`${channelID}:chatbot:usage`, 'total_tokens', usageData.total_tokens || 0);
+                await cacheClient.hincrby(`${channelID}:chatbot:usage`, 'prompt_tokens', usageData.prompt_tokens || 0);
+                await cacheClient.hincrby(`${channelID}:chatbot:usage`, 'completion_tokens', usageData.completion_tokens || 0);
+                await cacheClient.expire(`${channelID}:chatbot:usage`, generateTimeLeftToNextMonthInSeconds());
+            } catch (cacheError) {
+                console.error('Cache error tracking AI usage:', cacheError);
+            }
+        }
+        
+        return messageData?.content || '';
+        
+    } catch (fetchError) {
+        console.error('OpenRouter fetch error:', fetchError);
+        return {
+            error: true,
+            message: 'Connection error',
+            status: 500,
+            type: 'fetch_error'
+        };
+    }
+}
+
+module.exports = {
+    AiResponse,
+    getChannelPersonality,
+    selectModel,
+    MODELS,
+    TOKEN_LIMITS
+};

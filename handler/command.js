@@ -8,6 +8,7 @@ const banUser = require('../function/moderation/ban');
 const categories = require('../function/search/categories');
 const { getUserByLogin } = require('../function/user/getuser');
 const addVIPCommand = require('../command/addvip');
+const { executeAiCommand } = require('../util/ai/openrouter/command');
 
 // ============================================================================
 // 1. MANIFEST & PLANS - Monetization Preparation
@@ -627,19 +628,30 @@ async function resolveCommandSwitch(commandName, args, ctx) {
         }
 
         // ================================================================
-        // AI Placeholder
+        // AI Command - OpenRouter Integration
         // ================================================================
         case 'ai': {
-            // Placeholder for OpenRouter AI integration
-            // Args would contain the prompt/message for the AI
+            // Extract prompt from args or argument
             const prompt = args.join(' ') || argument || '';
-            if (!prompt) {
+            if (!prompt || prompt.trim() === '') {
                 return '[AI: No prompt provided]';
             }
-            // TODO: Implement OpenRouter API call
-            // const response = await openRouterAPI.chat(prompt, ctx);
-            // return response;
-            return '[AI: Feature coming soon]';
+            
+            // Build user context from tags
+            const userContext = {
+                username: tags['display-name'] || tags.username || 'Anonymous',
+                badges: '' // Badges optional for command mode
+            };
+            
+            // Execute AI command with tiered model selection
+            const aiResult = await executeAiCommand(streamer, userContext, prompt);
+            
+            if (aiResult.error) {
+                return aiResult.message;
+            }
+            
+            // Return sanitized AI response (sanitization done in executeAiCommand)
+            return aiResult.message;
         }
 
         default:

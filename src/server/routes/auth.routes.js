@@ -58,6 +58,7 @@ router.get('/register', async (req, res) => {
             twitch_user_token_id: id_token,
             actived: true,
             chat_enabled: true,
+            up_to_date_twitch_permissions: true,
         });
 
         await STREAMERS.updateStreamers();
@@ -187,7 +188,8 @@ router.post('/login', auth, async (req, res) => {
             premium_plus: false,
             premium_until: null,
             actived: false,
-            chat_enabled: false
+            chat_enabled: false,
+            up_to_date_twitch_permissions: true,
         });
 
         try {

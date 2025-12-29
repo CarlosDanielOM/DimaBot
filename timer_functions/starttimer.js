@@ -2,8 +2,9 @@ const TimerService = require('./timer.service');
 const commandSchema = require('../schema/command');
 const commandTimerSchema = require('../schema/commandtimer');
 const STREAMERS = require('../class/streamer');
+const sendChatMessage = require('../function/chat/sendmessage');
 
-async function startTimerCommands(client, eventData) {
+async function startTimerCommands(eventData) {
     const {broadcaster_user_id, broadcaster_user_login} = eventData;
     let timers = await commandTimerSchema.find({channelID: broadcaster_user_id});
 
@@ -12,13 +13,13 @@ async function startTimerCommands(client, eventData) {
 
     if(timers.length === 0) return { error: true, message: 'No timers found', status: 404, type: 'no_timers_found' };
 
-    await creatingTimers(timers, broadcaster_user_id, streamer, client);
+    await creatingTimers(timers, broadcaster_user_id, streamer);
     
 }
 
 module.exports = startTimerCommands;
 
-async function creatingTimers(timers, channelID, streamer, client) {
+async function creatingTimers(timers, channelID, streamer) {
     let timerArray = [];
     await timers.forEach(async timer => {
         let command = await commandSchema.findOne({channelID: channelID, cmd: timer.command});
@@ -34,7 +35,7 @@ async function creatingTimers(timers, channelID, streamer, client) {
         }
 
         let newTimer = setInterval(() => {
-            client.say(streamer.name, command.message);
+            sendChatMessage(channelID, command.message);
         }, timer.timer * (1000 * 60));
 
         timerArray.push(newTimer);

@@ -1,13 +1,15 @@
 const { getClient } = require("../util/database/dragonfly");
 const defaultMessage = require("../util/defaultmessage");
 const STREAMER = require('../class/streamer');
+const sendChatMessage = require('../function/chat/sendmessage');
 
 async function cheerHandler(client, eventData, eventsubData, chatEnabled) {
     const cacheClient = getClient();
-    let broacasterLogin = eventData.broadcaster_user_login;
+    let broadcasterID = eventData.broadcaster_user_id;
     
     if(eventData.is_anonymous) {
-        return client.say(broacasterLogin, `Gracias por los ${eventData.bits} bits Anonimo!`);
+        sendChatMessage(broadcasterID, `Gracias por los ${eventData.bits} bits Anonimo!`);
+        return;
     }
 
     let cheerMessage = eventsubData.message;
@@ -16,7 +18,7 @@ async function cheerHandler(client, eventData, eventsubData, chatEnabled) {
         return;
     }
     
-    defaultMessage(client, eventData, cheerMessage, chatEnabled)
+    defaultMessage(eventData, cheerMessage, chatEnabled)
     
 }
 

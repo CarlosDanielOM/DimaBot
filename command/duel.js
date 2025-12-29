@@ -4,6 +4,7 @@ const { getUserByLogin } = require("../function/user/getuser");
 const { getClient } = require("../util/database/dragonfly");
 const removeChannelModerator = require("../function/channel/removemoderator");
 const addChannelModerator = require("../function/channel/addmoderator");
+const sendChatMessage = require("../function/chat/sendmessage");
 const battlePhrases = [
     "The battle is intense, who will win?",
     "Looks like someone is having the advantages!",
@@ -19,7 +20,7 @@ const battlePhrases = [
     "Who will emerge victorious from this struggle?"
 ];
 
-async function duel(client, channelID, channel, user, userMod, argument, modID = 698614112) {
+async function duel(channelID, user, userMod, argument, modID = 698614112) {
     if(!user || !argument) {
         return {
             error: true,
@@ -69,7 +70,7 @@ async function duel(client, channelID, channel, user, userMod, argument, modID =
             for (const phrase of selectedPhrases) {
                 const waitTime = Math.floor(Math.random() * 2001) + 1000; // 1000ms - 3000ms
                 await new Promise(resolve => setTimeout(resolve, waitTime));
-                client.say(channel, phrase);
+                sendChatMessage(channelID, phrase);
             }
             
             // Wait one last time before result

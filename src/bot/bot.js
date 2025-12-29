@@ -5,6 +5,7 @@ const STREAMERS = require('../../class/streamer');
 const {connectChannels, refreshAllTokens, isTest, getEnvironment} = require('../../util/dev')
 const token = require('../../util/token');
 const messageHandler = require('../../handler/message');
+const sendChatMessage = require('../../function/chat/sendmessage');
 
 let client = null;
 
@@ -38,7 +39,7 @@ async function init() {
 
     // await refreshAllTokens(token.refreshAllTokens)
 
-    client.on('resub', (channel, username, months, message, userstate, methods) => {
+    client.on('resub', async (channel, username, months, message, userstate, methods) => {
         if(channel == '#ozbellvt') return;
         let tier = userstate['msg-param-sub-plan'];
         switch (tier) {
@@ -58,10 +59,13 @@ async function init() {
 
         if (months == 0) { months++ }
 
-        client.say(channel, `Gracias por la resub ${username}! de ${months} meses y de nivel ${tier}!`);
+        let streamer = await STREAMERS.getStreamerByName(channel.replace('#', ''));
+        if (streamer) {
+            sendChatMessage(streamer.user_id, `Gracias por la resub ${username}! de ${months} meses y de nivel ${tier}!`);
+        }
     });
 
-    client.on('subscription', (channel, username, method, message, userstate) => {
+    client.on('subscription', async (channel, username, method, message, userstate) => {
         if(channel == '#ozbellvt') return;
         let tier = userstate['msg-param-sub-plan'];
         switch (tier) {
@@ -79,7 +83,10 @@ async function init() {
                 break;
         }
 
-        client.say(channel, `Gracias por la sub ${username} de nivel ${tier}!`);
+        let streamer = await STREAMERS.getStreamerByName(channel.replace('#', ''));
+        if (streamer) {
+            sendChatMessage(streamer.user_id, `Gracias por la sub ${username} de nivel ${tier}!`);
+        }
     })
 
     client.on('message', async (channel, tags, message, self) => {

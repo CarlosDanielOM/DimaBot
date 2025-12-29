@@ -7,6 +7,7 @@ const CHANNEL = require('../function/channel');
 const commandSchema = require('../schema/command');
 const logger = require('../util/logger');
 const chatHistory = require('../class/chatHistory');
+const sendChatMessage = require('../function/chat/sendmessage');
 
 const COOLDOWNS = require('../class/cooldown')
 
@@ -33,10 +34,13 @@ const router = require('../util/ai/openrouter/router');
 
 async function message(client, channel, tags, message) {
     
+    let streamer = await STREAMERS.getStreamerByName(channel);
+    let channelID = streamer.user_id;
+
     if(channel == 'andonide') {
         if(message == 'a' && !isAndoni) {
             isAndoni = true;
-            client.say(channel, 'A la verga Power Rangerrrr!');
+            sendChatMessage(channelID, 'A la verga Power Rangerrrr!');
             setTimeout(() => {
                 isAndoni = false;
             }, 10000);
@@ -44,8 +48,6 @@ async function message(client, channel, tags, message) {
     }
     
     let cacheClient = getClient();
-    let streamer = await STREAMERS.getStreamerByName(channel);
-    let channelID = streamer.user_id;
     let userLevel = await giveUserLevel(channel, tags, channelID);
     messageLogger(channelID, tags, message);
 
@@ -84,7 +86,7 @@ async function message(client, channel, tags, message) {
 
             let aiResponse = await router(channelID, aiInput, '@preset/router', recentMessages, tags, [{reasoning: {'effort': 'medium'}}, {usage: {'include': true}}, {'user': `${channelID}`}], streamer);
 
-            client.say(channel, aiResponse.message);
+            sendChatMessage(channelID, aiResponse.message);
         }
         return;
     };
@@ -241,7 +243,7 @@ async function message(client, channel, tags, message) {
             res = await COMMANDS.followage(channelID, argument || tags['display-name']);
             break;
         case 'createClip':
-            client.say(channel, 'Saving clip...');
+            sendChatMessage(channelID, 'Saving clip...');
             res = await COMMANDS.createClip(channelID);
             break;
         case 'commands':
@@ -294,7 +296,7 @@ async function message(client, channel, tags, message) {
             res = await COMMANDS.vanish(channelID, tags);
             break;
         case 'duel':
-            res = await COMMANDS.duel(client, channelID, channel, tags['username'], tags.mod, argument);
+            res = await COMMANDS.duel(channelID, tags['username'], tags.mod, argument);
             break;
         case 'pechos':
             res = await COMMANDS.pechos(channelID, tags);
@@ -323,7 +325,7 @@ async function message(client, channel, tags, message) {
     
     if(!res.message) return;
     
-    client.say(channel, res.message)
+    sendChatMessage(channelID, res.message)
     
 }
 

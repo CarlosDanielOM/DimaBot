@@ -61,19 +61,19 @@ async function eventsubHandler(subscriptionData, eventData) {
                 eventsubData.message = eventsubData.message + ` (Follow #${followDayCount})`;
             }
 
-            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
+            defaultMessages(eventData, eventsubData.message, chatEnabled);
             break;
         case 'stream.online':
-            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
+            defaultMessages(eventData, eventsubData.message, chatEnabled);
             await getEditors(eventData.broadcaster_user_id, true);
             await addCommandsToCache(eventData.broadcaster_user_id);
             //! SEPARATOR FOR FUNCTIONS
             unVIPExpiredUser(client, eventData);
-            await startTimerCommands(client, eventData);
+            await startTimerCommands(eventData);
             await incrementSiteAnalytics('live', 1);
             break;
         case 'stream.offline':
-            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
+            defaultMessages(eventData, eventsubData.message, chatEnabled);
             //! SEPARATOR FOR FUNCTIONS
             resetRedemptionPrice(client, eventData.broadcaster_user_id);
             stopTimerCommands(client, eventData);
@@ -93,10 +93,10 @@ async function eventsubHandler(subscriptionData, eventData) {
             redeemHandler(client, eventData);
             break;
         case 'channel.ad_break.begin':
-            defaultMessages(client, eventData, eventsubData.message, chatEnabled);
+            defaultMessages(eventData, eventsubData.message, chatEnabled);
             if(!eventsubData.endEnabled) return;
             setTimeout(() => {
-                defaultMessages(client, eventData, eventsubData.endMessage, chatEnabled);
+                defaultMessages(eventData, eventsubData.endMessage, chatEnabled);
             }, eventData.duration_seconds * 1000);
             break;
         case 'channel.raid':
@@ -110,7 +110,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             if(!eventData.is_permanent) {
                 defaultMessages(client, eventData, eventsubData.temporalBanMessage, chatEnabled)
             } else {
-                defaultMessages(client, eventData, eventsubData.message, chatEnabled)
+                defaultMessages(eventData, eventsubData.message, chatEnabled)
             }
             break;
         case 'channel.cheer':

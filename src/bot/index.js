@@ -28,8 +28,6 @@ async function init() {
 
         eventsub.init();
 
-        await migrateChannelChatMessageEventsub();
-        
         await bot();
 
         await dev.refreshAllTokens(refreshAllTokens);

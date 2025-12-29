@@ -6,6 +6,7 @@ const songRequestFun = require('../redemption_functions/songrequest')
 const customRedemptionFun = require('../redemption_functions/custom')
 const { getUrl } = require('../util/dev');
 const STREAMERS = require('../class/streamer')
+const sendChatMessage = require('../function/chat/sendmessage');
 
 const textConvertor = require('./text');
 const { getStreamerHeaderById } = require('../util/header');
@@ -23,17 +24,23 @@ async function redeem(client, eventData) {
 
     if (vipMatch) {
         let result = await vipRedemtionFun(eventData, reward);
-        if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
-        let message = await textConvertor(broadcaster_user_id, eventData,result.rewardMessage, reward )
-        client.say(broadcaster_user_login, `${message}`);
+        if (result.error) {
+            sendChatMessage(broadcaster_user_id, `${result.message}`);
+            return { error: true, message: result.message };
+        }
+        let message = await textConvertor(broadcaster_user_id, eventData, result.rewardMessage, reward)
+        sendChatMessage(broadcaster_user_id, `${message}`);
         return { error: false, message: 'VIP set' };
     }
 
     if(rewardData.type == 'song') {
         let result = await songRequestFun(eventData, reward);
-        if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
+        if (result.error) {
+            sendChatMessage(broadcaster_user_id, `${result.message}`);
+            return { error: true, message: result.message };
+        }
         let message = await textConvertor(broadcaster_user_id, eventData, result.rewardMessage, reward)
-        client.say(broadcaster_user_login, `${message}`);
+        sendChatMessage(broadcaster_user_id, `${message}`);
         return { error: false, message: 'Song Requested' };
     }
 
@@ -41,9 +48,12 @@ async function redeem(client, eventData) {
     
     if (!trigger) {
         let result = await customRedemptionFun(eventData, reward);
-        if (result.error) return client.say(broadcaster_user_login, `${result.message}`);
+        if (result.error) {
+            sendChatMessage(broadcaster_user_id, `${result.message}`);
+            return { error: true, message: result.message };
+        }
         let message = await textConvertor(broadcaster_user_id, eventData, result.rewardMessage, reward)
-        client.say(broadcaster_user_login, `${message}`);
+        sendChatMessage(broadcaster_user_id, `${message}`);
         return { error: false, message: 'Reward Redeemed' };
     };
 

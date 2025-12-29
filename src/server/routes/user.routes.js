@@ -10,6 +10,21 @@ const { connectChannel, disconnectChannel } = require('../../../util/client');
 const auth = require('../../../middleware/auth');
 const logger = require('../../../util/logger');
 const { incrementSiteAnalytics, decrementSiteAnalytics } = require('../../../util/siteanalytics');
+const getscopes = require('../../../function/user/getscopes');
+
+router.get('/scopes/:userID', async (req, res) => {
+    const { userID } = req.params;
+    let scopes = await getscopes(userID);
+    if(scopes.error) {
+        return res.status(scopes.status).json(scopes);
+    }
+    return res.status(200).json({
+        error: false,
+        message: 'Scopes fetched successfully',
+        status: 200,
+        data: scopes
+    });
+});
 
 router.get('/', async (req, res) => {
     const cacheClient = getClient();

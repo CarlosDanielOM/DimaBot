@@ -16,7 +16,7 @@ module.exports = async function getScopes(userID) {
         }
     }
 
-    let response = await fetch(getTwitchHelixUrl('users/scopes', params), {
+    let response = await fetch(getTwitchHelixUrl('authorization/users', params), {
         headers: {
             'Authorization': `Bearer ${appAccessToken}`,
             'Client-Id': process.env.CLIENT_ID,

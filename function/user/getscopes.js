@@ -31,9 +31,15 @@ module.exports = async function getScopes(userID) {
         return {
             error: true,
             message: data.message,
-            status: data.status
+            status: data.status,
+            data: data
         }
     }
 
-    return data;
+    return {
+        error: false,
+        message: 'Scopes fetched successfully',
+        status: 200,
+        data: data.data
+    }
 }

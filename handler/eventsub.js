@@ -65,7 +65,7 @@ async function eventsubHandler(subscriptionData, eventData) {
             defaultMessages(eventData, eventsubData.message, chatEnabled);
             break;
         case 'stream.online':
-            if(streamer.up_to_date_twitch_permissions == "false") {
+            if(streamer.up_to_date_twitch_permissions == "banana") {
                 client.say(eventData.broadcaster_user_login, "Por nuevas actualizaciones de Twitch, por favor vuelva a autorizar el bot para que las nuevas funcionalidades esten disponibles y el bot vuelva a estar activo. Gracias");
             }
             defaultMessages(eventData, eventsubData.message, chatEnabled);

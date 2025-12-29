@@ -9,6 +9,14 @@ const modID = '698614112';
 
 const subcriptionsTypes = [
     {
+        type: 'channel.chat.message',
+        version: '1',
+        condition: {
+            "broadcaster_user_id": "698614112",
+            "user_id": modID
+        }
+    },
+    {
         type: 'channel.follow',
         version: '2',
         condition: {

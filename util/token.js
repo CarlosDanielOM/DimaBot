@@ -162,7 +162,9 @@ async function getNewAppToken() {
 
         let tokenEncrypt = encrypt(token);
 
-        cache.set('domdimabot:app:token', token, 'EX', 60 * 60 * 24);
+        await cache.set('app:token', JSON.stringify({token: token}), 'EX', 60 * 60 * 24).catch(error => {
+            console.error(`Error setting app token in cache: ${error}`);
+        });
 
         let doc = await appConfigSchema.findOneAndUpdate({name: 'domdimabot'}, { access_token: tokenEncrypt });
 
@@ -177,11 +179,19 @@ async function getAppToken() {
     try {
         let cache = getClient();
 
-        let token = await cache.get('domdimabot:app:token');
+        let token = await cache.get('app:token');
 
-        if(token !== null) return token;
+        if(token) {
+            let decryptedToken = decrypt(JSON.parse(token));
+            return decryptedToken;
+        }
 
         let doc = await appConfigSchema.findOne({name: 'domdimabot'});
+
+        if(!doc) {
+            console.error('App config not found');
+            return null;
+        }
 
         return decrypt(doc.access_token);
     }

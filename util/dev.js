@@ -1,20 +1,27 @@
 require('dotenv').config();
-let production = process.env.PRODUCTION == 0 ? false : true;
+
+// Environment detection: 'production', 'dev', or 'test'
+// Defaults to 'dev' if not specified
+const environment = process.env.ENVIRONMENT || (process.env.PRODUCTION == 1 ? 'production' : 'dev');
+
+const isProduction = () => environment === 'production';
+const isTest = () => environment === 'test';
+const isDev = () => environment === 'dev';
 
 module.exports = {
-    isProduction: () => {return production},
+    isProduction,
+    isTest,
+    isDev,
+    getEnvironment: () => environment,
     getUrl: () => {
-        let url;
-        if (production) {
-            url = "https://api.domdimabot.com";
-        } else {
-            url = "http://localhost:3000";
+        if (isProduction()) {
+            return "https://api.domdimabot.com";
         }
-        return url;
+        return "http://localhost:3000";
     },
     refreshAllTokens: async fun => {
         try {
-            if(production) {
+            if(isProduction()) {
                 await fun();
             }
         } catch (error) {
@@ -23,9 +30,19 @@ module.exports = {
     },
     connectChannels: async (fun, client) => {
         try {
-            if(production) {
+            if(isProduction()) {
                 fun();
+            } else if (isTest()) {
+                // In test mode, connect to channels specified in TEST_CHANNELS env var
+                const testChannels = process.env.TEST_CHANNELS ? process.env.TEST_CHANNELS.split(',').map(c => c.trim()) : [];
+                for (const channel of testChannels) {
+                    if (channel) {
+                        await client.join(channel);
+                        console.log(`[TEST] Joined channel: ${channel}`);
+                    }
+                }
             } else {
+                // Dev mode
                 await client.join('cdom201');
             }
         } catch (error) {
@@ -33,9 +50,8 @@ module.exports = {
         }
     },
     getClientOpts: () => {
-        let options = null;
-        if(production) {
-            options = {
+        if(isProduction()) {
+            return {
                 options: {
                     debug: false
                 },
@@ -44,10 +60,13 @@ module.exports = {
                     password: process.env.User_Token_Auth,
                 },
                 channels: ['domdimabot']
-            }
+            };
         }
-        else {
-            options = {
+        
+        if (isTest()) {
+            // Test mode: debug enabled, channels from TEST_CHANNELS env var
+            const testChannels = process.env.TEST_CHANNELS ? process.env.TEST_CHANNELS.split(',').map(c => c.trim()) : [];
+            return {
                 options: {
                     debug: true
                 },
@@ -55,9 +74,20 @@ module.exports = {
                     username: process.env.TWITCH_USERNAME,
                     password: process.env.User_Token_Auth
                 },
-                channels: ['cdom201']
-            }
+                channels: testChannels
+            };
         }
-        return options;
+        
+        // Dev mode
+        return {
+            options: {
+                debug: true
+            },
+            identity: {
+                username: process.env.TWITCH_USERNAME,
+                password: process.env.User_Token_Auth
+            },
+            channels: ['kyori_vt']
+        };
     }
 }

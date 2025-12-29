@@ -45,7 +45,11 @@ The application is configured using environment variables. Create a `.env` file 
 
 ```env
 # General
-PRODUCTION=0 # 1 for production, 0 for development
+PRODUCTION=0 # 1 for production, 0 for development (deprecated, use ENVIRONMENT instead)
+ENVIRONMENT=dev # 'production', 'dev', or 'test'
+
+# Test Environment (only used when ENVIRONMENT=test)
+TEST_CHANNELS=channel1,channel2 # Comma-separated list of channels to join in test mode
 
 # Twitch Bot Account Credentials
 TWITCH_USERNAME=your_bot_twitch_username
@@ -83,6 +87,12 @@ The application consists of two main parts: the web server and the Twitch bot. Y
     ```bash
     npm run bot
     ```
+
+-   **To run the Twitch bot in test mode:**
+    ```bash
+    npm run test-bot
+    ```
+    Test mode enables detailed logging of all IRC messages and their tags for debugging purposes. Make sure to set `TEST_CHANNELS` in your `.env` file to specify which channels to join.
 
 Both will run with `nodemon`, which will automatically restart the application when file changes are detected.
 

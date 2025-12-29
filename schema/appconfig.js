@@ -6,7 +6,15 @@ const appConfigSchema = new Schema({
     access_token: {
         iv: String,
         content: String
-    }
+    },
+    refreshed_at: { type: Date, default: Date.now }
 });
 
-module.exports = mongoose.model('app_config', appConfigSchema);
+appConfigSchema.pre('save', function(next) {
+    this.refreshed_at = Date.now();
+    next();
+});
+
+const AppConfig = mongoose.model('app_config', appConfigSchema);
+
+module.exports = AppConfig;

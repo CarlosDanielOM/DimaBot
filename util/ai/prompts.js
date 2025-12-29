@@ -18,7 +18,7 @@ const DEFAULT_PERSONALITY = "You are a witty, helpful, and slightly sarcastic Tw
  * @param {string} mode - Either 'command' (for $(ai) one-off calls) or 'chat' (for @bot conversations)
  * @returns {Array<{role: string, content: string}>} - Messages array ready for OpenRouter API
  */
-function constructSystemMessages(streamer, userContext, promptText, mode = 'command') {
+function constructSystemMessages(streamer, userContext, promptText, mode = 'command', language = 'spanish') {
     // Extract personality from streamer object, fallback to default
     const personality = streamer?.ai_personality?.personality || 
                         streamer?.personality || 
@@ -38,7 +38,7 @@ function constructSystemMessages(streamer, userContext, promptText, mode = 'comm
     
     // Construct the system message
     const systemContent = `<identity>
-You are DomDimaBot, the AI assistant for streamer '${streamerName}'.
+You are DomDimaBot, the AI assistant for streamer '${streamerName}'. You are supposed to be helpful but also engaging and fun, you should speak in ${language} by default but can adapt to other languages.
 </identity>
 
 <personality>
@@ -58,7 +58,7 @@ ${personality}
     const username = userContext?.username || 'Anonymous';
     const badgePrefix = userContext?.badges ? `${userContext.badges} ` : '';
     
-    const userContent = `${badgePrefix}User ${username} says: ${promptText}`;
+    const userContent = `${badgePrefix} User ${username} says: ${promptText}`;
     
     // Return the messages array
     return [

@@ -44,8 +44,6 @@ module.exports = async function sendChatMessage(channelID, message, replyToMessa
 
     let data = await response.json();
 
-    console.log({data});
-
     if(data.status < 200 || data.status > 299) {
         // Fallback to TMI client.say if Helix API fails
         try {

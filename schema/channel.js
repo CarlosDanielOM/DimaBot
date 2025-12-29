@@ -14,6 +14,7 @@ const channelSchema = new schema({
     twitch_user_token: { iv: String, content: String },
     twitch_user_refresh_token: { iv: String, content: String },
     twitch_user_token_id: { type: String, default: null },
+    up_to_date_twitch_permissions: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: Date.now },
     refreshedAt: { type: Date, default: Date.now },

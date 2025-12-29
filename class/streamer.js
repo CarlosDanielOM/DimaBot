@@ -18,7 +18,7 @@ class STREAMERS {
         let result = [];
         try {
             this.cache = getClient();
-            result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
+            result = await channelSchema.find({actived: true}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled up_to_date_twitch_permissions');
             this.cache.del('streamers:by:name');
             this.cache.del('streamers:by:id');
 
@@ -33,7 +33,8 @@ class STREAMERS {
                     actived: result[i].actived ? 'true' : 'false',
                     premium: result[i].premium ? 'true' : 'false',
                     premium_plus: result[i].premium_plus ? 'true' : 'false',
-                    chat_enabled: result[i].chat_enabled ? 'true' : 'false'
+                    chat_enabled: result[i].chat_enabled ? 'true' : 'false',
+                    up_to_date_twitch_permissions: result[i].up_to_date_twitch_permissions ? 'true' : 'false'
                 }
 
                 // Store the data with both name and ID as keys
@@ -53,7 +54,7 @@ class STREAMERS {
     async getStreamerFromDBByName(name) {
         try {
             this.cache = getClient();
-            const streamer = await channelSchema.findOne({name: name}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
+            const streamer = await channelSchema.findOne({name: name}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled up_to_date_twitch_permissions');
 
             if (streamer) {
                 let data = {
@@ -64,7 +65,8 @@ class STREAMERS {
                     actived: streamer.actived ? 'true' : 'false',
                     premium: streamer.premium ? 'true' : 'false',
                     premium_plus: streamer.premium_plus ? 'true' : 'false',
-                    chat_enabled: streamer.chat_enabled ? 'true' : 'false'
+                    chat_enabled: streamer.chat_enabled ? 'true' : 'false',
+                    up_to_date_twitch_permissions: streamer.up_to_date_twitch_permissions ? 'true' : 'false'
                 }
 
                 // Store the data with both name and ID as keys
@@ -83,7 +85,7 @@ class STREAMERS {
     async getStreamerFromDBById(id) {
         try {
             this.cache = getClient();
-            const streamer = await channelSchema.findOne({twitch_user_id: id}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled');
+            const streamer = await channelSchema.findOne({twitch_user_id: id}, 'name twitch_user_id twitch_user_token twitch_user_refresh_token actived premium premium_plus refreshedAt chat_enabled up_to_date_twitch_permissions');
 
             if (streamer) {
                 let data = {
@@ -94,7 +96,8 @@ class STREAMERS {
                     actived: streamer.actived ? 'true' : 'false',
                     premium: streamer.premium ? 'true' : 'false',
                     premium_plus: streamer.premium_plus ? 'true' : 'false',
-                    chat_enabled: streamer.chat_enabled ? 'true' : 'false'
+                    chat_enabled: streamer.chat_enabled ? 'true' : 'false',
+                    up_to_date_twitch_permissions: streamer.up_to_date_twitch_permissions ? 'true' : 'false'
                 }
 
                 // Store the data with both name and ID as keys

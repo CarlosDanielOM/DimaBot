@@ -2,6 +2,13 @@ function getTwitchHelixURL() {
     return "https://api.twitch.tv/helix";
 }
 
+/**
+ * Get the Twitch Helix URL for a given endpoint
+ * @param {string} endpoint - The endpoint to get the URL for
+ * @param {string} params - The parameters to add to the URL
+ * @returns {string} The Twitch Helix URL for the given endpoint
+ */
+
 function getTwitchHelixUrl(endpoint, params = null) {
     return "https://api.twitch.tv/helix/" + endpoint + (params ? "?" + params : "");
 }

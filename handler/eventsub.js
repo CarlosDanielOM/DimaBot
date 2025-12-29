@@ -33,7 +33,8 @@ async function eventsubHandler(subscriptionData, eventData) {
         streamer = await STREAMERS.getStreamerById(eventData.to_broadcaster_user_id);
         if(!streamer) return;
     }
-    if(streamer.chat_enabled == "false") chatEnabled = false;
+    
+    if(streamer.chat_enabled == "false" || streamer.chat_enabled == null || streamer.chat_enabled == 0 || streamer.chat_enabled == false) chatEnabled = false;
     
     const {type, version, status, cost, id} = subscriptionData;
     let eventsubData = await eventsubSchema.findOne({type, channelID: streamer.user_id})
@@ -64,6 +65,9 @@ async function eventsubHandler(subscriptionData, eventData) {
             defaultMessages(eventData, eventsubData.message, chatEnabled);
             break;
         case 'stream.online':
+            if(streamer.up_to_date_twitch_permissions == "false") {
+                client.say(eventData.broadcaster_user_login, "Por nuevas actualizaciones de Twitch, por favor vuelva a autorizar el bot para que las nuevas funcionalidades esten disponibles y el bot vuelva a estar activo. Gracias");
+            }
             defaultMessages(eventData, eventsubData.message, chatEnabled);
             await getEditors(eventData.broadcaster_user_id, true);
             await addCommandsToCache(eventData.broadcaster_user_id);

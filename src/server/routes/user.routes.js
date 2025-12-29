@@ -16,6 +16,7 @@ router.get('/scopes/:userID', async (req, res) => {
     const { userID } = req.params;
     let scopes = await getscopes(userID);
     if(scopes.error) {
+        logger({error: true, message: 'Error fetching scopes', userID, scopes}, true, userID, `user-${userID}-scopes`);
         return res.status(scopes.status).json(scopes);
     }
     return res.status(200).json({

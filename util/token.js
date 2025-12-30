@@ -182,8 +182,7 @@ async function getAppToken() {
         let token = await cache.get('app:token');
 
         if(token) {
-            let decryptedToken = decrypt(JSON.parse(token));
-            return decryptedToken;
+            return JSON.parse(token).token;
         }
 
         let doc = await appConfigSchema.findOne({name: 'domdimabot'});

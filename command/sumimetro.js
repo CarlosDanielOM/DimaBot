@@ -1,7 +1,7 @@
 const e = require("cors");
 const { getClient } = require("../util/database/dragonfly");
 
-async function sumimetro(channelID, user, touser) {
+async function sumimetro(channelID, user, touser, cmdMessage = null) {
     // if(touser === 'reset') {
     //     return await resetSumimetro(channelID);
     // }
@@ -18,26 +18,30 @@ async function sumimetro(channelID, user, touser) {
     const lowerCaseUser = user.toLowerCase();
     const lowerCaseToUser = touser.toLowerCase();
 
-    let exists = await cacheClient.get(`${channelID}:sumimetro:${lowerCaseUser}`);
-    if(exists) {
+    let dominantValue = await cacheClient.get(`${channelID}:sumimetro:${lowerCaseUser}`);
+    if(dominantValue) {
+        let message = cmdMessage || `El usuario {user} el dia de hoy salio: {sumiso}% sumiso y {dominante}% dominante`;
+        let parsedMessage = parseMessage(message, 100 - dominantValue, dominantValue, user);
         return {
             error: false,
-            message: `El usuario ${user} el dia de hoy salio: ${100 - exists}% sumiso y ${exists}% dominante`,
-            status: 400,
-            type: 'error'
+            message: parsedMessage,
+            status: 200,
+            type: 'success'
         }
     }
 
     await cacheClient.set(`${channelID}:sumimetro:${lowerCaseUser}`, dominant, 'EX', 72000);
 
     if(lowerCaseUser !== lowerCaseToUser) {
-        exists = await cacheClient.get(`${channelID}:sumimetro:${lowerCaseToUser}`);
-        if(exists) {
+        dominantValue = await cacheClient.get(`${channelID}:sumimetro:${lowerCaseToUser}`);
+        if(dominantValue) {
+            let message = cmdMessage || `El usuario {user} el dia de hoy salio: {sumiso}% sumiso y {dominante}% dominante`;
+            let parsedMessage = parseMessage(message, 100 - dominantValue, dominantValue, touser);
             return {
                 error: false,
-                message: `El usuario ${touser} el dia de hoy salio: ${100 - exists}% sumiso y ${exists}% dominante`,
-                status: 400,
-                type: 'error'
+                message: parsedMessage,
+                status: 200,
+                type: 'success'
             }
         } else {
             return {
@@ -113,9 +117,12 @@ async function sumimetro(channelID, user, touser) {
         }
     }
 
+    let message = cmdMessage || `Los lectores del sumimetro reflejan que {user} tiene {sumiso}% de sumiso y {dominante}% de dominante`;
+    let parsedMessage = parseMessage(message, submissive, dominant, user);
+
     return {
         error: false,
-        message: `Los lectores del sumimetro reflejan que ${user} tiene ${submissive}% de sumiso y ${dominant}% de dominante`,
+        message: parsedMessage,
         status: 200,
         type: 'success'
     }
@@ -141,4 +148,12 @@ async function resetSumimetro(channelID) {
         status: 200,
         type: 'success'
     }
+}
+
+function parseMessage(message, sumisoValue, dominantValue, user) {
+    if(!message) {
+        return `Los lectores del sumimetro reflejan que ${user} tiene ${sumisoValue}% de sumiso y ${dominantValue}% de dominante`;
+    }
+
+    return message.replaceAll('{sumiso}', sumisoValue).replaceAll('{dominante}', dominantValue).replaceAll('{user}', user);
 }

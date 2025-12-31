@@ -1,6 +1,7 @@
 const e = require("cors");
 const { getClient } = require("../util/database/dragonfly");
 const COMMAND = require("../class/command");
+const commandSchema = require("../schema/command");
 
 async function sumimetro(channelID, user, touser) {
     // if(touser === 'reset') {
@@ -9,9 +10,11 @@ async function sumimetro(channelID, user, touser) {
 
     let cmdMessage = null;
     
-    let sumimetroCommand = await COMMAND.getCommandFromDB(channelID, 'sumimetro');
-    if(!sumimetroCommand.error) {
-        cmdMessage = sumimetroCommand.command.message;
+    // let sumimetroCommand = await COMMAND.getCommandFromDB(channelID, 'sumimetro');
+    let sumimetroCommand = await commandSchema.findOne({channelID, func: 'sumimetro'});
+
+    if(sumimetroCommand) {
+        cmdMessage = sumimetroCommand.message;
     }
     
     const cacheClient = getClient();

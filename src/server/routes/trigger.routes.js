@@ -249,13 +249,13 @@ router.post('/:channelID/upload', async (req, res) => {
         if(exists) {
             console.log({
                 error: 'Bad Request',
-                message: 'File already exists',
+                message: 'File name already exists',
                 status: 400,
                 channelID
             });
             return res.status(400).send({
                 error: 'Bad Request',
-                message: 'File already exists',
+                message: 'File name already exists',
                 status: 400
             });
         }
@@ -285,7 +285,7 @@ router.post('/:channelID/upload', async (req, res) => {
 
         let fileData = {
             name: req.body.triggerName,
-            fileName: filename,
+            fileName: s3SafeFilename,
             fileSize: req.file.size,
             fileType: req.file.mimetype,
             fileUrl: s3Url,

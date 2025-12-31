@@ -482,6 +482,13 @@ router.delete('/files/:channelID/:fileID', async (req, res) => {
     }
 
     try {
+        if(file.fileUrl.includes('https://api.domdimabot.com/media')) {
+            await file.deleteOne();
+            return res.status(200).send({
+                data: file,
+                status: 200
+            });
+        }
         // Remove from S3 - replace spaces with underscores to match S3 key format
         const s3SafeFilename = file.fileName.replace(/\s+/g, '_');
         const s3Key = `${channelID}/triggers/${s3SafeFilename}`;

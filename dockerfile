@@ -21,7 +21,17 @@ WORKDIR /app
 # 3. Install Node Dependencies
 # ---------------------------------------------------------------------
 COPY package*.json ./
-RUN npm ci --omit=dev
+
+# Accept NODE_ENV as an build argument (defaults to production)
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+
+# Install dependencies based on environment
+RUN if [ "$NODE_ENV" = "development" ]; then \
+      npm install; \
+    else \
+      npm ci --omit=dev; \
+    fi
 
 # ---------------------------------------------------------------------
 # 4. Shared Code (Your Shared Layer)
@@ -35,7 +45,6 @@ COPY handler_function/ ./handler_function/
 COPY middleware/ ./middleware/
 COPY redemption_functions/ ./redemption_functions/
 COPY schema/ ./schema/
-# COPY services/ ./services/
 COPY timer_functions/ ./timer_functions/
 COPY util/ ./util/
 
@@ -44,5 +53,10 @@ COPY util/ ./util/
 # ---------------------------------------------------------------------
 ARG SERVICE_NAME
 
-# Copy ONLY the specific folder (bot or server)
-COPY src/${SERVICE_NAME} ./src/${SERVICE_NAME}
+# Copy src/ based on SERVICE_NAME
+# If SERVICE_NAME is 'all', copy everything in src/
+RUN if [ "$SERVICE_NAME" = "all" ] || [ -z "$SERVICE_NAME" ]; then \
+      COPY src/ ./src/; \
+    else \
+      COPY src/${SERVICE_NAME} ./src/${SERVICE_NAME}; \
+    fi

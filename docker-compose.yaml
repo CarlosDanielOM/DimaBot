@@ -6,14 +6,15 @@ services:
     build:
       context: .
       args:
-        - SERVICE_NAME=server  # <--- Tells Dockerfile to copy src/server
-    image: dimabot/api-server:latest # Unique Image Name
+        - SERVICE_NAME=server
+        - NODE_ENV=production
+    image: dimabot/api-server:latest
     container_name: twitch-api
     command: node src/server/index.js
     restart: always
     env_file: .env
     networks:
-      - web-proxy  # Exposed to the internet via Nginx
+      - web-proxy
       - databases
 
   # =========================================
@@ -23,8 +24,9 @@ services:
     build:
       context: .
       args:
-        - SERVICE_NAME=bot     # <--- Tells Dockerfile to copy src/bot
-    image: dimabot/chat-bot:latest   # Unique Image Name
+        - SERVICE_NAME=bot
+        - NODE_ENV=production
+    image: dimabot/chat-bot:latest
     container_name: dima-bot
     command: node src/bot/index.js
     restart: always
@@ -32,7 +34,30 @@ services:
     networks:
       - web-proxy
       - databases
-      # Note: Bot is NOT in web-proxy because nobody connects to it directly.
+
+  # =========================================
+  # SERVICE 3: DEV BOT (Combined for Local Dev)
+  # =========================================
+  dev-bot:
+    build:
+      context: .
+      args:
+        - SERVICE_NAME=all
+        - NODE_ENV=development
+    image: dimabot/dev-bot:latest
+    container_name: dima-bot-dev
+    command: npm run dev-all
+    env_file:
+      - .env
+      - .env-bot # Combining both env files for dev
+    volumes:
+      - .:/app
+      - /app/node_modules # Don't overwrite container modules with local ones
+    ports:
+      - "3000:3000"
+    networks:
+      - web-proxy
+      - databases
 
 networks:
   web-proxy:

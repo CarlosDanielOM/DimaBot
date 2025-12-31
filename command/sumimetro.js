@@ -10,18 +10,24 @@ async function sumimetro(channelID, user, touser, commandName) {
     let cmdMessage = null;
     
     let sumimetroCommand = await commandSchema.findOne({channelID, cmd: commandName});
+
+    console.log({sumimetroCommand, queue: 'first'});
     
     if(!sumimetroCommand) {
         sumimetroCommand = await commandSchema.findOne({channelID, func: 'sumimetro', message: { $ne: '' } });
+        console.log({sumimetroCommand, queue: 'second'});
     }
 
     if(!sumimetroCommand) {
         sumimetroCommand = await commandSchema.findOne({channelID, func: 'sumimetro'});
+        console.log({sumimetroCommand, queue: 'third'});
     }
 
     if(sumimetroCommand && sumimetroCommand.message) {
         cmdMessage = sumimetroCommand.message;
     }
+
+    console.log({cmdMessage, queue: 'fourth'});
     
     const cacheClient = getClient();
     let random = Math.floor(Math.random() * 101);

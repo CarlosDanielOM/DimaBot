@@ -5,6 +5,7 @@ const { getClient } = require("../util/database/dragonfly");
 const removeChannelModerator = require("../function/channel/removemoderator");
 const addChannelModerator = require("../function/channel/addmoderator");
 const sendChatMessage = require("../function/chat/sendmessage");
+const STREAMERS = require("../class/streamer");
 const battlePhrases = [
     "The battle is intense, who will win?",
     "Looks like someone is having the advantages!",
@@ -33,7 +34,10 @@ async function duel(channelID, user, userMod, argument, modID = 698614112) {
             message: 'You cannot duel yourself.'
         }
     }
-    if(argument === channel || user.toLowerCase() === channel) {
+
+    let streamer = await STREAMERS.getStreamerById(channelID);
+    
+    if(argument === streamer.name || user.toLowerCase() === streamer.name) {
         return {
             error: true,
             message: 'You cannot duel the channel owner.'

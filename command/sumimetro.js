@@ -1,24 +1,31 @@
-const e = require("cors");
 const { getClient } = require("../util/database/dragonfly");
 const COMMAND = require("../class/command");
 const commandSchema = require("../schema/command");
 
-async function sumimetro(channelID, user, touser) {
+async function sumimetro(channelID, user, touser, commandName) {
     // if(touser === 'reset') {
     //     return await resetSumimetro(channelID);
     // }
 
     let cmdMessage = null;
     
-    // let sumimetroCommand = await COMMAND.getCommandFromDB(channelID, 'sumimetro');
-    let sumimetroCommand = await commandSchema.findOne({channelID, func: 'sumimetro'});
+    let sumimetroCommand = await commandSchema.findOne({channelID, cmd: commandName});
+    
+    if(!sumimetroCommand) {
+        sumimetroCommand = await commandSchema.findOne({channelID, func: 'sumimetro', message: { $ne: '' } });
+    }
 
-    if(sumimetroCommand) {
+    if(!sumimetroCommand) {
+        sumimetroCommand = await commandSchema.findOne({channelID, func: 'sumimetro'});
+    }
+
+    if(sumimetroCommand && sumimetroCommand.message) {
         cmdMessage = sumimetroCommand.message;
     }
     
     const cacheClient = getClient();
     let random = Math.floor(Math.random() * 101);
+
     if(random > 100) {
         random = 100;
     }

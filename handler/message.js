@@ -81,6 +81,8 @@ async function message(client, channel, tags, message) {
         if(message.startsWith('@domdimabot') || message.startsWith('@DomDimaBot') || message.includes('@domdimabot') || message.includes('@DomDimaBot')) {
             let aiInput = message.replace('@domdimabot', '');
 
+            if(channel == 'ozbellvt') return;
+
             // Get recent messages based on channel tier
             const recentMessages = await chatHistory.getRecentMessages(channelID, streamer.premium_plus ? 15 : 7);
 
@@ -213,7 +215,7 @@ async function message(client, channel, tags, message) {
             if(!res.error) res.message = '';
             break;
         case 'sumimetro':
-            res = await COMMANDS.sumimetro(channelID, tags['display-name'], argument || tags['display-name']);
+            res = await COMMANDS.sumimetro(channelID, tags['display-name'], argument || tags['display-name'], command);
             break;
         case 'memide':
             res = COMMANDS.memide(tags['display-name']);

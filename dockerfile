@@ -49,14 +49,8 @@ COPY timer_functions/ ./timer_functions/
 COPY util/ ./util/
 
 # ---------------------------------------------------------------------
-# 5. The Isolation Layer (Bot vs Server)
+# 5. Source Code
 # ---------------------------------------------------------------------
-ARG SERVICE_NAME
-
-# Copy src/ based on SERVICE_NAME
-# If SERVICE_NAME is 'all', copy everything in src/
-RUN if [ "$SERVICE_NAME" = "all" ] || [ -z "$SERVICE_NAME" ]; then \
-      COPY src/ ./src/; \
-    else \
-      COPY src/${SERVICE_NAME} ./src/${SERVICE_NAME}; \
-    fi
+# We copy the entire src directory. This supports both individual 
+# services (bot/server) and the combined 'dev-bot' service.
+COPY src/ ./src/

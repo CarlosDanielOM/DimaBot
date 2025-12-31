@@ -143,6 +143,63 @@ router.get('/register', async (req, res) => {
 
 });
 
+router.get('/reauthenticate', async (req, res) => {
+    const token = req.query.code;
+    const username = req.query.state;
+
+    if(!token || !username) return res.status(400).send('Missing token or username');
+
+    let params = new URLSearchParams();
+    params.append('client_id', process.env.CLIENT_ID);
+    params.append('client_secret', process.env.CLIENT_SECRET);
+    params.append('code', token);
+    params.append('grant_type', 'authorization_code');
+    params.append('redirect_uri', `https://domdimabot.com/login`);
+
+    let response = await fetch(`https://id.twitch.tv/oauth2/token?${params}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+    });
+
+    let data = await response.json();
+
+    if(data.error) {
+        logger(data, true, username, 'auth_token_reauth');
+        return res.status(400).send(data.error);
+    }
+
+    const { access_token, refresh_token, id_token } = data;
+
+    const encryptedToken = encrypt(access_token);
+    const encryptedRefreshToken = encrypt(refresh_token);
+
+    try {
+        await channelSchema.findOneAndUpdate({name: username}, {
+            twitch_user_token: encryptedToken,
+            twitch_user_refresh_token: encryptedRefreshToken,
+            twitch_user_token_id: id_token,
+            actived: true,
+            up_to_date_twitch_permissions: true,
+        });
+
+        await STREAMERS.updateStreamers();
+        let streamer = await STREAMERS.getStreamerByName(username);
+
+        if (streamer) {
+            await connectChannel(streamer.name);
+        }
+
+        return res.redirect(`https://domdimabot.com/login`);
+
+    } catch (error) {
+        logger(error, true, username, 'reauth');
+        return res.status(500).send('Internal server error');
+    }
+
+});
+
 router.post('/login', auth, async (req, res) => {
     const {name, id, email} = req.body;
 
@@ -174,6 +231,7 @@ router.post('/login', auth, async (req, res) => {
                 actived: exists.actived,
                 chat_enabled: exists.chat_enabled,
                 twitch_user_id: exists.twitch_user_id,
+                up_to_date_twitch_permissions: exists.up_to_date_twitch_permissions,
             }
         });
     } else {
@@ -215,9 +273,12 @@ router.post('/login', auth, async (req, res) => {
                 actived: newChannel.actived,
                 chat_enabled: newChannel.chat_enabled,
                 twitch_user_id: newChannel.twitch_user_id,
+                up_to_date_twitch_permissions: newChannel.up_to_date_twitch_permissions,
             }
         });
     }
 })
+
+
 
 module.exports = router;

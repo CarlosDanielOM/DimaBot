@@ -58,6 +58,15 @@ async function poll(action, channelID, argument) {
     
     let opt = argument.split(';');
 
+    if (opt.length < 3) {
+        return {
+            error: true,
+            message: 'Invalid arguments. Usage: Title;Option1/Option2;Duration',
+            status: 400,
+            type: 'error'
+        }
+    }
+
     //! TODO: Fix choices for better error handling if nothing to split
     let choices = opt[1].split('\/').map(choice => {
         return {
